@@ -1,0 +1,8 @@
+.gradle/
+build/*
+*/build/*
+projectFilesBackup/
+out/
+*.iml
+*.ipr
+*.iws

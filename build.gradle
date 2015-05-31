@@ -1,0 +1,30 @@
+apply plugin: 'maven'
+apply plugin: 'scala'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+apply plugin: 'java-library-distribution'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.11.4'
+    compile 'org.scala-lang:scala-compiler:2.11.4'
+}
+
+distributions {
+    main {
+        contents {
+            into('deploy') {
+                from(jar)
+            }
+        }
+    }
+}
+
+dependencies {
+    testCompile "junit:junit:4.11"
+}
+
