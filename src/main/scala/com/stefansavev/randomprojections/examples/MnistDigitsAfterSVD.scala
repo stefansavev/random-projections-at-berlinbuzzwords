@@ -1,5 +1,6 @@
 package com.stefansavev.randomprojections.examples
 
+import java.io.PrintWriter
 import com.stefansavev.randomprojections.datarepr.dense.{DataFrameOptions, DataFrameView, DenseRowStoredMatrixViewBuilderFactory, RowStoredMatrixView}
 import com.stefansavev.randomprojections.file.CSVFileOptions
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
@@ -20,13 +21,16 @@ object MnistDigitsAfterSVD {
   }
 
   def main (args: Array[String]): Unit = {
-    val inputFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")
+    val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")
     val indexFile = Utils.combinePaths(ExamplesSettings.outputDirectory, "mnist/svdpreprocessed-index")
+    val testFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/test.csv")
+    val predictionsOnTestFile = Utils.combinePaths(ExamplesSettings.outputDirectory, "mnist/predictions-test-svd.csv")
 
     val doTrain = true
     val doSearch = true
+    val doTest = true
 
-    val dataset = loadData(inputFile)
+    val dataset = loadData(trainFile)
 
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=100,
@@ -67,5 +71,40 @@ object MnistDigitsAfterSVD {
         throw new IllegalStateException("broke it")
       }
     }
+
+    if (doTest){
+      val testDataset = loadData(testFile)
+      println(testDataset)
+      val treesFromFile = RandomTrees.fromFile(indexFile)
+
+      val searcherSettings = SearcherSettings (
+        bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 100),
+        pointScoreSettings = PointScoreSettings(topKCandidates = 100, rescoreExactlyTopK = 100),
+        randomTrees = treesFromFile,
+        trainingSet = dataset)
+
+      val searcher = new NonThreadSafeSearcher(searcherSettings)
+
+      PerformanceCounters.initialize()
+      val allNN = Utils.timed("Search all Nearest neighbors", {
+        AllNearestNeighborsForDataset.getTopNearestNeighborsForAllPointsTestDataset(100, searcher, testDataset)
+      }).result
+      writePredictionsInKaggleFormat(predictionsOnTestFile, allNN)
+      //expected score on kaggle: 0.97557
+    }
+  }
+
+  def writePredictionsInKaggleFormat(outputFile: String, allKnns: Array[KNNS]): Unit = {
+    val writer = new PrintWriter(outputFile)
+    writer.println("ImageId,Label")
+    var i = 0
+    while(i < allKnns.length){
+      val topNNLabel = allKnns(i).neighbors(0).label
+      val pointId = i + 1
+      val asStr = s"${pointId},${topNNLabel}"
+      writer.println(asStr)
+      i += 1
+    }
+    writer.close()
   }
 }
