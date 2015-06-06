@@ -42,6 +42,7 @@ class IndexImpl(val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2La
       }
       i += 1
     }
+    countsOfCounts(0) = 0
   }
 
   def clearCountsWithoutWeights(bucketIds: Array[Int], pointCounts: Array[Int], pruningThreshold: Int, maxIndex: Int, countsOfCounts: Array[Int], buffer: Array[KNN]): Unit = {

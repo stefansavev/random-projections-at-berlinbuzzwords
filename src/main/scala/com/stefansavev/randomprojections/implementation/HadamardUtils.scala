@@ -5,11 +5,10 @@ object HadamardUtils {
   val eps = 0.0001
 
   def recurse(from: Int, to: Int, input: Array[Double], output: Array[Double]): Unit = {
-    /*if (to - from == 1){
+    if (to - from == 1){
       output(from) = input(from)
     }
-    else*/
-    if (to - from == 2){
+    else if (to - from == 2){
       val a = input(from)
       val b = input(from + 1)
       output(from) = a + b
