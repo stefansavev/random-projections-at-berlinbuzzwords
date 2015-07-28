@@ -252,15 +252,16 @@ object RandomTreeSerializer{
 object RandomTreesSerializer{
   import ImplicitSerializers._
   def toBinary(outputStream: OutputStream, randomTrees: RandomTrees): Unit = {
+    SplitStrategySerializer.toBinary(outputStream, randomTrees.datasetSplitStrategy)
     ColumnHeaderSerializer.toBinary(outputStream, randomTrees.header)
     outputStream.writeInt(randomTrees.trees.length)
     for(tree <- randomTrees.trees){
       RandomTreeSerializer.toBinary(outputStream, tree)
     }
-
   }
 
   def fromBinary(inputStream: InputStream, invIndex: IndexImpl): RandomTrees = {
+    val splitStrategy = SplitStrategySerializer.fromBinary(inputStream)
     val header = ColumnHeaderSerializer.fromBinary(inputStream)
 
     val numTrees = inputStream.readInt()
@@ -271,7 +272,26 @@ object RandomTreesSerializer{
       trees(i) = tree
       i += 1
     }
-    new RandomTrees(header, invIndex, trees)
+    new RandomTrees(splitStrategy, header, invIndex, trees)
+  }
+}
+object SplitStrategySerializer{
+  import ImplicitSerializers._
+
+  def toBinary(stream: OutputStream, splitStrategy: DatasetSplitStrategy): Unit = {
+    val tag = splitStrategy match {
+      case h: HadamardProjectionSplitStrategy => 0
+      case d: DataInformedSplitStrategy => 1
+    }
+    stream.writeInt(tag)
+  }
+
+  def fromBinary(stream: java.io.InputStream): DatasetSplitStrategy = {
+    val id = stream.readInt()
+    id match{
+      case 0 => new HadamardProjectionSplitStrategy()
+      case 1 => new DataInformedSplitStrategy()
+    }
   }
 }
 

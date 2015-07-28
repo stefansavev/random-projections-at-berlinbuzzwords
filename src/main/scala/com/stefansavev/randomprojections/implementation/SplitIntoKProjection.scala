@@ -66,5 +66,8 @@ case class SplitIntoKProjectionSettings(k: Int)
 
 class SplitIntoKProjectionBuilder(builderSettings: SplitIntoKProjectionSettings) extends ProjectionStrategyBuilder{
   type T = SplitIntoKProjectionStrategy
+  val splitStrategy: DatasetSplitStrategy = new HadamardProjectionSplitStrategy()
+
   def build(settings: IndexSettings, rnd: Random, dataFrameView:DataFrameView): T = SplitIntoKProjectionStrategy(rnd, dataFrameView.numCols, builderSettings.k)
+  def datasetSplitStrategy: DatasetSplitStrategy = splitStrategy
 }

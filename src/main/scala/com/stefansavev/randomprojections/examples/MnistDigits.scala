@@ -32,7 +32,7 @@ object MnistDigits {
       maxPntsPerBucket=100,
       numTrees=40,
       maxDepth = None,
-      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(16),
+      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(16), //.dataInformedProjectionStrategy(), // .splitIntoKRandomProjection(16),
       randomSeed = 39393
     )
 
@@ -41,7 +41,7 @@ object MnistDigits {
     if (doTrain) {
       val trees =
           Utils.timed("Build index", {
-          IndexBuilder.buildWithPreprocessing(4 * 128, settings = randomTreeSettings, dataFrameView = dataset)
+          IndexBuilder.buildWithPreprocessing(/*4 * */128, settings = randomTreeSettings, dataFrameView = dataset)
         }).result
       trees.toFile(indexFile)
     }

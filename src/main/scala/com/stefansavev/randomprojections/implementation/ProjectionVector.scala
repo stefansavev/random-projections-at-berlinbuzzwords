@@ -22,6 +22,7 @@ trait ProjectionStrategy{
 trait ProjectionStrategyBuilder{
   type T <: ProjectionStrategy
   def build(settings: IndexSettings, rnd: Random, dataFrameView: DataFrameView): T
+  def datasetSplitStrategy: DatasetSplitStrategy
 }
 
 class SearchBucketsResult(numFeatures: Int, scratch: NearestNeigbhorQueryScratchBuffer){

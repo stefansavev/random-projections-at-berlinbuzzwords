@@ -12,7 +12,7 @@ case class SearcherSettings(bucketSearchSettings: BucketSearchSettings,
                             usesPointWeights: Boolean = false){
   def createBucketSearchStrategy(): BucketSearchStrategy = {
     bucketSearchSettings match {
-      case pqBasedSettings: PriorityQueueBasedBucketSearchSettings => new PriorityQueueBasedBucketSearchStrategy(pqBasedSettings)
+      case pqBasedSettings: PriorityQueueBasedBucketSearchSettings => new PriorityQueueBasedBucketSearchStrategy(randomTrees.datasetSplitStrategy, pqBasedSettings)
     }
   }
 }

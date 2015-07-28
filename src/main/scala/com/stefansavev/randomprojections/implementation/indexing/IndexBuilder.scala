@@ -20,55 +20,6 @@ class Point2LeavesMapImpl(map: scala.collection.mutable.HashMap[Int, Array[(Int,
 }
 
 object IndexBuilder{
-
-  def getBucketIndex(tmpInput: Array[Double], tmpOutput: Array[Double]): Int = {
-    val dim = tmpInput.length
-    var i = 0
-    var sum = 0.0
-    while(i < dim){
-      val p = tmpInput(i)
-      tmpInput(i) = p
-      sum += p*p
-      i += 1
-    }
-
-    sum = Math.sqrt(sum + HadamardUtils.eps)
-    i = 0
-    while(i < dim){
-      tmpInput(i) /= sum
-      i += 1
-    }
-
-    HadamardUtils.multiplyInto(dim, tmpInput, tmpOutput)
-    val bucketIndex = HadamardUtils.argAbsValueMax(dim, tmpOutput)
-    bucketIndex
-  }
-
-  def splitDataset(inputData: DataFrameView, abstractProjVector: AbstractProjectionVector): (Array[DataFrameView], Array[Double])  = {
-    val signs: SparseVector = abstractProjVector.asInstanceOf[HadamardProjectionVector].signs
-    val dim = signs.ids.length
-    val numberOfOutputs = 2*dim + 1
-    //TODO:
-    val tmpInput = Array.ofDim[Double](dim)
-    val tmpOutput = Array.ofDim[Double](numberOfOutputs)
-
-    val pointIndexes = inputData.getUnderlyingIndexes()
-
-    val splits = Array.ofDim[IntArrayBuffer](numberOfOutputs).map(_=> new IntArrayBuffer())
-
-    var i = 0
-    while(i < pointIndexes.size){
-      val rowId = pointIndexes(i)
-      inputData.multiplyRowComponentWiseBySparseVector(rowId, signs, tmpInput)
-      val bestIdx = getBucketIndex(tmpInput, tmpOutput)
-      splits(bestIdx) += rowId
-      i += 1
-    }
-    val childFrames =  splits.map(buf => inputData.childView(PointIndexes(buf.toArray)))
-    val means = Array.ofDim[Double](dim) //TODO: right now the means are not used
-    (childFrames, means)
-  }
-
   class Counter(){
     var index = 0
 
@@ -83,6 +34,7 @@ object IndexBuilder{
                  settings: IndexSettings,
                  inputDataView: DataFrameView,
                  collector: BucketCollector,
+                 splitStrategy: DatasetSplitStrategy,
                  projStrategy: ProjectionStrategy,
                  logger: IndexCounters): RandomTree = {
 
@@ -102,7 +54,7 @@ object IndexBuilder{
       else {
         val nodeId = counter.next() //for debugging purposes
         val projectionVector = projStrategy.nextRandomProjection(depth, dataFrameView)
-        val (splits, means) = splitDataset(dataFrameView, projectionVector)
+        val (splits, means) = splitStrategy.splitDataset(dataFrameView, projectionVector)
 
         var m = 0
         var numFull = 0
@@ -181,13 +133,14 @@ object IndexBuilder{
     val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
     val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, dataFrameView)
+    val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
     val logger = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
     for(i <- 0 until settings.numTrees){
-      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, dataFrameView, bucketCollector, projStrategy, logger)}).result
+      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, dataFrameView, bucketCollector, splitStrategy, projStrategy, logger)}).result
       randomTrees(i) = randomTree
     }
-    new RandomTrees(dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(dataFrameView.getAllLabels()), randomTrees)
   }
 
   def buildWithPreprocessing(numInterProj: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
@@ -200,14 +153,16 @@ object IndexBuilder{
     val newDataFrameView = new DataFrameView(newIndexes, dataFrameView.rowStoredView)
     val newProjS = ProjectionStrategies.splitIntoKRandomProjection(numInterProj).build(settings, rnd, dataFrameView)
     var savedRes: (AbstractProjectionVector, DataFrameView) = null
+    val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
     for(i <- 0 until settings.numTrees){
       savedRes = modifyDataFrame(newDataFrameView, newProjS)
       val (absProjV, modDF) = savedRes
       val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, modDF)
-      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, modDF, bucketCollector, projStrategy, logger)}).result
+      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, modDF, bucketCollector, splitStrategy, projStrategy, logger)}).result
       randomTrees(i) = RandomTreeNodeRoot(absProjV, randomTree)
     }
-    new RandomTrees(dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(dataFrameView.getAllLabels()), randomTrees)
+
+    new RandomTrees(splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(dataFrameView.getAllLabels()), randomTrees)
   }
 
 }
