@@ -120,7 +120,7 @@ class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val label
       offset += 1
       j += 1
     }
-    2.0 - 2.0*sum
+    1.0 - 0.5*sum
   }
 
   def getLabel(rowId: Int): Int = labels(rowId)

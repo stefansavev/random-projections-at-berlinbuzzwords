@@ -92,6 +92,27 @@ object DoubleSerializer{
   }
 }
 
+object LongSerializer{
+  val bytes = Array.ofDim[Byte](8)
+  def toByteArray(value: Long): Array[Byte] = {
+    ByteBuffer.wrap(bytes).putLong(value)
+    bytes
+  }
+
+  def toLong(bytes:  Array[Byte]): Long = {
+    return ByteBuffer.wrap(bytes).getLong()
+  }
+
+  def write(outputStream: OutputStream, value: Long): Unit = {
+    outputStream.write(toByteArray(value))
+  }
+
+  def read(inputStream: InputStream): Long = {
+    inputStream.read(bytes)
+    toLong(bytes)
+  }
+}
+
 object DoubleArraySerializer{
   def write(outputStream: OutputStream, values: Array[Double]): Unit = {
     IntSerializer.write(outputStream, values.length)
@@ -108,6 +129,28 @@ object DoubleArraySerializer{
     var i = 0
     while(i < len){
       values(i) = DoubleSerializer.read(inputStream)
+      i += 1
+    }
+    values
+  }
+}
+
+object LongArraySerializer{
+  def write(outputStream: OutputStream, values: Array[Long]): Unit = {
+    IntSerializer.write(outputStream, values.length)
+    var i = 0
+    while(i < values.length){
+      LongSerializer.write(outputStream, values(i))
+      i += 1
+    }
+  }
+
+  def read(inputStream: InputStream): Array[Long] = {
+    val len = IntSerializer.read(inputStream)
+    val values = Array.ofDim[Long](len)
+    var i = 0
+    while(i < len){
+      values(i) = LongSerializer.read(inputStream)
       i += 1
     }
     values
@@ -141,6 +184,99 @@ object ImplicitSerializers{
 
 }
 
+object SignatureVectorsSerializer{
+  import ImplicitSerializers._
+
+  def toBinary(outputStream: OutputStream, sigVectors: SignatureVectors): Unit = {
+    val vectors = sigVectors.signatureVectors
+    val len = vectors.length
+    outputStream.writeInt(len)
+    var i = 0
+    while(i < len){
+      SparseVectorSerializer.toBinary(outputStream, vectors(i))
+      i += 1
+    }
+  }
+
+  def fromBinary(inputStream: InputStream): SignatureVectors = {
+    val len = inputStream.readInt()
+    val vectors = Array.ofDim[SparseVector](len)
+    var i = 0
+    while(i < len){
+      vectors(i) = SparseVectorSerializer.fromBinary(inputStream)
+      i += 1
+    }
+    new SignatureVectors(vectors)
+  }
+}
+
+object PointSignaturesSerializer{
+  import ImplicitSerializers._
+
+  def toBinary(outputStream: OutputStream, pointSignatures: PointSignatures): Unit = {
+    val signatures = pointSignatures.pointSignatures
+    val len = signatures.length
+    outputStream.writeInt(len)
+    var i = 0
+    while(i < len){
+      LongArraySerializer.write(outputStream, signatures(i))
+      i += 1
+    }
+  }
+
+  def fromBinary(inputStream: InputStream): PointSignatures = {
+    val len = inputStream.readInt()
+    val vectors = Array.ofDim[Array[Long]](len)
+    var i = 0
+    while(i < len){
+      vectors(i) = LongArraySerializer.read(inputStream)
+      i += 1
+    }
+    new PointSignatures(vectors)
+  }
+}
+
+object SparseVectorSerializer{
+  import ImplicitSerializers._
+  def toBinary(outputStream: OutputStream, vec: SparseVector): Unit = {
+    outputStream.writeInt(vec.dim)
+    val len = vec.ids.length
+    outputStream.writeInt(len)
+    var i = 0
+    while(i < len){
+      outputStream.writeInt(vec.ids(i))
+      i += 1
+    }
+    i = 0
+    while(i < len){
+      DoubleSerializer.write(outputStream, vec.values(i))
+      i += 1
+    }
+  }
+
+  def fromBinary(inputStream: InputStream): SparseVector = {
+    val dim = inputStream.readInt()
+    val len = inputStream.readInt()
+    val ids = Array.ofDim[Int](len)
+    val values = Array.ofDim[Double](len)
+
+    var i = 0
+    while(i < len){
+      ids(i) = inputStream.readInt()
+      i += 1
+    }
+
+    i = 0
+    while(i < len){
+      values(i) = DoubleSerializer.read(inputStream)
+      i += 1
+    }
+
+    new SparseVector(dim, ids, values)
+  }
+}
+
+//TODO: use sparse vector serialializer
 object ProjectionVectorSerializer{
   import ImplicitSerializers._
   def toBinary(outputStream: OutputStream, projVec: AbstractProjectionVector): Unit = {
@@ -252,6 +388,7 @@ object RandomTreeSerializer{
 object RandomTreesSerializer{
   import ImplicitSerializers._
   def toBinary(outputStream: OutputStream, randomTrees: RandomTrees): Unit = {
+    SignatureVectorsSerializer.toBinary(outputStream, randomTrees.signatureVecs)
     SplitStrategySerializer.toBinary(outputStream, randomTrees.datasetSplitStrategy)
     ColumnHeaderSerializer.toBinary(outputStream, randomTrees.header)
     outputStream.writeInt(randomTrees.trees.length)
@@ -261,6 +398,7 @@ object RandomTreesSerializer{
   }
 
   def fromBinary(inputStream: InputStream, invIndex: IndexImpl): RandomTrees = {
+    val sigVectors = SignatureVectorsSerializer.fromBinary(inputStream)
     val splitStrategy = SplitStrategySerializer.fromBinary(inputStream)
     val header = ColumnHeaderSerializer.fromBinary(inputStream)
 
@@ -272,7 +410,7 @@ object RandomTreesSerializer{
       trees(i) = tree
       i += 1
     }
-    new RandomTrees(splitStrategy, header, invIndex, trees)
+    new RandomTrees(sigVectors, splitStrategy, header, invIndex, trees)
   }
 }
 object SplitStrategySerializer{

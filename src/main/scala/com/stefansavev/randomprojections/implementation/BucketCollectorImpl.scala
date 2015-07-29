@@ -28,10 +28,10 @@ class BucketCollectorImpl(totalRows: Int) extends BucketCollector{
     result
   }
 
-  def build(labels: Array[Int]): Index = {
+  def build(pointSignatures: PointSignatures, labels: Array[Int]): Index = {
     starts += globalIndex
     val leaf2Points = new Leaf2Points(getIntArrayAndClear(starts), getIntArrayAndClear(pointIds))
-    val index = new IndexImpl(labels.length, leaf2Points, labels)
+    val index = new IndexImpl(pointSignatures, labels.length, leaf2Points, labels)
     index
   }
 

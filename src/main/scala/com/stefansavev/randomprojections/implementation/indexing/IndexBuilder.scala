@@ -136,11 +136,13 @@ object IndexBuilder{
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
     val logger = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
+    val (signatureVecs, signatures) = Signatures.computePointSignatures(2, rnd, dataFrameView)
+    dataFrameView.setPointSignatures(signatures)
     for(i <- 0 until settings.numTrees){
       val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, dataFrameView, bucketCollector, splitStrategy, projStrategy, logger)}).result
       randomTrees(i) = randomTree
     }
-    new RandomTrees(splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 
   def buildWithPreprocessing(numInterProj: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
@@ -154,6 +156,8 @@ object IndexBuilder{
     val newProjS = ProjectionStrategies.splitIntoKRandomProjection(numInterProj).build(settings, rnd, dataFrameView)
     var savedRes: (AbstractProjectionVector, DataFrameView) = null
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
+    val (signatureVecs, signatures) = Signatures.computePointSignatures(2, rnd, dataFrameView)
+    dataFrameView.setPointSignatures(signatures)
     for(i <- 0 until settings.numTrees){
       savedRes = modifyDataFrame(newDataFrameView, newProjS)
       val (absProjV, modDF) = savedRes
@@ -162,7 +166,7 @@ object IndexBuilder{
       randomTrees(i) = RandomTreeNodeRoot(absProjV, randomTree)
     }
 
-    new RandomTrees(splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 
 }

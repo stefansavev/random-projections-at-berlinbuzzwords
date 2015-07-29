@@ -1,6 +1,7 @@
 package com.stefansavev.randomprojections.datarepr.dense
 
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+import com.stefansavev.randomprojections.implementation.PointSignatures
 
 case class PointIndexes(indexes: Array[Int]){
   def size = indexes.length
@@ -8,9 +9,17 @@ case class PointIndexes(indexes: Array[Int]){
 }
 
 class DataFrameView(val indexes: PointIndexes, val rowStoredView: RowStoredMatrixView) {
+  var pointSignatures: PointSignatures = null //work around until the concept is validated
   def numRows: Int = indexes.size
   def numCols: Int = rowStoredView.numCols
 
+  def setPointSignatures(pointSignatures: PointSignatures): Unit = {
+    this.pointSignatures = pointSignatures
+  }
+
+  def getPointSignatures(): PointSignatures = {
+    this.pointSignatures
+  }
 
   def getPointAsDenseVector(pntId: Int): Array[Double] = {
     rowStoredView.getPointAsDenseVector(pntId)

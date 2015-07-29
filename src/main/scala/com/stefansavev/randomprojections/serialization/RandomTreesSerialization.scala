@@ -10,8 +10,10 @@ import scala.collection.mutable.ArrayBuffer
 
 object InvertedIndexSerializer{
   def fromFile(file: File): IndexImpl = {
+
     val deser = new BinaryFileDeserializer(file)
 
+    val signatures = PointSignaturesSerializer.fromBinary(deser.stream)
     val leafArrays = deser.getIntArrays(2)
     val numLeaves = deser.getInt()
 
@@ -19,13 +21,15 @@ object InvertedIndexSerializer{
 
     val labels = deser.getIntArray()
 
-    val index = new IndexImpl(numPoints, new Leaf2Points(leafArrays(0), leafArrays(1)),
+    val index = new IndexImpl(signatures, numPoints, new Leaf2Points(leafArrays(0), leafArrays(1)),
       /*new Point2Leaves(pointArrays(0), pointArrays(1), numPoints),*/ labels)
 
     deser.close()
     index
   }
 }
+
+
 
 object RandomTreesSerialization{
 

@@ -22,20 +22,21 @@ object TestOnRandomData {
 
       val randomTreeSettings = IndexSettings(
         maxPntsPerBucket=10,
-        numTrees=1000,
+        numTrees=10,
         maxDepth = None,
-        projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(2),
+        projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(), //.splitIntoKRandomProjection(2),
         randomSeed = 39393
       )
 
       println("Number of Rows: " + randomBitStringsDataset.numRows)
 
       val trees = Utils.timed("Build Index", {
-        IndexBuilder.buildWithPreprocessing(256, settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
+        //IndexBuilder.buildWithPreprocessing(256, settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
+        IndexBuilder.build(settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
       }).result
 
       val searcherSettings = SearcherSettings (
-        bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 10),
+        bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 1000),
         pointScoreSettings = PointScoreSettings(topKCandidates = 100, rescoreExactlyTopK = 100),
         randomTrees = trees,
         trainingSet = randomBitStringsDataset)

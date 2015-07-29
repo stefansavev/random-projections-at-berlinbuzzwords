@@ -4,12 +4,13 @@ import java.io.File
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer
 import com.stefansavev.randomprojections.interface.Index
-import com.stefansavev.randomprojections.serialization.BinaryFileSerializer
+import com.stefansavev.randomprojections.serialization.{PointSignaturesSerializer, BinaryFileSerializer}
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 
-class IndexImpl(val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2Label: Array[Int]) extends Index{
+class IndexImpl(val signatures: PointSignatures, val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2Label: Array[Int]) extends Index{
   def toFile(file: File): Unit = {
     val ser = new BinaryFileSerializer(file)
+    PointSignaturesSerializer.toBinary(ser.stream, signatures)
     ser.putIntArrays(leaf2Points.starts, leaf2Points.points)
     ser.putInt(leaf2Points.numberOfLeaves())
 
@@ -20,9 +21,12 @@ class IndexImpl(val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2La
     ser.close()
   }
 
-  def fillCountsWithoutWeights(bucketIds: Array[Int], pointCounts: Array[Int], maxIndex: Int, countsOfCounts: Array[Int]): Unit = {
+  def fillCountsWithoutWeights(query: Array[Double], settings: SearcherSettings, trainingSet: DataFrameView, bucketIds: Array[Int], pointCounts: Array[Int], maxIndex: Int, countsOfCounts: Array[Int]): Unit = {
+    val signatures = this.signatures
+    val sigVectors = settings.randomTrees.signatureVecs
+    val querySigs = sigVectors.computePointSignatures(query)
     val leafEnd = bucketIds.length
-    var i = 0 //leafStart
+    var i = 0
 
     while (i < leafEnd) {
       val leaf = bucketIds(i)
@@ -33,11 +37,13 @@ class IndexImpl(val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2La
       while (j < pointsEnd) {
         val pointId = leaf2Points.points(j)
         val prevCount = pointCounts(pointId)
+        val inc = if (prevCount == 0) {1 + signatures.overlap(querySigs, pointId)} else 1
+
         if (prevCount < maxIndex){
           countsOfCounts(prevCount) -= 1
-          countsOfCounts(prevCount + 1) += 1
+          countsOfCounts(prevCount + inc) += 1
         }
-        pointCounts(pointId) = prevCount + 1
+        pointCounts(pointId) = prevCount + inc
         j += 1
       }
       i += 1
@@ -114,7 +120,7 @@ class IndexImpl(val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2La
     }
   }
 
-  def fillDistances(query: Array[Double], rescoreExactlyTopK: Int, buffer: Array[KNN], trainingSet: DataFrameView): Unit = {
+  def fillDistances(query: Array[Double], rescoreExactlyTopK: Int, buffer: Array[KNN], settings: SearcherSettings, trainingSet: DataFrameView): Unit = {
     var i = 0
     while(i < buffer.length){
       val knn = buffer(i)
@@ -133,11 +139,11 @@ class IndexImpl(val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2La
     //val bucketScores = if (usesWeights) (searchBucketsResult.bucketScoreBuffer.toArray()) else null TODO
     val pointCounts = scratchBuffer.pointCounts
     val dataset = settings.trainingSet
-    val maxIndex = settings.randomTrees.trees.length //number of trees
+    val maxIndex = 64*settings.randomTrees.signatureVecs.numSignatures + settings.randomTrees.trees.length //number of trees
     val countsOfCounts = Array.ofDim[Int](maxIndex + 1) //a point can appear in at most 100 trees
 
     //Stage 1: Fill the counts of the points (in how many trees(buckets) does the point appear)
-    fillCountsWithoutWeights(bucketIds, pointCounts, maxIndex, countsOfCounts)
+    fillCountsWithoutWeights(query, settings, dataset, bucketIds, pointCounts, maxIndex, countsOfCounts)
 
     //Stage 2: extract the counts and clear the memory
     val (pruningThreshold, expectedCounts) = getPruningThreshold(maxIndex, countsOfCounts, settings.pointScoreSettings.topKCandidates)
@@ -153,7 +159,7 @@ class IndexImpl(val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2La
     //val sortedArray = java.util.Arrays.sort .sortBy(-_.similarity) //notice doing it by similarity
     PerformanceCounters.sortedPointsDuringSearch(buffer.size)
 
-    fillDistances(query, settings.pointScoreSettings.rescoreExactlyTopK, buffer, dataset)
+    fillDistances(query, settings.pointScoreSettings.rescoreExactlyTopK, buffer, settings, dataset)
 
     java.util.Arrays.sort(buffer, new KNNDistanceComparator())
     //val topK: Array[KVPair] = buffer.take(k)

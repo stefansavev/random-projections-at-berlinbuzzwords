@@ -34,7 +34,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
 
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=10,
-      numTrees=10,
+      numTrees=5,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(),
       randomSeed = 39393
@@ -54,7 +54,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
 
       val searcherSettings = SearcherSettings (
         bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 100),
-        pointScoreSettings = PointScoreSettings(topKCandidates = 100, rescoreExactlyTopK = 100),
+        pointScoreSettings = PointScoreSettings(topKCandidates = 50, rescoreExactlyTopK = 50),
         randomTrees = treesFromFile,
         trainingSet = dataset)
 

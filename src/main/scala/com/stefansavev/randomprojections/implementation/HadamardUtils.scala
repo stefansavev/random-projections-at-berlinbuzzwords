@@ -2,6 +2,7 @@ package com.stefansavev.randomprojections.implementation
 
 object HadamardUtils {
   //assume k is a power of 2
+  //TODO: make it work without k being a power of 2
   val eps = 0.0001
 
   def recurse(from: Int, to: Int, input: Array[Double], output: Array[Double]): Unit = {

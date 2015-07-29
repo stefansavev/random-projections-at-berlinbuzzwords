@@ -33,8 +33,8 @@ object MnistDigitsAfterSVD {
     val dataset = loadData(trainFile)
 
     val randomTreeSettings = IndexSettings(
-      maxPntsPerBucket=100,
-      numTrees=40,
+      maxPntsPerBucket=10,
+      numTrees=10,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(2),
       randomSeed = 39393
