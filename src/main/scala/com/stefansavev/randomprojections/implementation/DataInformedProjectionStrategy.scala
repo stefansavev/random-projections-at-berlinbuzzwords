@@ -65,7 +65,7 @@ class OnlineVariance(k: Int) {
 }
 
 case class DataInformedProjectionStrategy(rnd: Random, numCols: Int) extends ProjectionStrategy{
-  def nextRandomProjection(depth: Int, view: DataFrameView): AbstractProjectionVector = {
+  def nextRandomProjection(depth: Int, view: DataFrameView, prevProjVector: AbstractProjectionVector): AbstractProjectionVector = {
     val indexes = view.indexes.indexes
     val a = rnd.nextInt(indexes.length)
     val b0 = rnd.nextInt(indexes.length - 1)

@@ -16,7 +16,7 @@ case class HadamardProjectionVector(signs: SparseVector) extends AbstractProject
 }
 
 trait ProjectionStrategy{
-  def nextRandomProjection(depth: Int, view: DataFrameView): AbstractProjectionVector
+  def nextRandomProjection(depth: Int, view: DataFrameView, prevProjection: AbstractProjectionVector): AbstractProjectionVector
 }
 
 trait ProjectionStrategyBuilder{

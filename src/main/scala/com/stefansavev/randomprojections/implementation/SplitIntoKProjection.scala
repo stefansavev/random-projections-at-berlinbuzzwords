@@ -53,7 +53,7 @@ case class SplitIntoKProjectionStrategy(rnd: Random, numCols: Int, k: Int) exten
       buff.toArray
   }
 
-  def nextRandomProjection(depth: Int, view: DataFrameView): AbstractProjectionVector = {
+  def nextRandomProjection(depth: Int, view: DataFrameView, projectionVector: AbstractProjectionVector): AbstractProjectionVector = {
     val useK = HadamardUtils.largestPowerOf2(k)
     val chosenDim = chooseKDimensions(useK)
     val randomVector = generateRandomVector(chosenDim)

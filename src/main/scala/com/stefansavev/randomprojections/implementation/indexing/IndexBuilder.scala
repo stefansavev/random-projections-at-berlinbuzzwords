@@ -39,7 +39,7 @@ object IndexBuilder{
                  logger: IndexCounters): RandomTree = {
 
     val counter = new Counter()
-    def loop(dataFrameView: DataFrameView, depth: Int, noProgressCount: Int): RandomTree = {
+    def loop(dataFrameView: DataFrameView, prevProjection: AbstractProjectionVector, depth: Int, noProgressCount: Int): RandomTree = {
       val hasReachedDepth = settings.maxDepth match {case None => false; case Some(v) => depth >= v}
       if (dataFrameView.numRows <= 0){
         EmptyLeaf //too little data
@@ -53,7 +53,7 @@ object IndexBuilder{
       }
       else {
         val nodeId = counter.next() //for debugging purposes
-        val projectionVector = projStrategy.nextRandomProjection(depth, dataFrameView)
+        val projectionVector = projStrategy.nextRandomProjection(depth, dataFrameView, prevProjection)
         val (splits, means) = splitStrategy.splitDataset(dataFrameView, projectionVector)
 
         var m = 0
@@ -65,7 +65,7 @@ object IndexBuilder{
           m += 1
         }
         if (numFull <= 1) {
-          loop(dataFrameView, depth, noProgressCount + 1)
+          loop(dataFrameView, prevProjection, depth, noProgressCount + 1)
         }
         else {
           val children = Array.ofDim[RandomTree](splits.size)
@@ -74,7 +74,7 @@ object IndexBuilder{
           while (i < splits.length) {
             val slice = splits(i)
             if (slice.numRows > 0){
-              val subTree = loop(slice, depth + 1, 0)
+              val subTree = loop(slice, projectionVector, depth + 1, 0)
               children(i) = subTree
               count += subTree.getCount
             }
@@ -86,7 +86,7 @@ object IndexBuilder{
         }
       }
     }
-    loop(inputDataView, 0, 0)
+    loop(inputDataView, null, 0, 0)
   }
 
 
@@ -103,7 +103,7 @@ object IndexBuilder{
     val newF = Array.range(0, newNumCols).map(i => (i.toString,i ))
     val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, Array.empty)
     val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
-    val absprojVec = projSt.nextRandomProjection(0, dataFrame)
+    val absprojVec = projSt.nextRandomProjection(0, dataFrame, null)
     val signs = absprojVec.asInstanceOf[HadamardProjectionVector].signs
     val vec = Array.ofDim[Double](dataFrame.numCols)
     val input = Array.ofDim[Double](signs.ids.length)
