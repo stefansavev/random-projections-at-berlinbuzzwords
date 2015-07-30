@@ -175,13 +175,19 @@ object HadamardUtils {
   }
 
   def multiplyInto(dim: Int, input: Array[Double], output: Array[Double]): Unit = {
-    val k = dim // largestPowerOf2(dim)
+    val k = dim
     var i = 0
     while(i < dim){
       output(i) = 0.0
       i += 1
     }
     recurse(0, k, input, output)
+  }
+
+  def roundUp(dim: Int): Int = {
+    val powOf2 = largestPowerOf2(dim)
+    val k = if (powOf2 == dim) dim else 2*powOf2
+    k
   }
 }
 

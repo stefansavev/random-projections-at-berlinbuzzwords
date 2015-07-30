@@ -142,8 +142,9 @@ object Signatures {
 
   def computePointSignature(signs: SparseVector, query: Array[Double]): Long = {
     val dim = signs.dim
-    val input = Array.ofDim[Double](dim)
-    val output = Array.ofDim[Double](dim)
+    val powOf2 = HadamardUtils.roundUp(dim)
+    val input = Array.ofDim[Double](powOf2)
+    val output = Array.ofDim[Double](powOf2)
     computePointSignature(signs, query, input, output)
   }
 
@@ -170,6 +171,12 @@ object Signatures {
 
     //TODO: move to function
     var j = 0
+    while(j < 0){
+      input(j)= 0.0
+      j += 1
+    }
+
+    j = 0
     while(j < signs.ids.length){
       val index = signs.ids(j)
       val b = signs.values(j)
@@ -178,7 +185,7 @@ object Signatures {
       j += 1
     }
 
-    HadamardUtils.multiplyInto(dim, input, output)
+    HadamardUtils.multiplyInto(input.length, input, output)
     val hash = vectorToHash(output)
     hash
   }
@@ -212,8 +219,9 @@ object Signatures {
     val signs = generateRandomVector(rnd, dim, Array.range(0, dim))
     val vec = Array.ofDim[Double](dataFrameView.numCols)
 
-    val input = Array.ofDim[Double](dim)
-    val output = Array.ofDim[Double](dim)
+    val powOf2 = HadamardUtils.roundUp(dim)
+    val input = Array.ofDim[Double](powOf2)
+    val output = Array.ofDim[Double](powOf2)
     val signatures = Array.ofDim[Long](dataFrameView.numRows)
     var i = 0
     while(i < dataFrameView.numRows){

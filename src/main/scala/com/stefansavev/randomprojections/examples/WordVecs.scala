@@ -89,7 +89,7 @@ object WordVecs {
     val debug =false
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=100,
-      numTrees=40,
+      numTrees=10,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(), //ProjectionStrategies.splitIntoKRandomProjection(32 /*2*8*/ /*16*//*64*/ /*2*32*/),
       randomSeed = 39393
