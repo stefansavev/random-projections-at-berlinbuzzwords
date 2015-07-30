@@ -34,7 +34,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
 
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=10,
-      numTrees=1,
+      numTrees=10,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(),
       randomSeed = 39393

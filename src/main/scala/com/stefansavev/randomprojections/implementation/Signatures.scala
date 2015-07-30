@@ -217,6 +217,8 @@ object Signatures {
   def computePointSignaturesHelper(rnd: Random, dataFrameView: DataFrameView): (SparseVector, Array[Long]) = {
     val dim = dataFrameView.numCols
     val signs = generateRandomVector(rnd, dim, Array.range(0, dim))
+    //generate the random vector based on the data
+    //val signs = (new DataInformedProjectionStrategy(rnd, dim)).nextRandomProjection(0, dataFrameView, null).asInstanceOf[HadamardProjectionVector].signs
     val vec = Array.ofDim[Double](dataFrameView.numCols)
 
     val powOf2 = HadamardUtils.roundUp(dim)

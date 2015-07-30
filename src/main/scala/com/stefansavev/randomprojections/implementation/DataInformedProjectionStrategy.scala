@@ -1,10 +1,8 @@
 package com.stefansavev.randomprojections.implementation
 
 import java.util.Random
-import com.stefansavev.randomprojections.buffers.IntArrayBuffer
-import com.stefansavev.randomprojections.datarepr.dense.{PointIndexes, DataFrameView}
+import com.stefansavev.randomprojections.datarepr.dense.{DataFrameView}
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.randomprojections.utils.RandomUtils
 
 class OnlineVariance(k: Int) {
   var n = 0.0
@@ -65,7 +63,50 @@ class OnlineVariance(k: Int) {
 }
 
 case class DataInformedProjectionStrategy(rnd: Random, numCols: Int) extends ProjectionStrategy{
-  def nextRandomProjection(depth: Int, view: DataFrameView, prevProjVector: AbstractProjectionVector): AbstractProjectionVector = {
+  def nextRandomProjection(depth: Int, view: DataFrameView, prevProjection: AbstractProjectionVector): AbstractProjectionVector = {
+    val indexes = view.indexes.indexes
+
+    val proj = Array.ofDim[Double](view.numCols)
+
+    val replacements = new scala.collection.mutable.HashMap[Int, Int]()
+    //TODO: must guarantee that for different trees we end up with different vectors
+    //sample numSamples(256) vectors without replacement
+    //if the vectors are a b c d e f, compute a + b - c + d - e + f
+    val numSamples = Math.min(256, indexes.length - 1)
+    var j = 0
+    while(j < numSamples){
+      var b = rnd.nextInt(indexes.length - j)
+      if (replacements.contains(b)){
+        b = replacements(b)
+      }
+      replacements += ((b, indexes.length - j - 1))
+      val pnt = view.getPointAsDenseVector(b)
+      val sign = (if (j % 2 == 0) 1.0 else - 1.0)
+      var i = 0
+      while(i < pnt.length){
+        proj(i) += sign* pnt(i)
+        i += 1
+      }
+      j += 1
+    }
+
+    var norm = 0.0
+    var i = 0
+    while(i < proj.length){
+      norm += proj(i)*proj(i)
+      i += 1
+    }
+    norm = Math.sqrt(norm + 0.001)
+    i = 0
+    while(i < proj.length){
+      proj(i) /= norm
+      i += 1
+    }
+    val randomVector = new SparseVector(numCols, Array.range(0, numCols), proj)
+    new HadamardProjectionVector(randomVector)
+  }
+
+  def nextRandomProjection1(depth: Int, view: DataFrameView, prevProjVector: AbstractProjectionVector): AbstractProjectionVector = {
     val indexes = view.indexes.indexes
     val a = rnd.nextInt(indexes.length)
     val b0 = rnd.nextInt(indexes.length - 1)
