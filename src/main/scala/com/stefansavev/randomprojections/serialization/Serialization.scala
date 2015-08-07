@@ -420,6 +420,7 @@ object SplitStrategySerializer{
     val tag = splitStrategy match {
       case h: HadamardProjectionSplitStrategy => 0
       case d: DataInformedSplitStrategy => 1
+      case n: NoSplitStrategy => 2
     }
     stream.writeInt(tag)
   }
@@ -429,6 +430,7 @@ object SplitStrategySerializer{
     id match{
       case 0 => new HadamardProjectionSplitStrategy()
       case 1 => new DataInformedSplitStrategy()
+      case 2 => new NoSplitStrategy()
     }
   }
 }

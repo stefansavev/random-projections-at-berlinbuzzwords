@@ -31,4 +31,15 @@ class PointSignatures(val pointSignatures: Array[Array[Long]]) {
     }
     sum
   }
+
+  def pointSignature(pointId: Int): Array[Long] = {
+    val output = Array.ofDim[Long](pointSignatures.length)
+    var i = 0
+    while(i < pointSignatures.length){
+      output(i) = pointSignatures(i)(pointId)
+      i += 1
+    }
+    output
+  }
+
 }

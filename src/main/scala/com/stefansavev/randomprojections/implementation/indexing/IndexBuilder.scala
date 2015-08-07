@@ -1,10 +1,8 @@
 package com.stefansavev.randomprojections.implementation.indexing
 
 import java.util.Random
-import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.implementation._
-import com.stefansavev.randomprojections.interface.{BucketCollector, Index}
 import com.stefansavev.randomprojections.interface.BucketCollector
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.utils.Utils
@@ -138,7 +136,11 @@ object IndexBuilder{
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
     val (signatureVecs, signatures) = Signatures.computePointSignatures(2, rnd, dataFrameView)
     dataFrameView.setPointSignatures(signatures)
-    for(i <- 0 until settings.numTrees){
+    val numTrees = projStrategy match {
+      case os: OnlySignaturesStrategy => 0
+      case _ => settings.numTrees
+    }
+    for(i <- 0 until numTrees){
       val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, dataFrameView, bucketCollector, splitStrategy, projStrategy, logger)}).result
       randomTrees(i) = randomTree
     }
