@@ -41,6 +41,7 @@ object MnistAfterSVD_BruteForceWithSignatures {
 
   def main (args: Array[String]): Unit = {
     val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")
+    //val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/originaldata/train.csv")
     val indexFile = Utils.combinePaths(ExamplesSettings.outputDirectory, "mnist/svdpreprocessed-index")
     val testFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/test.csv")
     val predictionsOnTestFile = Utils.combinePaths(ExamplesSettings.outputDirectory, "mnist/predictions-test-svd.csv")

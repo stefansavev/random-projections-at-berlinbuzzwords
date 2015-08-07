@@ -36,11 +36,17 @@ class BruteForceBySignatureSearcher(settings: SearcherSettings) extends Searcher
     import java.util.PriorityQueue
     val pq = new PriorityQueue[PointScore]()
     var j = 0
-    while(j < numRows) {
+    while(j < numRows) { //TODO: probably you want to process in a randomized order to make sure you don't insert too many itmes in pq
       val score = signatures.overlap(querySig, j)
-      pq.add(new PointScore(j, score))
-      if (pq.size() > k){
-        pq.remove()
+      if (pq.size() < k ){
+        pq.add(new PointScore(j, score))
+      }
+      else{//it should be exactly k items in pq
+        val minAcceptedScore = pq.peek().score
+        if (score > minAcceptedScore){
+          pq.remove() //remove min
+          pq.add(new PointScore(j, score))
+        }
       }
       j += 1
     }
