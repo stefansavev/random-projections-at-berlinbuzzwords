@@ -12,6 +12,8 @@ repositories {
 dependencies {
     compile 'org.scala-lang:scala-library:2.11.4'
     compile 'org.scala-lang:scala-compiler:2.11.4'
+    compile 'com.github.fommil.netlib:all:1.1.2'
+    compile 'com.googlecode.matrix-toolkits-java:mtj:1.0.1'
 }
 
 distributions {
