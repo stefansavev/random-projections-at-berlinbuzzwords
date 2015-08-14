@@ -2,9 +2,12 @@ package com.stefansavev.randomprojections.serialization.core
 
 import java.io._
 
+import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedIntSerializer
+
 //approach is losely based on "Scala for generic programmers"
 
 trait TypedSerializer[T]{
+  type SerializerType = T
   def toBinary(outputStream: OutputStream, input: T): Unit
   def fromBinary(inputStream: InputStream): T
 }
@@ -28,8 +31,90 @@ object Core{
   }
   */
 
+  abstract class TypeTag[A](implicit mf: Manifest[A]){
+    def tag: Int
+    def manifest: Manifest[A] = mf
+  }
+
+  class Subtype1Serializer[BaseType, SubType1 <: BaseType](tag1: TypeTag[SubType1], subTypeSer1 : TypedSerializer[SubType1]) extends TypedSerializer[BaseType] {
+    def toBinary(outputStream: OutputStream, input: BaseType): Unit = {
+      input match {
+        case subType: SubType1 => {
+          TypedIntSerializer.toBinary(outputStream, tag1.tag)
+        }
+        case _ => {
+          throw new IllegalStateException("Unsupported subtype in serialization")
+        }
+      }
+    }
+
+    def fromBinary(inputStream: InputStream): BaseType = {
+      val inputTag = TypedIntSerializer.fromBinary(inputStream)
+      if (inputTag == tag1.tag) {
+        subTypeSer1.fromBinary(inputStream)
+      }
+      else{
+          throw new IllegalStateException("Unknown tag in deserialization")
+      }
+    }
+  }
+
+  class Subtype2Serializer[BaseType, SubType1 <: BaseType, SubType2 <: BaseType](
+      tag1: TypeTag[SubType1],
+      tag2: TypeTag[SubType2],
+      subTypeSer1 : TypedSerializer[SubType1],
+      subTypeSer2 : TypedSerializer[SubType2]) extends TypedSerializer[BaseType] {
+    //TODO verify that the more specific type is first
+    if (tag1.tag == tag2.tag){
+      throw new IllegalStateException("Subtypes should have different tags")
+    }
+    if (tag1.manifest.runtimeClass.equals(tag2.manifest.runtimeClass)){
+      throw new IllegalStateException("Subtypes should be of different classes")
+    }
+    def toBinary(outputStream: OutputStream, input: BaseType): Unit = {
+      if (tag1.manifest.runtimeClass.equals(input.getClass)){
+        TypedIntSerializer.toBinary(outputStream, tag1.tag)
+        subTypeSer1.toBinary(outputStream, input.asInstanceOf[SubType1])
+      }
+      else if (tag2.manifest.runtimeClass.equals(input.getClass)){
+        TypedIntSerializer.toBinary(outputStream, tag2.tag)
+        subTypeSer2.toBinary(outputStream, input.asInstanceOf[SubType2])
+      }
+      else{
+        throw new IllegalStateException("Unsupported subtype in serialization")
+      }
+    }
+
+    def fromBinary(inputStream: InputStream): BaseType = {
+      val inputTag = TypedIntSerializer.fromBinary(inputStream)
+      if (inputTag == tag1.tag) {
+        subTypeSer1.fromBinary(inputStream)
+      }
+      else if (inputTag == tag2.tag){
+        subTypeSer2.fromBinary(inputStream)
+      }
+      else{
+        throw new IllegalStateException("Unknown tag in deserialization")
+      }
+    }
+  }
+
+  implicit def subtype1Serializer[BaseType, SubType1 <: BaseType](implicit typeTag1: TypeTag[SubType1], subTypeSer1 : TypedSerializer[SubType1]): Subtype1Serializer[BaseType, SubType1] = {
+    new Subtype1Serializer[BaseType, SubType1](typeTag1, subTypeSer1)
+  }
+
+  implicit def subtype2Serializer[BaseType, SubType1 <: BaseType, SubType2 <: BaseType](
+       implicit
+       typeTag1: TypeTag[SubType1],
+       typeTag2: TypeTag[SubType2],
+       subTypeSer1 : TypedSerializer[SubType1],
+       subTypeSer2 : TypedSerializer[SubType2]): Subtype2Serializer[BaseType, SubType1, SubType2] = {
+    new Subtype2Serializer[BaseType, SubType1, SubType2](typeTag1, typeTag2, subTypeSer1, subTypeSer2)
+  }
+
   //Iso means isomorphism, just mapping from A to B, and back
   trait Iso[A, B]{
+    type Input = A
     type Output = B
 
     def from(input: A): B

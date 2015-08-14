@@ -5,6 +5,9 @@ import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.file.CSVFileOptions
 
 class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val labels: Array[Int], header: ColumnHeader) extends RowStoredMatrixView{
+
+  def toTuple: DenseRowStoredMatrixView.TupleType = (_numCols, data, labels, header)
+
   override def numCols: Int = _numCols
 
   override def getColumnHeader: ColumnHeader = header
@@ -127,9 +130,19 @@ class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val label
 }
 
 object DenseRowStoredMatrixView{
+
   def fromFile(fileName: String,  opt: CSVFileOptions, dataFrameOptions: DataFrameOptions): DataFrameView = {
     RowStoredMatrixView.fromFile(fileName, opt, dataFrameOptions)
   }
+
+  type TupleType = (Int, Array[Double], Array[Int], ColumnHeader)
+
+  def fromTuple(t: DenseRowStoredMatrixView.TupleType): DenseRowStoredMatrixView = {
+    new DenseRowStoredMatrixView(t._1, t._2, t._3, t._4)
+  }
+
+  def tag: Int = 1
+
 }
 
 object DenseRowStoredMatrixViewBuilderFactory extends RowStoredMatrixViewBuilderFactory{

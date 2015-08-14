@@ -7,6 +7,7 @@ import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDi
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.datarepr.dense.{DataFrameView, ColumnHeaderImpl, ColumnHeader}
+import com.stefansavev.randomprojections.serialization.core.TypedSerializer
 import no.uib.cipr.matrix.DenseMatrix
 
 object BinaryFileSerializerSig{
@@ -132,6 +133,28 @@ object DoubleArraySerializer{
     var i = 0
     while(i < len){
       values(i) = DoubleSerializer.read(inputStream)
+      i += 1
+    }
+    values
+  }
+}
+
+object IntArraySerializer{
+  def write(outputStream: OutputStream, values: Array[Int]): Unit = {
+    IntSerializer.write(outputStream, values.length)
+    var i = 0
+    while(i < values.length){
+      IntSerializer.write(outputStream, values(i))
+      i += 1
+    }
+  }
+
+  def read(inputStream: InputStream): Array[Int] = {
+    val len = IntSerializer.read(inputStream)
+    val values = Array.ofDim[Int](len)
+    var i = 0
+    while(i < len){
+      values(i) = IntSerializer.read(inputStream)
       i += 1
     }
     values
@@ -466,6 +489,8 @@ object RandomTreeSerializer{
 
 object RandomTreesSerializer{
   import ImplicitSerializers._
+  import ColumnHeaderSerialization._
+
   def toBinary(outputStream: OutputStream, randomTrees: RandomTrees): Unit = {
     DimensionalityReductionTransformSerializer.toBinary(outputStream, randomTrees.dimReductionTransform)
     ReportingDistanceEvaluatorSerializer.toBinary(outputStream, randomTrees.reportingDistanceEvaluator)
@@ -518,14 +543,3 @@ object SplitStrategySerializer{
   }
 }
 
-object ColumnHeaderSerializer{
-  import ImplicitSerializers._
-  def toBinary(stream: OutputStream, header: ColumnHeader): Unit = {
-    stream.writeInt(header.numCols)
-  }
-
-  def fromBinary(stream: java.io.InputStream): ColumnHeader = {
-    val numCols = stream.readInt()
-    new ColumnHeaderImpl(numCols, null, null, null, null)
-  }
-}
