@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.serialization
+package com.stefansavev.randomprojections.serialization.core
 
 object GenTupleSerializers{
   //use this code to generate all tuple serializers
@@ -48,13 +48,13 @@ object GenTupleSerializers{
   }
 
   def main (args: Array[String]): Unit = {
-    println("package com.stefansavev.randomprojections.serialization\n")
+    println("package com.stefansavev.randomprojections.serialization.core\n")
 
     println("import java.io._\n")
 
     println("object TupleSerializers {")
 
-    for(i <- 2 until 3){
+    for(i <- 2 until 15){
       genTupleSerializers(i)
       println("    //---------------------------------------------------------")
     }

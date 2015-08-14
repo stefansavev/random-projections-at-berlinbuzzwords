@@ -1,9 +1,9 @@
-package com.stefansavev.randomprojections.serialization
+package com.stefansavev.randomprojections.serialization.core
 
 object Demo {
   import Core._
-  import TupleSerializers._
   import PrimitiveTypeSerializers._
+  import TupleSerializers._
 
   def roundTripInputOutput[A](ser: TypedSerializer[A], input: A, fileName: String): A = {
     toFile(ser, fileName, input)

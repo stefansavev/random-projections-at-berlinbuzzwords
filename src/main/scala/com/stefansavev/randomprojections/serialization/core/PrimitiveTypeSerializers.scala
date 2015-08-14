@@ -1,6 +1,8 @@
-package com.stefansavev.randomprojections.serialization
+package com.stefansavev.randomprojections.serialization.core
 
 import java.io.{InputStream, OutputStream}
+
+import com.stefansavev.randomprojections.serialization.{DoubleSerializer, IntSerializer}
 
 object PrimitiveTypeSerializers {
 
@@ -23,5 +25,5 @@ object PrimitiveTypeSerializers {
       DoubleSerializer.read(inputStream)
     }
   }
-  
+
 }
