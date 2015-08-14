@@ -5,6 +5,8 @@ import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.interface.BucketCollector
 import com.stefansavev.randomprojections.datarepr.dense._
+import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReduction}
+import com.stefansavev.randomprojections.dimensionalityreduction.svd.{SVDFromRandomizedDataEmbedding, SVDParams}
 import com.stefansavev.randomprojections.utils.Utils
 
 trait Point2LeavesMap{
@@ -144,7 +146,7 @@ object IndexBuilder{
       val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, dataFrameView, bucketCollector, splitStrategy, projStrategy, logger)}).result
       randomTrees(i) = randomTree
     }
-    new RandomTrees(signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(NoDimensionalityReductionTransform, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 
   def buildWithPreprocessing(numInterProj: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
@@ -168,8 +170,36 @@ object IndexBuilder{
       randomTrees(i) = RandomTreeNodeRoot(absProjV, randomTree)
     }
 
-    new RandomTrees(signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(NoDimensionalityReductionTransform, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 
+  def buildWithSVD(k: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
+    val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
+    val rnd = new Random(settings.randomSeed)
+    val logger = new IndexCounters()
+    val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
+    val emptyScores = Array.ofDim[Double](dataFrameView.indexes.indexes.length)
+    val newIndexes = PointIndexes(dataFrameView.indexes.indexes)
+    val newDataFrameView = new DataFrameView(newIndexes, dataFrameView.rowStoredView)
+
+    val svdParams = SVDParams(k, SVDFromRandomizedDataEmbedding)//TODO: add random seed
+    val transformResult = DimensionalityReduction.fitTransform(svdParams, dataFrameView)
+    val transformedDataset = transformResult.transformedDataset
+    //val newProjS = ProjectionStrategies.splitIntoKRandomProjection(numInterProj).build(settings, rnd, dataFrameView)
+
+    var savedRes: (AbstractProjectionVector, DataFrameView) = null
+    val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
+    //if signatures are computed on the SVD??
+    val (signatureVecs, signatures) = Signatures.computePointSignatures(16, rnd, dataFrameView)
+    dataFrameView.setPointSignatures(signatures)
+
+    val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, transformedDataset)
+    for(i <- 0 until settings.numTrees){
+      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, transformedDataset, bucketCollector, splitStrategy, projStrategy, logger)}).result
+      randomTrees(i) = randomTree
+    }
+
+    new RandomTrees(transformResult.transform, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
+  }
 }
 

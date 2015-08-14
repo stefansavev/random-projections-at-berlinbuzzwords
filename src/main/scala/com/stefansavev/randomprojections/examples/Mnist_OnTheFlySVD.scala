@@ -35,13 +35,15 @@ object Mnist_OnTheFlySVD {
     val doSearch = true
     val doTest = false
 
-    //val dataset = loadData(trainFile)
+    val dataset = loadData(trainFile)
+    /*
     val dataset = {
       val dataset0 = loadData(trainFile)
       //SVDTest.svdProj(100, dataset0)
       val svdParams = SVDParams(100, FullDenseSVD /*SVDFromRandomizedDataEmbedding*/)
       DimensionalityReduction.fitTransform(svdParams, dataset0).transformedDataset
     }
+    */
 
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=10,
@@ -55,7 +57,7 @@ object Mnist_OnTheFlySVD {
     if (doTrain) {
       val trees = Utils.timed("Create trees", {
         //IndexBuilder.buildWithPreprocessing(64, settings = randomTreeSettings, dataFrameView = dataset)
-        IndexBuilder.build(settings = randomTreeSettings, dataFrameView = dataset)
+        IndexBuilder.buildWithSVD(100, settings = randomTreeSettings, dataFrameView = dataset)
       }).result
       trees.toFile(indexFile)
     }

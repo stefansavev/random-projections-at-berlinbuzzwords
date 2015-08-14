@@ -40,8 +40,9 @@ class PriorityQueueBasedBucketSearchStrategy(datasetSplitStrategy: DatasetSplitS
     //println("Total nodes: " + totalNodes + " in queue " + pq.size())
   }
 
-  def getBucketIndexes(randomTrees: RandomTrees, query: Array[Double], scratchBuffer: NearestNeigbhorQueryScratchBuffer): SearchBucketsResult = {
+  def getBucketIndexes(randomTrees: RandomTrees, inputQuery: Array[Double], scratchBuffer: NearestNeigbhorQueryScratchBuffer): SearchBucketsResult = {
     val numberOfRequiredPointsPerTree = settings.numberOfRequiredPointsPerTree
+    val query = randomTrees.dimReductionTransform.transformQuery(inputQuery)
     val enableGreedy = settings.enableGreedy
     val datasetSplitStrategy = this.datasetSplitStrategy
     PerformanceCounters.numberOfRequiredPointsPerTree(numberOfRequiredPointsPerTree)

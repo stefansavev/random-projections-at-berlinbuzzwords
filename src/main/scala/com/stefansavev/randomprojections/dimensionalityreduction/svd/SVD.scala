@@ -101,19 +101,19 @@ object FullDenseSVD extends SVDMethod {
     val data = X.getData
     //for the interface see http://www.math.utah.edu/software/lapack/lapack-blas/dgemm.html
     BLAS.getInstance.dgemm(
-        "T", /*use X', not X*/
-        "N", /*use X, not X'*/
-        numCols, /*m: first dimension (num rows) of X'*/
-        numCols, /*m: number of columns of X*/
-        numRows, /*number of columns of X', number of rows of X*/
-        1.0,
-        data /*A = X*/,
-        numRows /*first dimension of X*/,
-        data /*B = X*/,
-        numRows /*first dimension of X*/,
-        1,
-        output.getData,
-        numCols /*first dimension of output*/)
+      "T", /*use X', not X*/
+      "N", /*use X, not X'*/
+      numCols, /*m: first dimension (num rows) of X'*/
+      numCols, /*m: number of columns of X*/
+      numRows, /*number of columns of X', number of rows of X*/
+      1.0,
+      data /*A = X*/,
+      numRows /*first dimension of X*/,
+      data /*B = X*/,
+      numRows /*first dimension of X*/,
+      1,
+      output.getData,
+      numCols /*first dimension of output*/)
     //return C
     output
   }
@@ -198,9 +198,6 @@ case class SVDParams(k: Int, svdMethod: SVDMethod) extends DimensionalityReducti
 }
 
 class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends DimensionalityReductionTransform{
-}
-
-object SVD {
   private def projectOnToRowsVt(k: Int, vec: Array[Double], weightedVt: DenseMatrix, out: Array[Double]): Unit = {
     val numOrigFeatures = weightedVt.numColumns()
     var i = 0
@@ -217,11 +214,18 @@ object SVD {
     }
   }
 
-  private def projectDataset(k: Int, weightedVt: DenseMatrix, dataFrame: DataFrameView): DataFrameView = {
+  def transformQuery(query: Array[Double]): Array[Double] = {
+    val out = Array.ofDim[Double](this.k)
+    projectOnToRowsVt(this.k, query, this.weightedVt, out)
+    out
+  }
+
+  def projectDataset(dataFrame: DataFrameView): DataFrameView = {
+    val k = this.k
     val oldHeader = dataFrame.rowStoredView.getColumnHeader
     val newNumCols = k
     val newF = Array.range(0, newNumCols).map(i => (i.toString,i ))
-    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, Array.empty)
+    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, dataFrame.rowStoredView.getAllRowNames())
     val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
 
     val colIds = Array.range(0, dataFrame.numCols)
@@ -243,15 +247,17 @@ object SVD {
     val indexes = dataFrame.indexes
     new DataFrameView(indexes, builder.build())
   }
+}
+
+object SVD {
 
   def fit(params: SVDParams, dataFrame: DataFrameView): SVDTransform = {
     params.svdMethod.fit(params, dataFrame)
   }
 
   def transform(svdTransform: SVDTransform, inputData: DataFrameView): DataFrameView = {
-    val k = svdTransform.k
     println("Started transformation with SVD")
-    val result = projectDataset(k, svdTransform.weightedVt, inputData)
+    val result = svdTransform.projectDataset(inputData)
     println("Finished transformation with SVD")
     result
   }

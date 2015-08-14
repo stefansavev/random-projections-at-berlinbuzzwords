@@ -8,6 +8,11 @@ trait DimensionalityReductionParams{
 }
 
 trait DimensionalityReductionTransform{
+  def transformQuery(query: Array[Double]): Array[Double]
+}
+
+object NoDimensionalityReductionTransform extends DimensionalityReductionTransform {
+  def transformQuery(query: Array[Double]): Array[Double] = query
 }
 
 case class DimensionalityReductionResult(transform: DimensionalityReductionTransform, transformedDataset: DataFrameView)

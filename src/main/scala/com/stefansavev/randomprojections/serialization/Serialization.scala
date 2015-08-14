@@ -3,8 +3,11 @@ package com.stefansavev.randomprojections.serialization
 import java.io._
 import java.nio.ByteBuffer
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReductionTransform}
+import com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeaderImpl, ColumnHeader}
+import no.uib.cipr.matrix.DenseMatrix
 
 object BinaryFileSerializerSig{
   val signature = Array(80,42,51,67)
@@ -182,6 +185,51 @@ object ImplicitSerializers{
     }
   }
 
+}
+
+object SVDTransformSerializer{
+  def toBinary(outputStream: OutputStream, svdTransform: SVDTransform): Unit = {
+    IntSerializer.write(outputStream, svdTransform.k)
+    val matrix = svdTransform.weightedVt
+    IntSerializer.write(outputStream, matrix.numRows())
+    IntSerializer.write(outputStream, matrix.numColumns())
+    DoubleArraySerializer.write(outputStream, matrix.getData)
+  }
+
+  def fromBinary(inputStream: InputStream): SVDTransform = {
+    val k = IntSerializer.read(inputStream)
+    val numRows = IntSerializer.read(inputStream)
+    val numCols = IntSerializer.read(inputStream)
+    val weightedVt = new DenseMatrix(numRows, numCols)
+
+    val inputData = DoubleArraySerializer.read(inputStream)
+    val toOverwrite = weightedVt.getData
+    System.arraycopy(inputData, 0, toOverwrite, 0, inputData.length)
+    new SVDTransform(k, weightedVt)
+  }
+
+}
+
+object DimensionalityReductionTransformSerializer{
+  def toBinary(outputStream: OutputStream, dimRedTransform: DimensionalityReductionTransform): Unit = {
+    dimRedTransform match {
+      case NoDimensionalityReductionTransform => {
+        IntSerializer.write(outputStream, 0)
+      }
+      case svdTransform: SVDTransform => {
+        IntSerializer.write(outputStream, 1)
+        SVDTransformSerializer.toBinary(outputStream, svdTransform)
+      }
+    }
+  }
+
+  def fromBinary(inputStream: InputStream): DimensionalityReductionTransform = {
+    val tag = IntSerializer.read(inputStream)
+    tag match {
+      case 0 => NoDimensionalityReductionTransform
+      case 1 => SVDTransformSerializer.fromBinary(inputStream)
+    }
+  }
 }
 
 object SignatureVectorsSerializer{
@@ -388,6 +436,7 @@ object RandomTreeSerializer{
 object RandomTreesSerializer{
   import ImplicitSerializers._
   def toBinary(outputStream: OutputStream, randomTrees: RandomTrees): Unit = {
+    DimensionalityReductionTransformSerializer.toBinary(outputStream, randomTrees.dimReductionTransform)
     SignatureVectorsSerializer.toBinary(outputStream, randomTrees.signatureVecs)
     SplitStrategySerializer.toBinary(outputStream, randomTrees.datasetSplitStrategy)
     ColumnHeaderSerializer.toBinary(outputStream, randomTrees.header)
@@ -398,6 +447,7 @@ object RandomTreesSerializer{
   }
 
   def fromBinary(inputStream: InputStream, invIndex: IndexImpl): RandomTrees = {
+    val dimRedTransform = DimensionalityReductionTransformSerializer.fromBinary(inputStream)
     val sigVectors = SignatureVectorsSerializer.fromBinary(inputStream)
     val splitStrategy = SplitStrategySerializer.fromBinary(inputStream)
     val header = ColumnHeaderSerializer.fromBinary(inputStream)
@@ -410,7 +460,7 @@ object RandomTreesSerializer{
       trees(i) = tree
       i += 1
     }
-    new RandomTrees(sigVectors, splitStrategy, header, invIndex, trees)
+    new RandomTrees(dimRedTransform, sigVectors, splitStrategy, header, invIndex, trees)
   }
 }
 object SplitStrategySerializer{
