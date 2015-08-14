@@ -1,7 +1,7 @@
 package com.stefansavev.randomprojections.examples
 
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
-import com.stefansavev.randomprojections.implementation.{IndexSettings, ProjectionStrategies, NonThreadSafeSearcher, SearcherSettings}
+import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
@@ -25,6 +25,7 @@ object TestOnRandomData {
         numTrees=10,
         maxDepth = None,
         projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(), //.splitIntoKRandomProjection(2),
+        reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
         randomSeed = 39393
       )
 

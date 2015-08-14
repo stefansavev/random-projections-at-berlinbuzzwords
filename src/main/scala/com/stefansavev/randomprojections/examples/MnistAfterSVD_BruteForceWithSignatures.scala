@@ -57,6 +57,7 @@ object MnistAfterSVD_BruteForceWithSignatures {
       numTrees=0,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.onlySignaturesStrategy(),
+      reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
     println(dataset)

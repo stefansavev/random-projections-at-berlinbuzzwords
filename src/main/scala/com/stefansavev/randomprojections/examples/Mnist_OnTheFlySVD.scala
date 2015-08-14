@@ -50,6 +50,7 @@ object Mnist_OnTheFlySVD {
       numTrees=10,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(),
+      reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
     println(dataset)

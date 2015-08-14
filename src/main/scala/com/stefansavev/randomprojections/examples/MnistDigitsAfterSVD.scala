@@ -37,6 +37,7 @@ object MnistDigitsAfterSVD {
       numTrees=10,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(2),
+      reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
     println(dataset)

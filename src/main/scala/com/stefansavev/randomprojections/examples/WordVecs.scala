@@ -3,7 +3,7 @@ package com.stefansavev.randomprojections.examples
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.file.{CSVFile, CSVFileOptions}
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
-import com.stefansavev.randomprojections.implementation.{IndexSettings, ProjectionStrategies, NonThreadSafeSearcher, SearcherSettings}
+import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
@@ -92,6 +92,7 @@ object WordVecs {
       numTrees=10,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(), //ProjectionStrategies.splitIntoKRandomProjection(32 /*2*8*/ /*16*//*64*/ /*2*32*/),
+      reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
     println(dataset)

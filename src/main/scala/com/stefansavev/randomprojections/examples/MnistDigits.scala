@@ -33,6 +33,7 @@ object MnistDigits {
       numTrees=40,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(16), //.dataInformedProjectionStrategy(), // .splitIntoKRandomProjection(16),
+      reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
 
