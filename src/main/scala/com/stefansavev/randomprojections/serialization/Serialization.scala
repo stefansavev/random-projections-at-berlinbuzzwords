@@ -232,59 +232,6 @@ object DimensionalityReductionTransformSerializer{
   }
 }
 
-//trait CompositionSerializer[T, A1, A2, A3, A4]//(T => (A1,A2,A3,A4))
-//slowly switching to better serialization
-trait TypedSerializer[T]{
-  def toBinary(outputStream: OutputStream, input: T): Unit
-  def fromBinary(inputStream: InputStream): T
-}
-
-trait TypedIntSerializer extends TypedSerializer[Int] {
-  def toBinary(outputStream: OutputStream, input: Int): Unit = {
-    IntSerializer.write(outputStream, input)
-  }
-
-  def fromBinary(inputStream: InputStream): Int = {
-    IntSerializer.read(inputStream)
-  }
-}
-
-class Tuple2Serializer[A, B](serA: TypedSerializer[A], serB: TypedSerializer[B]) extends TypedSerializer[(A, B)]{
-  def toBinary(outputStream: OutputStream, input: (A, B)): Unit = {
-    serA.toBinary(outputStream, input._1)
-    serB.toBinary(outputStream, input._2)
-  }
-
-  def fromBinary(inputStream: InputStream): (A, B) = {
-    val a = serA.fromBinary(inputStream)
-    val b = serB.fromBinary(inputStream)
-    (a, b)
-  }
-}
-
-class RemappingSerializer[Input, Intermedidate](
-          toIntermediate: Input => Intermedidate,
-          toInput: Intermedidate => Input,
-          serIntermediate: TypedSerializer[Intermedidate]) extends TypedSerializer[Input]{
-  def toBinary(outputStream: OutputStream, input: Input): Unit = {
-    serIntermediate.toBinary(outputStream, toIntermediate(input))
-  }
-
-  def fromBinary(inputStream: InputStream): Input = {
-    toInput(serIntermediate.fromBinary(inputStream))
-  }
-}
-
-class Tuple3Serializer[A, B, C](serA: TypedSerializer[A],
-                                serB: TypedSerializer[B],
-                                serC: TypedSerializer[C] )
-  extends RemappingSerializer[(A, B, C), (A, (B, C))]({case (a,b,c) => (a,(b,c))},
-                                                      {case (a,(b,c)) => (a,b,c)},
-                                                      new Tuple2Serializer[A, (B,C)](
-                                                        serA,
-                                                        new Tuple2Serializer[B,C](serB, serC)))
-
-
 object DataFrameViewSerializer{
   def toBinary(outputStream: OutputStream, distanceEvaluator: DataFrameView): Unit = {
     null
