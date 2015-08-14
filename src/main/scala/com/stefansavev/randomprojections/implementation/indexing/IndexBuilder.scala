@@ -129,6 +129,14 @@ object IndexBuilder{
     (absprojVec, new DataFrameView(indexes, builder.build()))
   }
 
+  private def requiresStorageOfOriginalDataset(evaluator: ReportingDistanceEvaluator): Boolean = {
+    val req = evaluator.dataSetSerializationRequirement
+    req match {
+      case NoDatasetSerializationRequriement => false
+      case OriginalDatasetSerializationRequirement(_) => true
+    }
+  }
+
   def build(settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
     val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
@@ -138,6 +146,8 @@ object IndexBuilder{
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
     val (signatureVecs, signatures) = Signatures.computePointSignatures(2, rnd, dataFrameView)
     dataFrameView.setPointSignatures(signatures)
+    val reportingDistanceEvaluator = settings.reportingDistanceEvaluator.build(dataFrameView)
+
     val numTrees = projStrategy match {
       case os: OnlySignaturesStrategy => 0
       case _ => settings.numTrees
@@ -146,7 +156,7 @@ object IndexBuilder{
       val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, dataFrameView, bucketCollector, splitStrategy, projStrategy, logger)}).result
       randomTrees(i) = randomTree
     }
-    new RandomTrees(NoDimensionalityReductionTransform, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(NoDimensionalityReductionTransform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 
   def buildWithPreprocessing(numInterProj: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
@@ -162,6 +172,8 @@ object IndexBuilder{
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
     val (signatureVecs, signatures) = Signatures.computePointSignatures(2, rnd, dataFrameView)
     dataFrameView.setPointSignatures(signatures)
+    val reportingDistanceEvaluator = settings.reportingDistanceEvaluator.build(dataFrameView)
+
     for(i <- 0 until settings.numTrees){
       savedRes = modifyDataFrame(newDataFrameView, newProjS)
       val (absProjV, modDF) = savedRes
@@ -170,7 +182,7 @@ object IndexBuilder{
       randomTrees(i) = RandomTreeNodeRoot(absProjV, randomTree)
     }
 
-    new RandomTrees(NoDimensionalityReductionTransform, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(NoDimensionalityReductionTransform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 
   def buildWithSVD(k: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
@@ -192,14 +204,14 @@ object IndexBuilder{
     //if signatures are computed on the SVD??
     val (signatureVecs, signatures) = Signatures.computePointSignatures(16, rnd, dataFrameView)
     dataFrameView.setPointSignatures(signatures)
-
+    val reportingDistanceEvaluator = settings.reportingDistanceEvaluator.build(dataFrameView)
     val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, transformedDataset)
     for(i <- 0 until settings.numTrees){
       val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, transformedDataset, bucketCollector, splitStrategy, projStrategy, logger)}).result
       randomTrees(i) = randomTree
     }
 
-    new RandomTrees(transformResult.transform, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(transformResult.transform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 }
 

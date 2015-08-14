@@ -6,7 +6,7 @@ import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReductionTransform}
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform
 import com.stefansavev.randomprojections.implementation._
-import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeaderImpl, ColumnHeader}
+import com.stefansavev.randomprojections.datarepr.dense.{DataFrameView, ColumnHeaderImpl, ColumnHeader}
 import no.uib.cipr.matrix.DenseMatrix
 
 object BinaryFileSerializerSig{
@@ -232,6 +232,90 @@ object DimensionalityReductionTransformSerializer{
   }
 }
 
+//trait CompositionSerializer[T, A1, A2, A3, A4]//(T => (A1,A2,A3,A4))
+//slowly switching to better serialization
+trait TypedSerializer[T]{
+  def toBinary(outputStream: OutputStream, input: T): Unit
+  def fromBinary(inputStream: InputStream): T
+}
+
+trait TypedIntSerializer extends TypedSerializer[Int] {
+  def toBinary(outputStream: OutputStream, input: Int): Unit = {
+    IntSerializer.write(outputStream, input)
+  }
+
+  def fromBinary(inputStream: InputStream): Int = {
+    IntSerializer.read(inputStream)
+  }
+}
+
+class Tuple2Serializer[A, B](serA: TypedSerializer[A], serB: TypedSerializer[B]) extends TypedSerializer[(A, B)]{
+  def toBinary(outputStream: OutputStream, input: (A, B)): Unit = {
+    serA.toBinary(outputStream, input._1)
+    serB.toBinary(outputStream, input._2)
+  }
+
+  def fromBinary(inputStream: InputStream): (A, B) = {
+    val a = serA.fromBinary(inputStream)
+    val b = serB.fromBinary(inputStream)
+    (a, b)
+  }
+}
+
+class RemappingSerializer[Input, Intermedidate](
+          toIntermediate: Input => Intermedidate,
+          toInput: Intermedidate => Input,
+          serIntermediate: TypedSerializer[Intermedidate]) extends TypedSerializer[Input]{
+  def toBinary(outputStream: OutputStream, input: Input): Unit = {
+    serIntermediate.toBinary(outputStream, toIntermediate(input))
+  }
+
+  def fromBinary(inputStream: InputStream): Input = {
+    toInput(serIntermediate.fromBinary(inputStream))
+  }
+}
+
+class Tuple3Serializer[A, B, C](serA: TypedSerializer[A],
+                                serB: TypedSerializer[B],
+                                serC: TypedSerializer[C] )
+  extends RemappingSerializer[(A, B, C), (A, (B, C))]({case (a,b,c) => (a,(b,c))},
+                                                      {case (a,(b,c)) => (a,b,c)},
+                                                      new Tuple2Serializer[A, (B,C)](
+                                                        serA,
+                                                        new Tuple2Serializer[B,C](serB, serC)))
+
+
+object DataFrameViewSerializer{
+  def toBinary(outputStream: OutputStream, distanceEvaluator: DataFrameView): Unit = {
+    null
+  }
+
+  def fromBinary(inputStream: InputStream): DataFrameView = {
+    null
+  }
+}
+
+object ReportingDistanceEvaluatorSerializer{
+  def toBinary(outputStream: OutputStream, distanceEvaluator: ReportingDistanceEvaluator): Unit = {
+    distanceEvaluator match {
+      case evaluator: CosineOnOriginalDataDistanceEvaluator => {
+        IntSerializer.write(outputStream, 0)
+
+      }
+    }
+  }
+
+  def fromBinary(inputStream: InputStream): ReportingDistanceEvaluator = {
+    val tag = IntSerializer.read(inputStream)
+    tag match {
+      case 0 => {
+        val origDataset: DataFrameView = null
+        new CosineOnOriginalDataDistanceEvaluator(origDataset)
+      }
+    }
+  }
+}
+
 object SignatureVectorsSerializer{
   import ImplicitSerializers._
 
@@ -437,6 +521,7 @@ object RandomTreesSerializer{
   import ImplicitSerializers._
   def toBinary(outputStream: OutputStream, randomTrees: RandomTrees): Unit = {
     DimensionalityReductionTransformSerializer.toBinary(outputStream, randomTrees.dimReductionTransform)
+    ReportingDistanceEvaluatorSerializer.toBinary(outputStream, randomTrees.reportingDistanceEvaluator)
     SignatureVectorsSerializer.toBinary(outputStream, randomTrees.signatureVecs)
     SplitStrategySerializer.toBinary(outputStream, randomTrees.datasetSplitStrategy)
     ColumnHeaderSerializer.toBinary(outputStream, randomTrees.header)
@@ -448,6 +533,7 @@ object RandomTreesSerializer{
 
   def fromBinary(inputStream: InputStream, invIndex: IndexImpl): RandomTrees = {
     val dimRedTransform = DimensionalityReductionTransformSerializer.fromBinary(inputStream)
+    val distanceEvaluator = ReportingDistanceEvaluatorSerializer.fromBinary(inputStream)
     val sigVectors = SignatureVectorsSerializer.fromBinary(inputStream)
     val splitStrategy = SplitStrategySerializer.fromBinary(inputStream)
     val header = ColumnHeaderSerializer.fromBinary(inputStream)
@@ -460,7 +546,7 @@ object RandomTreesSerializer{
       trees(i) = tree
       i += 1
     }
-    new RandomTrees(dimRedTransform, sigVectors, splitStrategy, header, invIndex, trees)
+    new RandomTrees(dimRedTransform, distanceEvaluator, sigVectors, splitStrategy, header, invIndex, trees)
   }
 }
 object SplitStrategySerializer{
