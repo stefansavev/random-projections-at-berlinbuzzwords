@@ -37,14 +37,14 @@ object Core{
   }
 
   class Subtype1Serializer[BaseType, SubType1 <: BaseType](tag1: TypeTag[SubType1], subTypeSer1 : TypedSerializer[SubType1]) extends TypedSerializer[BaseType] {
+
     def toBinary(outputStream: OutputStream, input: BaseType): Unit = {
-      input match {
-        case subType: SubType1 => {
-          TypedIntSerializer.toBinary(outputStream, tag1.tag)
-        }
-        case _ => {
-          throw new IllegalStateException("Unsupported subtype in serialization")
-        }
+      if (tag1.manifest.runtimeClass.equals(input.getClass)){
+        TypedIntSerializer.toBinary(outputStream, tag1.tag)
+        subTypeSer1.toBinary(outputStream, input.asInstanceOf[SubType1])
+      }
+      else{
+        throw new IllegalStateException("Unsupported subtype in serialization")
       }
     }
 
@@ -64,7 +64,7 @@ object Core{
       tag2: TypeTag[SubType2],
       subTypeSer1 : TypedSerializer[SubType1],
       subTypeSer2 : TypedSerializer[SubType2]) extends TypedSerializer[BaseType] {
-    //TODO verify that the more specific type is first
+
     if (tag1.tag == tag2.tag){
       throw new IllegalStateException("Subtypes should have different tags")
     }
@@ -121,17 +121,25 @@ object Core{
     def to(output: B): A
   }
 
-  def toFile[A](serializer: TypedSerializer[A], outputFile: String, input: A): Unit ={
+  def toFile[A](serializer: TypedSerializer[A], outputFile: String, input: A): Unit = {
+    toFile(serializer, new File(outputFile), input)
+  }
+
+  def toFile[A](serializer: TypedSerializer[A], outputFile: File, input: A): Unit = {
     val outputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
     serializer.toBinary(outputStream, input)
     outputStream.close()
   }
 
-  def fromFile[A](serializer: TypedSerializer[A], inputFile: String): A = {
+  def fromFile[A](serializer: TypedSerializer[A], inputFile: File): A = {
     val inputStream = new BufferedInputStream(new FileInputStream(inputFile))
     val output = serializer.fromBinary(inputStream)
     inputStream.close()
     output
+  }
+
+  def fromFile[A](serializer: TypedSerializer[A], inputFile: String): A = {
+    fromFile(serializer, new File(inputFile))
   }
 
   class IsoSerializer[A, B](iso: Iso[A, B], serB: TypedSerializer[B]) extends TypedSerializer[A]{

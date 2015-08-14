@@ -1,7 +1,5 @@
 package com.stefansavev.randomprojections.serialization
 
-import java.io.{InputStream, OutputStream}
-
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.serialization.core.Core._
 import com.stefansavev.randomprojections.serialization.core.TupleSerializers._
@@ -55,6 +53,4 @@ object DataFrameViewSerializers {
     isoSerializer[DataFrameView, DataFrameView.TupleType](DataFrameViewIso, testSerializer())
   }
 
-  //
-  // class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val labels: Array[Int], header: ColumnHeader) extends RowStoredMatrixView{
 }

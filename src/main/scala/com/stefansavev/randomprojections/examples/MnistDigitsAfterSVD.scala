@@ -30,7 +30,16 @@ object MnistDigitsAfterSVD {
     val doSearch = true
     val doTest = true
 
-    val dataset = loadData(trainFile)
+
+
+    val dataset = {
+      import com.stefansavev.randomprojections.serialization.DataFrameViewSerializationExt._
+      val tmpFile = "D:/tmp/tmp-dataset-mnist"
+      val dataset = loadData(trainFile)
+      Utils.timed("Write to file", {dataset.toFile(tmpFile)})
+      val dataset1 = Utils.timed("Read from file", {DataFrameView.fromFile(tmpFile)}).result
+      dataset1
+    }
 
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=10,
