@@ -73,7 +73,7 @@ object ImplicitExtensions{
       arr
     }
 
-    def init_i[T : ClassTag](sz: Int, f: Int => T ): Array[T] = {
+    def init_i[T : ClassTag](sz: Int, f: Int => T): Array[T] = {
       val arr = Array.ofDim[T](sz)
       var i = 0
       while(i < sz){

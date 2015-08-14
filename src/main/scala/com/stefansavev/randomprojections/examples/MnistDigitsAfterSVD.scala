@@ -30,8 +30,6 @@ object MnistDigitsAfterSVD {
     val doSearch = true
     val doTest = true
 
-
-
     val dataset = {
       import com.stefansavev.randomprojections.serialization.DataFrameViewSerializationExt._
       val tmpFile = "D:/tmp/tmp-dataset-mnist"

@@ -14,7 +14,7 @@ class ColumnHeaderImpl(_numCols: Int,
                        _labelName: String,
                        id2ColumnNameMap: mutable.HashMap[Int, String],
                        name2ColumnNameMap: mutable.HashMap[String, Int],
-                       rowNames: Array[String] ) extends ColumnHeader{
+                       rowNames: Array[String]) extends ColumnHeader{
   override def numCols: Int = _numCols
   override def labelName: String = _labelName
   override def getId2ColumnName(id: Int): Option[String] = id2ColumnNameMap.get(id)
