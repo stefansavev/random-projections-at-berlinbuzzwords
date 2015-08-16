@@ -31,6 +31,10 @@ class DataFrameView(val indexes: PointIndexes, val rowStoredView: RowStoredMatri
     this.pointSignatures
   }
 
+  def getAllRowNames(): Array[String] = {
+    rowStoredView.getAllRowNames()
+  }
+
   def getPointAsDenseVector(pntId: Int): Array[Double] = {
     rowStoredView.getPointAsDenseVector(pntId)
   }
