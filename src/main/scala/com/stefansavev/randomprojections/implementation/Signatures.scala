@@ -4,6 +4,7 @@ import java.util.Random
 
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+import com.stefansavev.randomprojections.utils.RandomUtils
 
 object Counts{
   def numberOf1s(input: Int): Int = {
@@ -51,27 +52,6 @@ object Counts{
   }
 }
 object Signatures {
-  //TODO: move to utils
-  def generateRandomVector(rnd: Random, numCols: Int, columnIds: Array[Int]): SparseVector = {
-    val signs = columnIds.map(_ => (if (rnd.nextDouble() >= 0.5) 1.0 else -1.0))
-    var sum = 0.0
-    var i = 0
-    while(i < signs.length){
-      val v = signs(i)
-      sum += v*v
-      i += 1
-    }
-    sum = Math.sqrt(sum)
-
-    i = 0
-    while(i < signs.length){
-      signs(i) /= sum
-      i += 1
-    }
-
-    val sparseVec = new SparseVector(numCols, columnIds,signs)
-    sparseVec
-  }
 
   def getSign(v: Double): Int = if (v >= 0) 1 else -1
   def isSignificant(v: Double): Boolean = Math.abs(v)> Math.sqrt(1.0/64)
@@ -216,7 +196,7 @@ object Signatures {
 
   def computePointSignaturesHelper(rnd: Random, dataFrameView: DataFrameView): (SparseVector, Array[Long]) = {
     val dim = dataFrameView.numCols
-    val signs = generateRandomVector(rnd, dim, Array.range(0, dim))
+    val signs = RandomUtils.generateRandomVector(rnd, dim, Array.range(0, dim))
     //generate the random vector based on the data
     //val signs = (new DataInformedProjectionStrategy(rnd, dim)).nextRandomProjection(0, dataFrameView, null).asInstanceOf[HadamardProjectionVector].signs
     val vec = Array.ofDim[Double](dataFrameView.numCols)

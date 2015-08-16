@@ -1,5 +1,7 @@
 package com.stefansavev.randomprojections.implementation
 
+import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+
 object HadamardUtils {
   //assume k is a power of 2
   //TODO: make it work without k being a power of 2
@@ -184,10 +186,46 @@ object HadamardUtils {
     recurse(0, k, input, output)
   }
 
+  def normalizeOutput(dim: Int, output: Array[Double]): Unit = {
+    val norm = Math.sqrt(dim)
+    var i = 0
+    while(i < dim){
+      output(i) /= norm
+      i += 1
+    }
+  }
+
   def roundUp(dim: Int): Int = {
     val powOf2 = largestPowerOf2(dim)
     val k = if (powOf2 == dim) dim else 2*powOf2
     k
   }
+
+  def roundDown(dim: Int): Int = {
+    largestPowerOf2(dim)
+  }
+
+  def computeHadamardFeatures(signs: SparseVector, query: Array[Double], input: Array[Double], output: Array[Double]): Unit = {
+    val dim = signs.dim
+
+    //TODO: move to function (significant overlap  with code in Signatures)
+    var j = 0
+    while(j < input.length){
+      input(j)= 0.0
+      j += 1
+    }
+
+    j = 0
+    while(j < signs.ids.length){
+      val index = signs.ids(j)
+      val b = signs.values(j)
+      val a = query(index)
+      input(j) = a * b
+      j += 1
+    }
+
+    HadamardUtils.multiplyInto(input.length, input, output)
+  }
+
 }
 
