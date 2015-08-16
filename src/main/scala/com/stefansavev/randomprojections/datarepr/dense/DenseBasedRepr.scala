@@ -181,7 +181,6 @@ class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMat
     _currentRow += 1
   }
 
-
   override def build(): RowStoredMatrixView = {
     new DenseRowStoredMatrixView(numCols, valuesBuffer.toArray, labelsBuilder.toArray, header)
   }
@@ -189,7 +188,5 @@ class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMat
   def build(newHeader: ColumnHeader): RowStoredMatrixView = {
     new DenseRowStoredMatrixView(numCols, valuesBuffer.toArray, labelsBuilder.toArray, newHeader)
   }
-
-
 }
 
