@@ -57,6 +57,8 @@ class DataFrameView(val indexes: PointIndexes, val rowStoredView: RowStoredMatri
 
   def getAllLabels(): Array[Int] = rowStoredView.getAllLabels()
 
+  def getName(rowId: Int): String = "?" //TODO: getAllRowNames()(rowId)
+
   def dist(id1: Int, id2: Int): Double = rowStoredView.dist(id1, id2)
 
   def cosineForNormalizedData(query: Array[Double], id: Int): Double = rowStoredView.cosineForNormalizedData(query, id)
