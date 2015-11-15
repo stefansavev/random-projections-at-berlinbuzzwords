@@ -17,18 +17,19 @@ object DataFrameViewSerializers {
   implicit object DenseRowStoredMatrixViewTag extends TypeTag[DenseRowStoredMatrixView]{
     def tag: Int = DenseRowStoredMatrixView.tag
   }
+
   //this is how to help the compiler
-  //implicit def denseRowStoredMatrixViewTupleTypeSerializer(): TypedSerializer[DenseRowStoredMatrixView.TupleType] = {
-  //  tuple4Serializer[Int, Array[Double], Array[Int], ColumnHeader]
-  //}
+  implicit def denseRowStoredMatrixViewTupleTypeSerializer(): TypedSerializer[DenseRowStoredMatrixView.TupleType] = {
+    tuple4Serializer[Int, Array[Double], Array[Int], ColumnHeader](TypedIntSerializer, TypedDoubleArraySerializer, TypedIntArraySerializer, ColumnHeaderSerializer)
+  }
 
   implicit def denseRowStoredMatrixSerializer(): TypedSerializer[DenseRowStoredMatrixView] = {
-    isoSerializer[DenseRowStoredMatrixView, DenseRowStoredMatrixView.TupleType]
+    isoSerializer[DenseRowStoredMatrixView, DenseRowStoredMatrixView.TupleType](DenseRowStoredMatrixViewIso, denseRowStoredMatrixViewTupleTypeSerializer())
   }
 
 
   implicit def rowStoredMatrixSerializer(): TypedSerializer[RowStoredMatrixView] = {
-    subtype1Serializer[RowStoredMatrixView, DenseRowStoredMatrixView]
+    subtype1Serializer[RowStoredMatrixView, DenseRowStoredMatrixView](DenseRowStoredMatrixViewTag, denseRowStoredMatrixSerializer())
   }
 
   implicit object PointIndexesIso extends Iso[PointIndexes, PointIndexes.TupleType]{
