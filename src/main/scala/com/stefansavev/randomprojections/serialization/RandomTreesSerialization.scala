@@ -106,11 +106,11 @@ object RandomTreesSerialization{
           deser.close()
           if (isValid){
             if (!indexFile.delete()){
-              throw new IllegalStateException("old index file cannot be deleted")
+              throw new IllegalStateException("old index file cannot be deleted" + indexFile.getAbsolutePath)
             }
           }
           else{
-            throw new IllegalStateException("unrecognized file cannot be deleted")
+            throw new IllegalStateException("unrecognized file cannot be deleted: " + indexFile.getAbsolutePath)
           }
         }
         trees.invertedIndex.toFile(indexFile)

@@ -22,33 +22,7 @@ object Counts{
   val table: Array[Int] = Array.range(0, 256).map(i => numberOf1s(i))
 
   def numberOf1sLong(input: Long): Int = {
-    /*
-    var h = input
-    //println("input:" + input.toBinaryString)
-
-    var sum = 0
-    var i = 0
-    while(i < 8){
-      val part = (input & 0xFFL).toInt
-      sum += table(part)
-      h >>= 8
-      i += 1
-    }
-    sum
-    */
-
-    val i1 = (input & 0xFFL).toInt
-    val i2 = ((input >> 8) & 0xFFL).toInt
-    val i3 = ((input >> 2*8) & 0xFFL).toInt
-    val i4 = ((input >> 3*8) & 0xFFL).toInt
-
-    val i5 = ((input >> 4*8) & 0xFFL).toInt
-    val i6 = ((input >> 5*8) & 0xFFL).toInt
-    val i7 = ((input >> 6*8) & 0xFFL).toInt
-    val i8 = ((input >> 7*8) & 0xFFL).toInt
-
-    val sum = table(i1) + table(i2) + table(i3) + table(i4) + table(i5) + table(i6) + table(i7) + table(i8)
-    sum
+    java.lang.Long.bitCount(input)
   }
 }
 object Signatures {

@@ -85,21 +85,21 @@ object WordVecs {
 
     val numColumns = 18828 //hard-coded at the moment
     val dataFrameOptions = new DataFrameOptions("label", false, null)
-    val dataset = WordVecs.fromFile(inputFile, opt, dataFrameOptions, DenseRowStoredMatrixViewBuilderFactory) // HashBasedRowStoredMatrixViewBuilderFactory)
+    val dataset = WordVecs.fromFile(inputFile, opt, dataFrameOptions, DenseRowStoredMatrixViewBuilderFactory)
 
     val debug =false
     val randomTreeSettings = IndexSettings(
-      maxPntsPerBucket=10,
-      numTrees=10,
+      maxPntsPerBucket=50,
+      numTrees=50,
       maxDepth = None,
-      projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(), //ProjectionStrategies.splitIntoKRandomProjection(32 /*2*8*/ /*16*//*64*/ /*2*32*/),
+      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(4),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
     println(dataset)
 
     val trees = Utils.timed("Build index", {
-      IndexBuilder.build(settings = randomTreeSettings,dataFrameView = dataset)
+      IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings,dataFrameView = dataset)
     }).result
 
     val searcherSettings = SearcherSettings (

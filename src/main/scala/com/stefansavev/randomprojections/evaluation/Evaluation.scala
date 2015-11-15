@@ -44,10 +44,12 @@ object Evaluation {
       }
     }
     val accuracy = (100.0*matching/present)
-    println("------------------")
-    println("kNeigbhor: " + kNeigbhor + "   missing: " + missing)
-    println("kNeigbhor: " + kNeigbhor + "   per matching: " + accuracy)
-    println("avg. neighbors per query: " + numNeighborsTotal/labels.length)
+    println("---------------------------------------")
+    println("Performance evaluation")
+
+    println("Accuracy over " + present + " neighbors: " + accuracy)
+    println("Missing neighbors at rank " + kNeigbhor + ": " + missing)
+    println("Avg. neighbors per query: " + numNeighborsTotal/labels.length)
     accuracy
   }
 

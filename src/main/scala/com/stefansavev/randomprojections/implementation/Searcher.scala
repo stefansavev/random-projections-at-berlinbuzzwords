@@ -36,12 +36,14 @@ class NonThreadSafeSearcher(settings: SearcherSettings) extends Searcher{
   val trainingSet = settings.trainingSet
 
   override def getNearestNeighborsByVector(query: Array[Double], topNearestNeighbors: Int): KNNS = {
-    PerformanceCounters.processQuery()
+    val start = System.currentTimeMillis()
     PerformanceCounters.numTrees(randomTrees.trees.length)
     val bucketSearchResult = bucketSearchStrategy.getBucketIndexes(randomTrees, query, scratchBuffer)
     PerformanceCounters.exploreBuckets(bucketSearchResult.bucketIndexBuffer.size)
     val pointIdHint = -1
     val knns = randomTrees.invertedIndex.getNearestNeighbors(topNearestNeighbors, pointIdHint, query, settings, bucketSearchResult, scratchBuffer)
+    val end = System.currentTimeMillis()
+    PerformanceCounters.processQuery(end - start)
     knns
   }
 

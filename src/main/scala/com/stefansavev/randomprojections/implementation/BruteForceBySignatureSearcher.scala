@@ -61,17 +61,13 @@ class BruteForceBySignatureSearcher(settings: SearcherSettings) extends Searcher
 
 
   override def getNearestNeighborsByVector(query: Array[Double], topNearestNeighbors: Int): KNNS = {
-    PerformanceCounters.processQuery()
-    if (Counter.i > 100000){
-      KNNS(10, -1, Array())
-    }
-    else {
-      val topNeighbors = selectTopKNeighbors(query, 10)
-      val asKNN = topNeighbors.map(ps => KNN(ps.pointId, ps.score.toInt, trainingSet.getLabel(ps.pointId), ps.score))
-
-      Counter.i += 1
-      KNNS(10, -1, asKNN)
-    }
+    val start = System.currentTimeMillis()
+    val topNeighbors = selectTopKNeighbors(query, topNearestNeighbors)
+    val asKNN = topNeighbors.map(ps => KNN(ps.pointId, ps.score.toInt, trainingSet.getLabel(ps.pointId), ps.score))
+    val end = System.currentTimeMillis()
+    Counter.i += 1
+    PerformanceCounters.processQuery(end - start)
+    KNNS(10, -1, asKNN)
   }
 
   def getNearestNeighborsById(id: Int, topNearestNeighbors: Int): KNNS = {

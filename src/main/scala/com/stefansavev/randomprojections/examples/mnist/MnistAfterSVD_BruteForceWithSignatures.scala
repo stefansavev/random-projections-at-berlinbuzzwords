@@ -58,8 +58,7 @@ object MnistAfterSVD_BruteForceWithSignatures {
 
     if (doTrain) {
       val trees = Utils.timed("Create trees", {
-        //IndexBuilder.buildWithPreprocessing(64, settings = randomTreeSettings, dataFrameView = dataset)
-        IndexBuilder.build(settings = randomTreeSettings, dataFrameView = dataset)
+        IndexBuilder.deprecate_build(settings = randomTreeSettings, dataFrameView = dataset)
       }).result
       trees.toFile(indexFile)
     }

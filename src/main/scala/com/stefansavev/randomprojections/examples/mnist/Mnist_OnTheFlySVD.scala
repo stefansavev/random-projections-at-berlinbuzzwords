@@ -31,10 +31,10 @@ object Mnist_OnTheFlySVD {
     val dataset = MnistUtils.loadData(trainFile)
 
     val randomTreeSettings = IndexSettings(
-      maxPntsPerBucket=10,
+      maxPntsPerBucket=50,
       numTrees=10,
       maxDepth = None,
-      projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(),
+      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
@@ -42,7 +42,7 @@ object Mnist_OnTheFlySVD {
 
     if (doTrain) {
       val trees = Utils.timed("Create trees", {
-        IndexBuilder.buildWithSVD(100, settings = randomTreeSettings, dataFrameView = dataset)
+        IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset)
       }).result
       trees.toFile(indexFile)
     }
@@ -66,7 +66,7 @@ object Mnist_OnTheFlySVD {
       PerformanceCounters.report()
 
       val accuracy = Evaluation.evaluate(dataset.getAllLabels(), allNN, -1, 1)
-      println("Leave one out accuracy: " + accuracy)
+      MnistUtils.printAccuracy(accuracy)
     }
 
     if (doTest){

@@ -1,5 +1,7 @@
 package com.stefansavev.randomprojections.examples.mnist
 
+import java.text.DecimalFormat
+
 import com.stefansavev.randomprojections.implementation.KNNS
 import java.io.PrintWriter
 import com.stefansavev.randomprojections.datarepr.dense.{RowStoredMatrixView, DenseRowStoredMatrixViewBuilderFactory, DataFrameOptions, DataFrameView}
@@ -25,5 +27,9 @@ object MnistUtils {
       i += 1
     }
     writer.close()
+  }
+
+  def printAccuracy(accuracy: Double): Unit = {
+    println("Leave-one-out accuracy " + new DecimalFormat("#0.00").format(accuracy))
   }
 }

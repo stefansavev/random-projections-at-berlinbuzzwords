@@ -22,10 +22,10 @@ object TestOnRandomData {
       val randomBitStringsDataset = RandomBitStrings.genRandomData(58585, dataGenSettings, debug, true)
 
       val randomTreeSettings = IndexSettings(
-        maxPntsPerBucket=10,
-        numTrees=10,
+        maxPntsPerBucket=50,
+        numTrees=50,
         maxDepth = None,
-        projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(), //.splitIntoKRandomProjection(2),
+        projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(),
         reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
         randomSeed = 39393
       )
@@ -33,8 +33,7 @@ object TestOnRandomData {
       println("Number of Rows: " + randomBitStringsDataset.numRows)
 
       val trees = Utils.timed("Build Index", {
-        //IndexBuilder.buildWithPreprocessing(256, settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
-        IndexBuilder.build(settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
+        IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
       }).result
 
       val searcherSettings = SearcherSettings (
