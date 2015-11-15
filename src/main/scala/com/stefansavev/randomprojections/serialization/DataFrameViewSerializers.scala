@@ -46,12 +46,12 @@ object DataFrameViewSerializers {
     def to(t: Output): Input = DataFrameView.fromTuple(t)
   }
 
-  implicit def testSerializer(): TypedSerializer[DataFrameView.TupleType] = {
+  implicit def dataFrameViewTupleSerializer(): TypedSerializer[DataFrameView.TupleType] = {
     tuple2Serializer[PointIndexes, RowStoredMatrixView](pointIndexesSerializer, rowStoredMatrixSerializer)
   }
 
   implicit def dataFrameSerializer(): TypedSerializer[DataFrameView] = {
-    isoSerializer[DataFrameView, DataFrameView.TupleType](DataFrameViewIso, testSerializer())
+    isoSerializer[DataFrameView, DataFrameView.TupleType](DataFrameViewIso, dataFrameViewTupleSerializer())
   }
 
 }

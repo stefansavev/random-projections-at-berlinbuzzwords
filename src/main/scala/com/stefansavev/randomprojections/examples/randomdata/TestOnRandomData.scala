@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples
+package com.stefansavev.randomprojections.examples.randomdata
 
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
 import com.stefansavev.randomprojections.implementation._
@@ -6,6 +6,7 @@ import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScore
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{Utils, AllNearestNeighborsForDataset}
+
 
 object TestOnRandomData {
 

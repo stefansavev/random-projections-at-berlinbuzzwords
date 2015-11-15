@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples
+package com.stefansavev.randomprojections.examples.wordvec
 
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.file.{CSVFile, CSVFileOptions}
@@ -10,6 +10,7 @@ import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{Utils, AllNearestNeighborsForDataset}
 
 import scala.collection.mutable.ArrayBuffer
+import com.stefansavev.randomprojections.examples.ExamplesSettings
 
 object WordVecs {
   def fromFile(fileName: String,  opt: CSVFileOptions, dataFrameOptions: DataFrameOptions,  matrixBuilderFactory: RowStoredMatrixViewBuilderFactory): DataFrameView = {

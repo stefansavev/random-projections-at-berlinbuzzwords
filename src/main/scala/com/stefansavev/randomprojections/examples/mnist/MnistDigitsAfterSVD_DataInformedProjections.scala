@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples
+package com.stefansavev.randomprojections.examples.mnist
 
 import java.io.PrintWriter
 import com.stefansavev.randomprojections.datarepr.dense.{DataFrameOptions, DataFrameView, DenseRowStoredMatrixViewBuilderFactory, RowStoredMatrixView}
@@ -10,15 +10,10 @@ import com.stefansavev.randomprojections.serialization.RandomTreesSerialization
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{AllNearestNeighborsForDataset, Utils}
+import com.stefansavev.randomprojections.examples.ExamplesSettings
 
 object MnistDigitsAfterSVD_DataInformedProjections {
   import RandomTreesSerialization.Implicits._
-
-  def loadData(fileName: String): DataFrameView ={
-    val opt = CSVFileOptions(onlyTopRecords = None)
-    val dataFrameOptions = new DataFrameOptions(labelColumnName = "label", builderFactory = DenseRowStoredMatrixViewBuilderFactory, normalizeVectors = true)
-    RowStoredMatrixView.fromFile(fileName, opt, dataFrameOptions)
-  }
 
   def main (args: Array[String]): Unit = {
     val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")
@@ -30,7 +25,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
     val doSearch = true
     val doTest = true
 
-    val dataset = loadData(trainFile)
+    val dataset = MnistUtils.loadData(trainFile)
 
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=10,
@@ -75,7 +70,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
     }
 
     if (doTest){
-      val testDataset = loadData(testFile)
+      val testDataset = MnistUtils.loadData(testFile)
       println(testDataset)
       val treesFromFile = RandomTrees.fromFile(indexFile)
 
@@ -91,22 +86,8 @@ object MnistDigitsAfterSVD_DataInformedProjections {
       val allNN = Utils.timed("Search all Nearest neighbors", {
         AllNearestNeighborsForDataset.getTopNearestNeighborsForAllPointsTestDataset(100, searcher, testDataset)
       }).result
-      writePredictionsInKaggleFormat(predictionsOnTestFile, allNN)
+      MnistUtils.writePredictionsInKaggleFormat(predictionsOnTestFile, allNN)
       //expected score on kaggle: ?
     }
-  }
-
-  def writePredictionsInKaggleFormat(outputFile: String, allKnns: Array[KNNS]): Unit = {
-    val writer = new PrintWriter(outputFile)
-    writer.println("ImageId,Label")
-    var i = 0
-    while(i < allKnns.length){
-      val topNNLabel = allKnns(i).neighbors(0).label
-      val pointId = i + 1
-      val asStr = s"${pointId},${topNNLabel}"
-      writer.println(asStr)
-      i += 1
-    }
-    writer.close()
   }
 }

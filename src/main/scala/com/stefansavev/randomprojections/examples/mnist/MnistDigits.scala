@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples
+package com.stefansavev.randomprojections.examples.mnist
 
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.file.CSVFileOptions
@@ -9,22 +9,17 @@ import com.stefansavev.randomprojections.serialization.RandomTreesSerialization
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{Utils, AllNearestNeighborsForDataset}
+import com.stefansavev.randomprojections.examples.ExamplesSettings
 
 
 object MnistDigits {
   import RandomTreesSerialization.Implicits._
 
-  def loadData(fileName: String): DataFrameView ={
-    val opt = CSVFileOptions(onlyTopRecords = None)
-    val dataFrameOptions = new DataFrameOptions(labelColumnName = "label", builderFactory = DenseRowStoredMatrixViewBuilderFactory, normalizeVectors = true)
-    RowStoredMatrixView.fromFile(fileName, opt, dataFrameOptions)
-  }
-
   def main (args: Array[String]): Unit = {
     val inputFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/originaldata/train.csv")
     val indexFile = Utils.combinePaths(ExamplesSettings.outputDirectory, "mnist/originaldata-index")
 
-    val dataset = loadData(inputFile)
+    val dataset = MnistUtils.loadData(inputFile)
     val doTrain = true
     val doSearch = true
 

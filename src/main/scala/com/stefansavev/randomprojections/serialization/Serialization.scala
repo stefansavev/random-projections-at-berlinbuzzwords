@@ -256,12 +256,13 @@ object DimensionalityReductionTransformSerializer{
 }
 
 object DataFrameViewSerializer{
-  def toBinary(outputStream: OutputStream, distanceEvaluator: DataFrameView): Unit = {
-    null
+  val serializer = DataFrameViewSerializers.dataFrameSerializer()
+  def toBinary(outputStream: OutputStream, dataFrameView: DataFrameView): Unit = {
+    serializer.toBinary(outputStream, dataFrameView)
   }
 
   def fromBinary(inputStream: InputStream): DataFrameView = {
-    null
+    serializer.fromBinary(inputStream)
   }
 }
 

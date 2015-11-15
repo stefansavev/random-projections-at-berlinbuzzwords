@@ -1,36 +1,18 @@
-package com.stefansavev.randomprojections.examples
+package com.stefansavev.randomprojections.examples.mnist
 
 import java.io.PrintWriter
-import com.stefansavev.randomprojections.datarepr.dense.DataFrameOptions
-import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
-import com.stefansavev.randomprojections.datarepr.dense.DenseRowStoredMatrixViewBuilderFactory
-import com.stefansavev.randomprojections.datarepr.dense.RowStoredMatrixView
 import com.stefansavev.randomprojections.datarepr.dense.{DataFrameOptions, DataFrameView, DenseRowStoredMatrixViewBuilderFactory, RowStoredMatrixView}
-import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.file.CSVFileOptions
-import com.stefansavev.randomprojections.file.CSVFileOptions
-import com.stefansavev.randomprojections.implementation.IndexSettings
-import com.stefansavev.randomprojections.implementation.KNNS
-import com.stefansavev.randomprojections.implementation.NonThreadSafeSearcher
-import com.stefansavev.randomprojections.implementation.ProjectionStrategies
-import com.stefansavev.randomprojections.implementation.RandomTrees
-import com.stefansavev.randomprojections.implementation.SearcherSettings
-import com.stefansavev.randomprojections.implementation.bucketsearch.PointScoreSettings
-import com.stefansavev.randomprojections.implementation.bucketsearch.PriorityQueueBasedBucketSearchSettings
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
-import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
-import com.stefansavev.randomprojections.serialization.RandomTreesSerialization
 import com.stefansavev.randomprojections.serialization.RandomTreesSerialization
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
-import com.stefansavev.randomprojections.tuning.PerformanceCounters
-import com.stefansavev.randomprojections.utils.AllNearestNeighborsForDataset
-import com.stefansavev.randomprojections.utils.Utils
 import com.stefansavev.randomprojections.utils.{AllNearestNeighborsForDataset, Utils}
+import com.stefansavev.randomprojections.examples.ExamplesSettings
 
-object MnistAfterSVD_BruteForceWithSignatures {
+object MnistDigitsAfterSVD {
   import RandomTreesSerialization.Implicits._
 
   def loadData(fileName: String): DataFrameView ={
@@ -41,22 +23,21 @@ object MnistAfterSVD_BruteForceWithSignatures {
 
   def main (args: Array[String]): Unit = {
     val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")
-    //val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/originaldata/train.csv")
     val indexFile = Utils.combinePaths(ExamplesSettings.outputDirectory, "mnist/svdpreprocessed-index")
     val testFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/test.csv")
     val predictionsOnTestFile = Utils.combinePaths(ExamplesSettings.outputDirectory, "mnist/predictions-test-svd.csv")
 
     val doTrain = true
     val doSearch = true
-    val doTest = false
+    val doTest = true
 
-    val dataset = loadData(trainFile)
+    val dataset = MnistUtils.loadData(trainFile)
 
     val randomTreeSettings = IndexSettings(
-      maxPntsPerBucket=0,
-      numTrees=0,
+      maxPntsPerBucket=10,
+      numTrees=10,
       maxDepth = None,
-      projectionStrategyBuilder = ProjectionStrategies.onlySignaturesStrategy(),
+      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(2),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
@@ -64,8 +45,7 @@ object MnistAfterSVD_BruteForceWithSignatures {
 
     if (doTrain) {
       val trees = Utils.timed("Create trees", {
-        //IndexBuilder.buildWithPreprocessing(64, settings = randomTreeSettings, dataFrameView = dataset)
-        IndexBuilder.build(settings = randomTreeSettings, dataFrameView = dataset)
+        IndexBuilder.buildWithPreprocessing(64, settings = randomTreeSettings, dataFrameView = dataset)
       }).result
       trees.toFile(indexFile)
     }
@@ -74,12 +54,12 @@ object MnistAfterSVD_BruteForceWithSignatures {
       val treesFromFile = RandomTrees.fromFile(indexFile)
 
       val searcherSettings = SearcherSettings (
-        bucketSearchSettings = BruteForceSignatureSearch(),
-        pointScoreSettings = PointScoreSettings(topKCandidates = 50, rescoreExactlyTopK = 50),
+        bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 100),
+        pointScoreSettings = PointScoreSettings(topKCandidates = 100, rescoreExactlyTopK = 100),
         randomTrees = treesFromFile,
         trainingSet = dataset)
 
-      val searcher = new BruteForceBySignatureSearcher(searcherSettings)
+      val searcher = new NonThreadSafeSearcher(searcherSettings)
 
       PerformanceCounters.initialize()
       val allNN = Utils.timed("Search all Nearest neighbors", {
@@ -89,7 +69,7 @@ object MnistAfterSVD_BruteForceWithSignatures {
       PerformanceCounters.report()
 
       val accuracy = Evaluation.evaluate(dataset.getAllLabels(), allNN, -1, 1)
-      if (Math.abs(accuracy - 97.5666) > 0.001){
+      if (Math.abs(accuracy - 97.55) > 0.001){
         throw new IllegalStateException("broke it")
       }
     }
@@ -111,22 +91,10 @@ object MnistAfterSVD_BruteForceWithSignatures {
       val allNN = Utils.timed("Search all Nearest neighbors", {
         AllNearestNeighborsForDataset.getTopNearestNeighborsForAllPointsTestDataset(100, searcher, testDataset)
       }).result
-      writePredictionsInKaggleFormat(predictionsOnTestFile, allNN)
-      //expected score on kaggle: ?
+      MnistUtils.writePredictionsInKaggleFormat(predictionsOnTestFile, allNN)
+      //expected score on kaggle: 0.97557
     }
   }
 
-  def writePredictionsInKaggleFormat(outputFile: String, allKnns: Array[KNNS]): Unit = {
-    val writer = new PrintWriter(outputFile)
-    writer.println("ImageId,Label")
-    var i = 0
-    while(i < allKnns.length){
-      val topNNLabel = allKnns(i).neighbors(0).label
-      val pointId = i + 1
-      val asStr = s"${pointId},${topNNLabel}"
-      writer.println(asStr)
-      i += 1
-    }
-    writer.close()
-  }
+
 }
