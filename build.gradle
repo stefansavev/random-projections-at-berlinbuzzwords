@@ -2,8 +2,10 @@ apply plugin: 'maven'
 apply plugin: 'scala'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
-apply plugin: 'java-library-distribution'
+apply plugin: 'distribution'
 
+version = '0.1'
+group = 'com.stefansavev'
 
 repositories {
     mavenCentral()
@@ -30,3 +32,18 @@ dependencies {
     testCompile "junit:junit:4.11"
 }
 
+publishing {
+    publications {
+        myPublication(MavenPublication) {
+            // telling gradle to publish project's jar archive (2)
+            from components.java
+        }
+    }
+    // telling gradle to publish artifact to local directory (3)
+    repositories {
+        maven {
+            url "file:/${project.projectDir}/artifacts"
+            //url "file:/${project.projectDir}/../fuzzy-search-demo/local/repository"
+        }
+    }
+}
