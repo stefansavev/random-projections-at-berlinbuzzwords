@@ -3,7 +3,7 @@ package com.stefansavev.fuzzysearch.implementation
 import java.io.File
 import java.util
 
-import com.stefansavev.fuzzysearch.{FuzzySearchItem, NearestNeighbor}
+import com.stefansavev.fuzzysearch.{FuzzySearchItem, FuzzySearchResult}
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
@@ -23,18 +23,18 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
 
   val searcher = new NonThreadSafeSearcher(searcherSettings)
 
-  def getNearestNeighborsByQuery(numNeighbors: Int, query: Array[Double]): java.util.List[NearestNeighbor] = {
+  def getNearestNeighborsByQuery(numNeighbors: Int, query: Array[Double]): java.util.List[FuzzySearchResult] = {
     val knns = searcher.getNearestNeighborsByVector(query, numNeighbors)
     val neighbors = knns.neighbors
     val dataset = this.dataset
-    val result = new java.util.ArrayList[NearestNeighbor]()
+    val result = new java.util.ArrayList[FuzzySearchResult]()
     var i = 0
     while(i < neighbors.length){
       val nn = neighbors(i)
       val id = nn.neighborId
       val name = dataset.getName(id)
       val label = nn.label
-      result.add(new NearestNeighbor(name, label, nn.dist))
+      result.add(new FuzzySearchResult(name, label, nn.dist))
       i += 1
     }
     result

@@ -55,7 +55,7 @@ public class MnistTest {
 
         while ((line = reader.readLine()) != null) {
             FuzzySearchItem item = parseItem(lineNumber, line, dataDimension);
-            List<NearestNeighbor> results = index.getNearestNeighborsByQuery(10, item.getVector());
+            List<FuzzySearchResult> results = index.getNearestNeighborsByQuery(10, item.getVector());
 
         }
         reader.close();
@@ -72,7 +72,7 @@ public class MnistTest {
 
         while (itemsIterator.hasNext()) {
             FuzzySearchItem item = itemsIterator.next();
-            List<NearestNeighbor> results = index.getNearestNeighborsByQuery(10, item.getVector());
+            List<FuzzySearchResult> results = index.getNearestNeighborsByQuery(10, item.getVector());
             if (results.get(0).getLabel() != item.getLabel()){
                 throw new IllegalStateException("The top result should be the query itself");
             }

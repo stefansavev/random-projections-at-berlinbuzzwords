@@ -1,11 +1,11 @@
 package com.stefansavev.fuzzysearch;
 
-public class NearestNeighbor {
+public class FuzzySearchResult {
     String name;
     int label;
     double cosineSimilarity;
 
-    public NearestNeighbor(String name, int label, double cosineSimilarity){
+    public FuzzySearchResult(String name, int label, double cosineSimilarity){
         this.name = name;
         this.label = label;
         this.cosineSimilarity = cosineSimilarity;

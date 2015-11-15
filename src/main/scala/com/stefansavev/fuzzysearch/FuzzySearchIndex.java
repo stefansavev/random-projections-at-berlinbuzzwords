@@ -20,7 +20,7 @@ public class FuzzySearchIndex {
         return new FuzzySearchIndex(FuzzySearchIndexWrapper.open(fileName));
     }
 
-    public List<NearestNeighbor> getNearestNeighborsByQuery(int numNeighbors, double[] query){
+    public List<FuzzySearchResult> getNearestNeighborsByQuery(int numNeighbors, double[] query){
         double[] normalizedQuery = DataPointVerifier.normalizeDataPointOrFail(query);
         return wrapper.getNearestNeighborsByQuery(numNeighbors, normalizedQuery);
     }
