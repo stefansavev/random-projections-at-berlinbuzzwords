@@ -33,7 +33,7 @@ object WordVecs {
         ((i, getTransformer(columnName)), (columnName, i))
       }).unzip
 
-    val header = ColumnHeaderBuilder.build("label", columnWithDataFrameIndexes, Array.empty)
+    val header = ColumnHeaderBuilder.build("label", columnWithDataFrameIndexes, false)
     val builder = matrixBuilderFactory.create(header)
 
     var numRows = 0
@@ -68,7 +68,7 @@ object WordVecs {
       }
     }
     file.close()
-    val newHeader = ColumnHeaderBuilder.build("label", columnWithDataFrameIndexes, buff.toArray)
+    val newHeader = ColumnHeaderBuilder.build("label", columnWithDataFrameIndexes, false)
     val b = builder.asInstanceOf[DenseRowStoredMatrixViewBuilder].build(newHeader)
 
     val indexes = PointIndexes(Array.range(0, numRows))

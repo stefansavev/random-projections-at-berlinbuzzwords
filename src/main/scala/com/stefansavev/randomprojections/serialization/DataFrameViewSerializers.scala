@@ -1,11 +1,13 @@
 package com.stefansavev.randomprojections.serialization
 
 import com.stefansavev.randomprojections.datarepr.dense._
+import com.stefansavev.randomprojections.serialization.String2IdHasherSerialization.String2IdHasherSerializer
 import com.stefansavev.randomprojections.serialization.core.Core._
 import com.stefansavev.randomprojections.serialization.core.TupleSerializers._
 import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers._
 import com.stefansavev.randomprojections.serialization.ColumnHeaderSerialization._
 import com.stefansavev.randomprojections.serialization.core.TypedSerializer
+import com.stefansavev.randomprojections.utils.String2IdHasher
 
 object DataFrameViewSerializers {
 
@@ -20,7 +22,7 @@ object DataFrameViewSerializers {
 
   //this is how to help the compiler
   implicit def denseRowStoredMatrixViewTupleTypeSerializer(): TypedSerializer[DenseRowStoredMatrixView.TupleType] = {
-    tuple4Serializer[Int, Array[Double], Array[Int], ColumnHeader](TypedIntSerializer, TypedDoubleArraySerializer, TypedIntArraySerializer, ColumnHeaderSerializer)
+    tuple5Serializer[Int, Array[Double], Array[Int], ColumnHeader, String2IdHasher](TypedIntSerializer, TypedDoubleArraySerializer, TypedIntArraySerializer, ColumnHeaderSerializer, String2IdHasherSerializer)
   }
 
   implicit def denseRowStoredMatrixSerializer(): TypedSerializer[DenseRowStoredMatrixView] = {

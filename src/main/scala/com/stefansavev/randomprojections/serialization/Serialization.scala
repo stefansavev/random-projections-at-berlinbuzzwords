@@ -75,6 +75,35 @@ object IntSerializer{
   }
 }
 
+object StringSerializer{
+
+  def write(outputStream: OutputStream, value: String): Unit = {
+    IntSerializer.write(outputStream, value.length)
+    val buffer = ByteBuffer.allocate(value.length*2)
+    var i = 0
+    while(i < value.length){
+      buffer.putChar(value(i))
+      i += 1
+    }
+    buffer.rewind()
+    outputStream.write(buffer.array())
+  }
+
+  def read(inputStream: InputStream): String = {
+    val len = IntSerializer.read(inputStream)
+    val buffer = Array.ofDim[Byte](len*2)
+    inputStream.read(buffer)
+    val byteBuffer = ByteBuffer.wrap(buffer)
+    val output = Array.ofDim[Char](len)
+    var i = 0
+    while(i < len){
+      output(i) = byteBuffer.getChar()
+      i += 1
+    }
+    new String(output)
+  }
+}
+
 object DoubleSerializer{
   val bytes = Array.ofDim[Byte](8)
   def toByteArray(value: Double): Array[Byte] = {

@@ -15,7 +15,9 @@ public class MnistTest {
         for(int i = 0; i < numDimensions; i ++){
             values[i] = Double.parseDouble(tokens[i + 1]);
         }
-        return new FuzzySearchItem(Integer.toString(lineNumber), label, values);
+        String lineNumberStr = Integer.toString(lineNumber);
+        String name = lineNumberStr + "#" + lineNumberStr;
+        return new FuzzySearchItem(name, label, values);
     }
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
@@ -73,10 +75,9 @@ public class MnistTest {
         while (itemsIterator.hasNext()) {
             FuzzySearchItem item = itemsIterator.next();
             List<FuzzySearchResult> results = index.getNearestNeighborsByQuery(10, item.getVector());
-            if (results.get(0).getLabel() != item.getLabel()){
+            if (!results.get(0).getName().equals(item.getName())){
                 throw new IllegalStateException("The top result should be the query itself");
             }
-            //System.out.println(results.get(1).getCosineSimilarity());
             if (item.getLabel() == results.get(1).getLabel()){
                 agree ++;
             }

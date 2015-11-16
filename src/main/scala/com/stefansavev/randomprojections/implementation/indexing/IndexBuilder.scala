@@ -101,7 +101,7 @@ object IndexBuilder{
     val oldHeader = dataFrame.rowStoredView.getColumnHeader
     val newNumCols = projSt.asInstanceOf[SplitIntoKProjectionStrategy].k
     val newF = Array.range(0, newNumCols).map(i => (i.toString,i ))
-    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, Array.empty)
+    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, false)
     val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
     val absprojVec = projSt.nextRandomProjection(0, dataFrame, null)
     val signs = absprojVec.asInstanceOf[HadamardProjectionVector].signs

@@ -249,7 +249,7 @@ object SVDTest {
     val oldHeader = dataFrame.rowStoredView.getColumnHeader
     val newNumCols = k
     val newF = Array.range(0, newNumCols).map(i => (i.toString,i ))
-    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, Array.empty)
+    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, false)
     val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
 
     val colIds = Array.range(0, dataFrame.numCols)

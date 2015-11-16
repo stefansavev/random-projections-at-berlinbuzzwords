@@ -9,7 +9,8 @@ trait RowStoredMatrixView{
   def numCols: Int
   def getAllLabels(): Array[Int]
   def getLabel(rowId: Int): Int
-
+  def getRowIdByName(name: String): Int
+  def getName(rowId: Int): String
   def getPointAsDenseVector(pntId: Int): Array[Double]
   def getPointAsDenseVector(pntId: Int, signs: Array[Int], vec: Array[Double]): Unit
 
@@ -59,7 +60,7 @@ object RowStoredMatrixView{
       }).unzip
     //val frameBuilder = ByRowDataFrameBuilder(header)
     //def build(_labelName: String, columnIds: Array[(String, Int)]): ColumnHeader = {
-    val header = ColumnHeaderBuilder.build(labelColumnName, columnWithDataFrameIndexes, Array.empty)
+    val header = ColumnHeaderBuilder.build(labelColumnName, columnWithDataFrameIndexes, false)
     val builder = matrixBuilderFactory.create(header)
 
     var numRows = 0

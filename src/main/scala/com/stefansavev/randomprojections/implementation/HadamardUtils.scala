@@ -166,6 +166,10 @@ object HadamardUtils {
     j
   }
 
+  def isPowerOf2(k: Int): Boolean = {
+    largestPowerOf2(k) == k
+  }
+
   def multiplyInto(input: Array[Double], output: Array[Double]): Unit = {
     val k = largestPowerOf2(input.length)
     var i = 0

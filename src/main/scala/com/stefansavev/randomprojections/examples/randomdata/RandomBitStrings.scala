@@ -43,7 +43,7 @@ object RandomBitStrings {
     var i = 0
 
     val columnNames = Array.range(0, numCols).map((i: Int) => ("feature" + i, i))
-    val header = ColumnHeaderBuilder.build("label", columnNames, Array.empty)
+    val header = ColumnHeaderBuilder.build("label", columnNames, false)
 
     val builder = RowStoredMatrixViewBuilderFactory.createDense(header)
 

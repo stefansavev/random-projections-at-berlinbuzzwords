@@ -11,7 +11,6 @@ import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.serialization.{DataFrameViewSerializationExt, DataFrameViewSerializers, RandomTreesSerialization}
 import com.stefansavev.randomprojections.utils.Utils
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
@@ -61,8 +60,13 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
     dataset.toFile(datasetFullFile)
   }
 
-  def getItemByName(name: String):FuzzySearchItem = {
-    null
+  def getItemByName(name: String): FuzzySearchItem = {
+    val i = dataset.getRowIdByName(name)
+    getItemById(i)
+  }
+
+  def getItemById(i: Int): FuzzySearchItem = {
+    new FuzzySearchItem(dataset.getName(i), dataset.getLabel(i), dataset.getPointAsDenseVector(i))
   }
 
   def getDimension(): Int = {
@@ -75,7 +79,7 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
       var i = 0
 
       override def next(): FuzzySearchItem = {
-        val item = new FuzzySearchItem(dataset.getName(i), dataset.getLabel(i), dataset.getPointAsDenseVector(i))
+        val item = getItemById(i)
         i += 1
         item
       }
@@ -112,22 +116,20 @@ object FuzzySearchIndexWrapper{
 
 class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int){
   val columnIds = Array.range(0, dim)
-  val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), Array.empty)
+  val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true)
   val names = new ArrayBuffer[String]()
   val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
 
   def addItem(name: String, label: Int, dataPoint: Array[Double]): Unit = {
     names += name
-    builder.addRow(label, columnIds, dataPoint)
+    builder.addRow(name, label, columnIds, dataPoint)
   }
 
   def build(): FuzzySearchIndexWrapper = {
     builder.build()
     val numRows = names.size
     val indexes = PointIndexes(Array.range(0, numRows))
-    val modifiedHeader = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), names.toArray)
-    val dataset = new DataFrameView(indexes, builder.asInstanceOf[DenseRowStoredMatrixViewBuilder].build(modifiedHeader))
-
+    val dataset = new DataFrameView(indexes, builder.asInstanceOf[DenseRowStoredMatrixViewBuilder].build())
 
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=50,

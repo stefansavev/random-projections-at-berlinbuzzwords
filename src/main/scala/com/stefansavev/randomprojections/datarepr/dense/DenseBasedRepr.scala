@@ -3,15 +3,37 @@ package com.stefansavev.randomprojections.datarepr.dense
 import com.stefansavev.randomprojections.buffers.{DoubleArrayBuffer, IntArrayBuffer}
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.file.CSVFileOptions
+import com.stefansavev.randomprojections.utils.{StringIdHasherSettings, String2IdHasher}
 
-class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val labels: Array[Int], header: ColumnHeader) extends RowStoredMatrixView{
+class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val labels: Array[Int], header: ColumnHeader, rowName2Hash: String2IdHasher = null) extends RowStoredMatrixView{
 
-  def toTuple: DenseRowStoredMatrixView.TupleType = (_numCols, data, labels, header)
+  def toTuple: DenseRowStoredMatrixView.TupleType = (_numCols, data, labels, header, rowName2Hash)
 
   override def numCols: Int = _numCols
 
   override def getColumnHeader: ColumnHeader = header
-  override def getAllRowNames(): Array[String] = header.getRowNames
+  override def getAllRowNames(): Array[String] = {
+    throw new IllegalStateException()
+  }
+
+  def getRowIdByName(name: String): Int = {
+    val hashCode = rowName2Hash.getOrAddId(name, false)
+    if (hashCode < 0){
+      -1
+    }
+    else{
+      rowName2Hash.getInternalId(hashCode)
+    }
+  }
+
+  def getName(rowId: Int): String = {
+    if (rowName2Hash != null){
+      rowName2Hash.getStringAtInternalIndex(rowId).get
+    }
+    else{
+      null
+    }
+  }
 
   def getAllLabels(): Array[Int] = labels
 
@@ -135,10 +157,10 @@ object DenseRowStoredMatrixView{
     RowStoredMatrixView.fromFile(fileName, opt, dataFrameOptions)
   }
 
-  type TupleType = (Int, Array[Double], Array[Int], ColumnHeader)
+  type TupleType = (Int, Array[Double], Array[Int], ColumnHeader, String2IdHasher)
 
   def fromTuple(t: DenseRowStoredMatrixView.TupleType): DenseRowStoredMatrixView = {
-    new DenseRowStoredMatrixView(t._1, t._2, t._3, t._4)
+    new DenseRowStoredMatrixView(t._1, t._2, t._3, t._4, t._5)
   }
 
   def tag: Int = 1
@@ -150,6 +172,8 @@ object DenseRowStoredMatrixViewBuilderFactory extends RowStoredMatrixViewBuilder
 }
 
 class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMatrixViewBuilder{
+  val maxRows: Int = 2 << 19 //maximum number of rows is just above 3 million
+  val string2IdHasher = if (header.hasRowNames()) new String2IdHasher(StringIdHasherSettings(maxRows, 50, 4)) else null
   val numCols = header.numCols
 
   var _currentRow = 0
@@ -160,10 +184,26 @@ class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMat
   override def currentRowId: Int = _currentRow
 
   override def addRow(label: Int, ids: Array[Int], values: Array[Double]): Unit = {
+    addRow(null, label, ids, values)
+  }
+
+  override def addRow(name: String, label: Int, ids: Array[Int], values: Array[Double]): Unit = {
     val sz = ids.length
     if (sz != numCols){
       throw new IllegalStateException("ids.length should equal number of columns")
     }
+
+    if (string2IdHasher != null) {
+      val hashCode = string2IdHasher.add(name)
+      if (hashCode < 0) {
+        throw new IllegalStateException("max. number of allowed documents is exceeded")
+      }
+      val internalIndex = string2IdHasher.getInternalId(hashCode)
+      if (internalIndex != _currentRow) {
+        throw new IllegalStateException("Internal error: internalIndex != _currentRow")
+      }
+    }
+
     val orderedValues = Array.ofDim[Double](sz)
     var i = 0
     while(i < ids.length){
@@ -182,7 +222,7 @@ class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMat
   }
 
   override def build(): RowStoredMatrixView = {
-    new DenseRowStoredMatrixView(numCols, valuesBuffer.toArray, labelsBuilder.toArray, header)
+    new DenseRowStoredMatrixView(numCols, valuesBuffer.toArray, labelsBuilder.toArray, header, string2IdHasher)
   }
 
   def build(newHeader: ColumnHeader): RowStoredMatrixView = {

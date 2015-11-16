@@ -225,7 +225,7 @@ class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends Dimensionali
     val oldHeader = dataFrame.rowStoredView.getColumnHeader
     val newNumCols = k
     val newF = Array.range(0, newNumCols).map(i => (i.toString,i ))
-    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, dataFrame.rowStoredView.getAllRowNames())
+    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, false)
     val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
 
     val colIds = Array.range(0, dataFrame.numCols)

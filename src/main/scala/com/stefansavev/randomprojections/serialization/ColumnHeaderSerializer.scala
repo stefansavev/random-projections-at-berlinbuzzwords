@@ -14,7 +14,7 @@ object ColumnHeaderSerialization{
 
     def fromBinary(stream: java.io.InputStream): ColumnHeader = {
       val numCols = stream.readInt()
-      new ColumnHeaderImpl(numCols, null, null, null, null)
+      new ColumnHeaderImpl(numCols, null, null, null, false)
     }
   }
 }

@@ -27,6 +27,10 @@ class DataFrameView(val indexes: PointIndexes, val rowStoredView: RowStoredMatri
     this.pointSignatures = pointSignatures
   }
 
+  def getRowIdByName(name: String): Int = {
+    rowStoredView.getRowIdByName(name)
+  }
+
   def getPointSignatures(): PointSignatures = {
     this.pointSignatures
   }
@@ -57,7 +61,9 @@ class DataFrameView(val indexes: PointIndexes, val rowStoredView: RowStoredMatri
 
   def getAllLabels(): Array[Int] = rowStoredView.getAllLabels()
 
-  def getName(rowId: Int): String = "?" //TODO: getAllRowNames()(rowId)
+  def getName(rowId: Int): String = {
+    rowStoredView.getName(rowId)
+  }
 
   def dist(id1: Int, id2: Int): Double = rowStoredView.dist(id1, id2)
 

@@ -6,20 +6,19 @@ trait ColumnHeader{
   def labelName: String
   def getId2ColumnName(id: Int): Option[String]
   def getColumnName2Id(name: String): Option[Int]
-  def getRowNames: Array[String]
   def isCompatible(header: ColumnHeader): Boolean
+  def hasRowNames(): Boolean
 }
 
 class ColumnHeaderImpl(_numCols: Int,
                        _labelName: String,
                        id2ColumnNameMap: mutable.HashMap[Int, String],
-                       name2ColumnNameMap: mutable.HashMap[String, Int],
-                       rowNames: Array[String]) extends ColumnHeader{
+                       name2ColumnNameMap: mutable.HashMap[String, Int], _hasRowNames: Boolean) extends ColumnHeader{
   override def numCols: Int = _numCols
   override def labelName: String = _labelName
   override def getId2ColumnName(id: Int): Option[String] = id2ColumnNameMap.get(id)
   override def getColumnName2Id(name: String): Option[Int] = name2ColumnNameMap.get(name)
-  override def getRowNames: Array[String] = rowNames
+  override def hasRowNames(): Boolean = _hasRowNames
 
   override def isCompatible(header: ColumnHeader): Boolean = {
     if (numCols == header.numCols){ // && labelName == header.labelName){
@@ -34,7 +33,7 @@ class ColumnHeaderImpl(_numCols: Int,
 }
 
 object ColumnHeaderBuilder{
-  def build(_labelName: String, columnIds: Array[(String, Int)], rowNames: Array[String]): ColumnHeader = {
+  def build(_labelName: String, columnIds: Array[(String, Int)], hasRowNames: Boolean): ColumnHeader = {
     val id2ColumnNameMap = mutable.HashMap[Int, String]()
 
     val name2ColumnNameMap = mutable.HashMap[String, Int]()
@@ -51,6 +50,6 @@ object ColumnHeaderBuilder{
       addOrFail(name2ColumnNameMap, name, id, "name")
     }
 
-    new ColumnHeaderImpl(columnIds.length, _labelName, id2ColumnNameMap, name2ColumnNameMap,rowNames)
+    new ColumnHeaderImpl(columnIds.length, _labelName, id2ColumnNameMap, name2ColumnNameMap, hasRowNames)
   }
 }
