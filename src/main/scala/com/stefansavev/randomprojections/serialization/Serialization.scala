@@ -480,6 +480,10 @@ object RandomTreeSerializer{
           ProjectionVectorSerializer.toBinary(outputStream, projVector)
           RandomTreeSerializer.toBinary(outputStream, child)
         }
+        case EfficientlyStoredTree(treeReader: TreeReader) => {
+          outputStream.writeInt(5)
+          IntArraySerializer.write(outputStream, treeReader.getInternalStore())
+        }
       }
     }
   }
@@ -512,6 +516,10 @@ object RandomTreeSerializer{
         val vec = ProjectionVectorSerializer.fromBinary(inputStream)
         val child = RandomTreeSerializer.fromBinary(inputStream)
         RandomTreeNodeRoot(vec, child)
+      }
+      case 5 => {
+        val internalStorage = IntArraySerializer.read(inputStream)
+        EfficientlyStoredTree(new TreeReader(new TreeReadBuffer(internalStorage)))
       }
     }
   }

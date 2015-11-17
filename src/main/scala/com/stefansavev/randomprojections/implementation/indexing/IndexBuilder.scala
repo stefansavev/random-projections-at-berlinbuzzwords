@@ -185,6 +185,11 @@ object IndexBuilder{
     new RandomTrees(NoDimensionalityReductionTransform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 
+  def toEfficientlyStoredTree(tree: RandomTree): RandomTree = {
+    //tree
+    RandomTree2EfficientlyStoredTreeConverter.toEfficientlyStoredTree(tree)
+  }
+
   def buildWithSVDAndRandomRotation(k: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
     val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
@@ -196,12 +201,12 @@ object IndexBuilder{
     val svdTransform = DimensionalityReduction.fitTransform(svdParams, dataFrameView)
     val datasetAfterSVD = svdTransform.transformedDataset
 
-    //phrase 2 place holder
+    //phase 2 place holder
     val newIndexes = PointIndexes(dataFrameView.indexes.indexes)
     val rotatedDatasetPlaceHolder = new DataFrameView(newIndexes, datasetAfterSVD.rowStoredView)
 
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
-    val (signatureVecs, signatures) = Signatures.computePointSignatures(2, rnd, dataFrameView)
+    val (signatureVecs, signatures) = Signatures.computePointSignatures(settings.signatureSize, rnd, dataFrameView)
     dataFrameView.setPointSignatures(signatures)
     val reportingDistanceEvaluator = settings.reportingDistanceEvaluator.build(dataFrameView)
 
@@ -210,7 +215,7 @@ object IndexBuilder{
       val randomRotation = ProjectionStrategies.splitIntoKRandomProjection(k).build(settings, rnd, datasetAfterSVD)
       val (rotationTransform, rotatedDataFrameView)= modifyDataFrame(rotatedDatasetPlaceHolder, randomRotation)
       val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, rotatedDataFrameView)
-      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, rotatedDataFrameView, bucketCollector, splitStrategy, projStrategy, logger)}).result
+      val randomTree = Utils.timed(s"Build tree ${i}", {toEfficientlyStoredTree(buildTree(i, rnd, settings, rotatedDataFrameView, bucketCollector, splitStrategy, projStrategy, logger))}).result
       randomTrees(i) = RandomTreeNodeRoot(rotationTransform, randomTree)
     }
 

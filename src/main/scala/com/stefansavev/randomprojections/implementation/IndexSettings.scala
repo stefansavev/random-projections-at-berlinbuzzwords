@@ -5,6 +5,7 @@ case class IndexSettings(maxPntsPerBucket: Int,
                     maxDepth: Option[Int],
                     projectionStrategyBuilder: ProjectionStrategyBuilder,
                     reportingDistanceEvaluator: ReportingDistanceEvaluatorBuilder,
-                    randomSeed: Int
+                    randomSeed: Int,
+                    signatureSize: Int = 16
                     )
 

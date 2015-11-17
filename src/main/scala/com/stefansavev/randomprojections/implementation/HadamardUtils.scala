@@ -2,6 +2,88 @@ package com.stefansavev.randomprojections.implementation
 
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 
+object OptimizedHadamard{
+  def multiplyIntoHelper(from: Int, input: Array[Double], output: Array[Double]): Unit = {
+    var a = input(from)
+    var b = input(from + 1)
+    output(from) = a + b
+    output(from + 1) = a - b
+
+    a = input(from + 2)
+    b = input(from + 3)
+    output(from + 2) = a + b
+    output(from + 3) = a - b
+
+    a = output(from)
+    b = output(from + 2)
+    output(from) = a + b
+    output(from + 2) = a - b
+
+    a = output(from + 1)
+    b = output(from + 3)
+
+    output(from + 1) = a + b
+    output(from + 3) = a - b
+  }
+
+  def mix2(j1: Int, j2: Int, output: Array[Double]): Unit = {
+    val a = output(j1)
+    val b = output(j2)
+    output(j1) = a + b
+    output(j2) = a - b
+  }
+
+  def mixOld(output: Array[Double]): Unit = {
+    val mid = 4
+    var j1 = 0
+    var j2 = mid
+    while(j1 < mid){
+      mix2(j1, j2, output)
+      /*
+      val a = output(j1)
+      val b = output(j2)
+      output(j1) = a + b
+      output(j2) = a - b
+      */
+      j1 += 1
+      j2 += 1
+    }
+  }
+
+  def mix(output: Array[Double]): Unit = {
+    /*
+    mix2(0, 4, output)
+    mix2(1, 5, output)
+    mix2(2, 6, output)
+    mix2(3, 7, output)
+    */
+    val a1 = output(0)
+    val a2 = output(1)
+    val a3 = output(2)
+    val a4 = output(3)
+
+    val a5 = output(4)
+    val a6 = output(5)
+    val a7 = output(6)
+    val a8 = output(7)
+
+    output(0) = a1 + a5
+    output(4) = a1 - a5
+    output(1) = a2 + a6
+    output(5) = a2 - a6
+    output(2) = a3 + a7
+    output(6) = a3 - a7
+    output(3) = a4 + a8
+    output(7) = a4 - a8
+  }
+
+  def multiplyInto(dim: Int, input: Array[Double], output: Array[Double]): Unit = {
+    multiplyIntoHelper(0, input, output)
+    multiplyIntoHelper(4, input, output)
+    mix(output)
+  }
+
+}
 object HadamardUtils {
   //assume k is a power of 2
   //TODO: make it work without k being a power of 2

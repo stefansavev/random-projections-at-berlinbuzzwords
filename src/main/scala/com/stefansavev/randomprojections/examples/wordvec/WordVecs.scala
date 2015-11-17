@@ -33,16 +33,17 @@ object WordVecs {
         ((i, getTransformer(columnName)), (columnName, i))
       }).unzip
 
-    val header = ColumnHeaderBuilder.build("label", columnWithDataFrameIndexes, false)
+    val header = ColumnHeaderBuilder.build("label", columnWithDataFrameIndexes, true)
     val builder = matrixBuilderFactory.create(header)
 
     var numRows = 0
 
     val labelTransformer = new IntTransformer("label")
-    val buff = new ArrayBuffer[String]()
-    for(valuesByLine1 <- file.getLines()){
+    //val buff = new ArrayBuffer[String]()
+    for(valuesByLine1 <- file.getLines().take(100000)){
       val line = numRows + 2
-      buff += valuesByLine1(0)
+      //buff += valuesByLine1(0)
+      val word = valuesByLine1(0)
       val valuesByLine = valuesByLine1(1).split(" ")
       val label = 0
       var j = 0
@@ -61,15 +62,15 @@ object WordVecs {
         j += 1
       }
 
-      builder.addRow(label, indexes, values)
+      builder.addRow(word, label, indexes, values)
       numRows += 1
       if (numRows % 1000 == 0){
         println("Line " + numRows)
       }
     }
     file.close()
-    val newHeader = ColumnHeaderBuilder.build("label", columnWithDataFrameIndexes, false)
-    val b = builder.asInstanceOf[DenseRowStoredMatrixViewBuilder].build(newHeader)
+    //val newHeader = ColumnHeaderBuilder.build("label", columnWithDataFrameIndexes, false)
+    val b = builder.asInstanceOf[DenseRowStoredMatrixViewBuilder].build()
 
     val indexes = PointIndexes(Array.range(0, numRows))
     new DataFrameView(indexes, b)
@@ -92,7 +93,7 @@ object WordVecs {
       maxPntsPerBucket=50,
       numTrees=50,
       maxDepth = None,
-      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(4),
+      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(8),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )

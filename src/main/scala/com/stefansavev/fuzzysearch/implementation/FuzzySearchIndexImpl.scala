@@ -135,7 +135,7 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int){
       maxPntsPerBucket=50,
       numTrees=numTrees,
       maxDepth = None,
-      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(4),
+      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(8),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )

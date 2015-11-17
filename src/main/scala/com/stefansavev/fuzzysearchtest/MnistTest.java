@@ -22,7 +22,7 @@ public class MnistTest {
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 100;
-        int numTrees = 10;
+        int numTrees = 20;
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension, FuzzySearchEngines.fastTrees(numTrees));
 
@@ -57,7 +57,7 @@ public class MnistTest {
 
         while ((line = reader.readLine()) != null) {
             FuzzySearchItem item = parseItem(lineNumber, line, dataDimension);
-            List<FuzzySearchResult> results = index.getNearestNeighborsByQuery(10, item.getVector());
+            List<FuzzySearchResult> results = index.search(10, item.getVector());
 
         }
         reader.close();
@@ -74,7 +74,7 @@ public class MnistTest {
 
         while (itemsIterator.hasNext()) {
             FuzzySearchItem item = itemsIterator.next();
-            List<FuzzySearchResult> results = index.getNearestNeighborsByQuery(10, item.getVector());
+            List<FuzzySearchResult> results = index.search(10, item.getVector());
             if (!results.get(0).getName().equals(item.getName())){
                 throw new IllegalStateException("The top result should be the query itself");
             }

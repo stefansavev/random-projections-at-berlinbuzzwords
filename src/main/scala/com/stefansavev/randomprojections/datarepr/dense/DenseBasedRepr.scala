@@ -12,8 +12,16 @@ class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val label
   override def numCols: Int = _numCols
 
   override def getColumnHeader: ColumnHeader = header
+
   override def getAllRowNames(): Array[String] = {
-    throw new IllegalStateException()
+    val len = rowName2Hash.numberOfUniqueStrings()
+    val output = Array.ofDim[String](len)
+    var i = 0
+    while(i < len){
+      output(i) = rowName2Hash.getStringAtInternalIndex(i).get
+      i += 1
+    }
+    output
   }
 
   def getRowIdByName(name: String): Int = {
