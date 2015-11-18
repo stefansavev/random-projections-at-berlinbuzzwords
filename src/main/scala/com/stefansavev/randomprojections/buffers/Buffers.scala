@@ -21,6 +21,10 @@ class IntArrayBuffer(preaccloc: Int = 16){
     current += values.length
   }
 
+  def apply(idx: Int): Int = {
+    array(idx)
+  }
+
   def +=(value: Int): Unit = {
     if (current >= array.length){
       val intArray = Array.ofDim[Int](2*array.length)

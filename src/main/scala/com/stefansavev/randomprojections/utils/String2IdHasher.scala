@@ -2,6 +2,7 @@ package com.stefansavev.randomprojections.utils
 
 import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.implementation.HadamardUtils
+import com.stefansavev.randomprojections.serialization.{StringSerializer, IntSerializer}
 
 object String2IdHasherHelper{
   def emptyIntArray(size: Int): Array[Int] = {
@@ -426,6 +427,8 @@ class String2IdHasher(settings: StringIdHasherSettings){
     }
   }
 
+  def hasMoreSpace(): Boolean = {nextAvailablePointer < maxAllowedValues}
+
   def getAllIds(): Array[Int] = {
     val output = new IntArrayBuffer()
     var i = 0
@@ -471,6 +474,84 @@ class String2IdHasher(settings: StringIdHasherSettings){
     }
   }
 
+}
+
+class AddStringResult{
+  var stringId: Int = -1
+  var existedPreviously: Boolean = false
+}
+
+class String2UniqueIdTable{
+  val avgStringLen = 10
+  val toleratedNumCollisions = 8
+  var settings = StringIdHasherSettings(1024, avgStringLen, toleratedNumCollisions)
+  var h = new String2IdHasher(settings)
+
+  def rebuildTable(): Unit = {
+    val newSettings = StringIdHasherSettings(2*settings.maxValues, avgStringLen, toleratedNumCollisions)
+    val newH = new String2IdHasher(newSettings)
+
+    val numStrings = h.numberOfUniqueStrings()
+    var id = 0
+    while(id < numStrings){
+      val str = h.getStringAtInternalIndex(id).get
+      newH.add(str)
+      id += 1
+    }
+    settings = newSettings
+    h = newH
+  }
+
+  def addString(input: String, output: AddStringResult = null): AddStringResult = {
+    if (!h.hasMoreSpace()){
+      rebuildTable()
+    }
+    val existedPreviously = (h.getOrAddId(input, false) >= 0) //work around
+    val handle = h.add(input)
+    val nonNullOutput = if (output == null) new AddStringResult() else output
+    nonNullOutput.stringId = h.getInternalId(handle)
+    nonNullOutput.existedPreviously = existedPreviously
+    nonNullOutput
+  }
+
+  def getStringId(input: String): Int = {
+    val id = h.getOrAddId(input, false)
+    if (id >= 0){
+      h.getInternalId(id)
+    }
+    else{
+      id
+    }
+  }
+
+  def getStringById(id: Int): String = {
+    val optStr = h.getStringAtInternalIndex(id)
+    if (optStr.isEmpty){
+      throw new IllegalStateException("The string does not exist")
+    }
+    else{
+      optStr.get
+    }
+  }
+}
+
+object TestDynamicString2IdHasher{
+  def main (args: Array[String]): Unit = {
+    val table = new String2UniqueIdTable()
+    def makeName(i: Int): String = i + "#" + i
+    for(i <- 0 until 10000000){
+      val result = table.addString(makeName(i)).stringId
+      //println("added " + i + " at " + result)
+    }
+    for(i <- 0 until 10000000){
+      val str = table.getStringById(i)
+      if (str != makeName(i).toString){
+        throw new IllegalStateException("problem")
+      }
+      //println("got " + str + " " + i)
+
+    }
+  }
 }
 
 object String2IdHasherTester{

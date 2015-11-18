@@ -9,8 +9,8 @@ public class DataPointVerifier {
                 throw new InvalidDataPointException("The data point contains infinite values or NaNs");
             }
             sumOfSquares += value*value;
-            i += 1;
         }
+
         if (Double.isInfinite(sumOfSquares) || Double.isNaN(sumOfSquares)){
             throw new InvalidDataPointException("The sum of squares of the data point is not a number of infinite");
         }

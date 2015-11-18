@@ -13,12 +13,18 @@ public class FuzzySearchIndexBuilder {
     }
 
     public void addItem(FuzzySearchItem item){
+        if (item == null){
+            throw new IllegalStateException("FuzzySearchItem cannot be null");
+        }
         addItem(item.getName(), item.getLabel(), item.getVector());
     }
 
     public void addItem(String name, int label, double[] dataPoint) throws InvalidDataPointException{
         if (dataPoint.length != dimension){
             throw new InvalidDataPointException("The dimension of the data point is incorrect");
+        }
+        if (name == null){
+            throw new IllegalStateException("FuzzySearchItem.name cannot be null");
         }
         double[] normalizedPoint = DataPointVerifier.normalizeDataPointOrFail(dataPoint);
         wrapper.addItem(name, label, normalizedPoint);

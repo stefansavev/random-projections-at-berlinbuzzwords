@@ -1,19 +1,21 @@
 package com.stefansavev.randomprojections.examples.wordvec
 
+import com.stefansavev.fuzzysearch.implementation.FuzzySearchResultsWrapper
+import com.stefansavev.fuzzysearch.{FuzzySearchResults, FuzzySearchResult, FuzzySearchResultBuilder}
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.file.{CSVFile, CSVFileOptions}
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
-import com.stefansavev.randomprojections.evaluation.Evaluation
+import com.stefansavev.randomprojections.evaluation.{RecallEvaluator, Evaluation}
 import com.stefansavev.randomprojections.utils.{Utils, AllNearestNeighborsForDataset}
 
 import scala.collection.mutable.ArrayBuffer
-import com.stefansavev.randomprojections.examples.ExamplesSettings
+import com.stefansavev.randomprojections.examples.{WordVecGroundTruth, ExamplesSettings}
 
 object WordVecs {
-  def fromFile(fileName: String,  opt: CSVFileOptions, dataFrameOptions: DataFrameOptions,  matrixBuilderFactory: RowStoredMatrixViewBuilderFactory): DataFrameView = {
+  def fromFile(fileName: String,  opt: CSVFileOptions, dataFrameOptions: DataFrameOptions,  matrixBuilderFactory: RowStoredMatrixViewBuilderFactory, topK: Int): DataFrameView = {
     if (opt.hasHeader){
       throw new IllegalStateException("Header cannot be set for this data")
     }
@@ -40,7 +42,7 @@ object WordVecs {
 
     val labelTransformer = new IntTransformer("label")
     //val buff = new ArrayBuffer[String]()
-    for(valuesByLine1 <- file.getLines().take(100000)){
+    for(valuesByLine1 <- file.getLines().take(topK)){
       val line = numRows + 2
       //buff += valuesByLine1(0)
       val word = valuesByLine1(0)
@@ -80,13 +82,34 @@ object WordVecs {
   //The data for this task is a result of running the sample command https://code.google.com/p/word2vec/
   //There are 71291. For each of them this code computes approximation of NN
   def main (args: Array[String]): Unit = {
+
     val opt = CSVFileOptions(sep = "\t", onlyTopRecords = None, hasHeader = false)
     val inputFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "wordvec/wordvec.txt")
     val outputFileNN = Utils.combinePaths(ExamplesSettings.outputDirectory, "wordvec-nearest-neighbors.txt")
 
     val numColumns = 18828 //hard-coded at the moment
     val dataFrameOptions = new DataFrameOptions("label", false, null)
-    val dataset = WordVecs.fromFile(inputFile, opt, dataFrameOptions, DenseRowStoredMatrixViewBuilderFactory)
+    val dataset = WordVecs.fromFile(inputFile, opt, dataFrameOptions, DenseRowStoredMatrixViewBuilderFactory, 100000)
+
+    val c = new FuzzySearchResults(FuzzySearchResultsWrapper.fromTextFile("C:/tmp/word-vec-truth.txt"))
+
+    val truth1 = WordVecGroundTruth.readGroundTruthInObject().mapping
+    val builderNeighbors = new FuzzySearchResultBuilder()
+    val rowNames = dataset.getAllRowNames()
+    for(name <- rowNames){
+      val neighbors = truth1(name).sortBy(-_._2)
+      val list = new java.util.ArrayList[FuzzySearchResult]()
+      for(kv <- neighbors){
+        list.add(new FuzzySearchResult(kv._1, -1, kv._2))
+      }
+      builderNeighbors.addResult(name, list)
+    }
+    val b = builderNeighbors.build()
+    //builderNeighbors.build().toTextFile("C:/tmp/word-vec-truth.txt")
+
+    val r = RecallEvaluator.evaluateRecall(10, b, c)
+    r.printRecalls()
+    throw new IllegalStateException("done!!!")
 
     val debug =false
     val randomTreeSettings = IndexSettings(
@@ -119,5 +142,9 @@ object WordVecs {
     PerformanceCounters.report()
 
     Evaluation.dumpLabels(outputFileNN, dataset.rowStoredView.getAllRowNames(), allNN, 0, 10)
+
+    val truth2 = WordVecGroundTruth.readGroundTruthInObject()
+    WordVecGroundTruth.evaluateRecall(allNN, truth2, dataset, 10)
+
   }
 }

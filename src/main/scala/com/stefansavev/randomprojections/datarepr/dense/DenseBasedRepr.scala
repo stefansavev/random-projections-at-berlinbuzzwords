@@ -142,6 +142,7 @@ class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val label
   }
 
   def cosineForNormalizedData(query: Array[Double], id: Int): Double = {
+
     var offset = id*_numCols
     var j = 0
     var sum = 0.0
@@ -154,6 +155,33 @@ class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val label
       j += 1
     }
     1.0 - 0.5*sum
+
+    /*
+    var offset = id*_numCols
+    var j = 0
+    //var sum = 0.0
+    var n1 = 0.0
+    var n2 = 0.0
+    var dotProduct = 0.0
+    while(j < _numCols){
+      val v1 = query(j)
+      val v2 = data(offset)
+      dotProduct += v1*v2
+      n1 += v1*v1
+      n2 += v2*v2
+      //val d = v1 - v2
+      //sum += d*d
+      offset += 1
+      j += 1
+    }
+    //println("dot prod: " + dotProduct)
+    //(x - y)^2 = x^2 + y^2 - 2*(xy) = 2  - 2*xy
+    //2*xy = 2 - sum of squares
+    //
+    println("n1/n2 " + n1 + " " +  n2)
+    dotProduct/Math.sqrt(n1*n2)
+    //1.0 - 0.5*sum
+    */
   }
 
   def getLabel(rowId: Int): Int = labels(rowId)
