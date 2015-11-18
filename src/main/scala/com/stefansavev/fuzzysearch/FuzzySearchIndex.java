@@ -25,6 +25,11 @@ public class FuzzySearchIndex {
         return wrapper.getNearestNeighborsByQuery(numNeighbors, normalizedQuery);
     }
 
+    public List<FuzzySearchResult> bruteForceSearch(int numNeighbors, double[] query) {
+        double[] normalizedQuery = DataPointVerifier.normalizeDataPointOrFail(query);
+        return wrapper.bruteForceSearch(numNeighbors, normalizedQuery);
+    }
+
     public Iterator<FuzzySearchItem> getItems(){
         return wrapper.getItems();
     }

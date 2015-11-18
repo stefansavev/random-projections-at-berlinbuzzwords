@@ -236,7 +236,7 @@ class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMat
       }
       val internalIndex = string2IdHasher.getInternalId(hashCode)
       if (internalIndex != _currentRow) {
-        throw new IllegalStateException("Internal error: internalIndex != _currentRow")
+        throw new IllegalStateException("Data point with name: " + name + " has already been added")
       }
     }
 

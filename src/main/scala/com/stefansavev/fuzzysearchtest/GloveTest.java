@@ -1,17 +1,15 @@
 package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.fuzzysearch.*;
-import com.stefansavev.fuzzysearch.FuzzySearchResultBuilder;
 import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
+import sun.awt.CharsetString;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class WordVecTest {
+public class GloveTest {
     static FuzzySearchItem parseItem(int lineNumber, String line, int numDimensions){
         String[] parts = line.split("\\s+");
         if (parts.length != (1 + numDimensions)){
@@ -23,17 +21,18 @@ public class WordVecTest {
             vec[i] =  Double.parseDouble(parts[i + 1]);
         }
         return new FuzzySearchItem(word, -1, vec); //ignore the label
-     }
+    }
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
-        int dataDimension = 200;
+        int dataDimension = 100;
         int numTrees = 50; //20;
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension, FuzzySearchEngines.fastTrees(numTrees));
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector
-        BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), java.nio.charset.Charset.forName("UTF-8")));
         int lineNumber = 1;
         String line = null;
         while ((line = reader.readLine()) != null) {
@@ -84,10 +83,11 @@ public class WordVecTest {
         */
         //resultBuilder.build()
         FuzzySearchResults retrieved = resultBuilder.build();
+        /*
         retrieved.toTextFile("C:/tmp/output-word-vec-results.txt");
         FuzzySearchResults groundTruth = FuzzySearchResults.fromTextFile("C:/tmp/word-vec-truth.txt");
         RecallEvaluator.evaluateRecall(11, retrieved, groundTruth).printRecalls();
-
+        */
 
         long end = System.currentTimeMillis();
         double timePerQuery = ((double)(end - start))/numQueries;
@@ -101,8 +101,8 @@ public class WordVecTest {
     }
 
     public static void main(String[] args) throws Exception {
-        String inputTextFile = "D:/RandomTreesData-144818512896186816/input/" + "wordvec/wordvec.txt";
-        String indexFile = "C:/tmp/output-index-wordvec/";
+        String inputTextFile = "C:\\glove\\100d.txt";
+        String indexFile = "C:/tmp/output-index-glove/";
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);

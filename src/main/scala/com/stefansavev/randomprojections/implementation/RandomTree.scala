@@ -95,7 +95,8 @@ class TreeReadBuffer(values: Array[Int]){
 
 
 class TreeWriteBuffer(initialSize: Int){
-  var output = Array.ofDim[Int](initialSize)
+  val adjustedInitialSize = HadamardUtils.largestPowerOf2(initialSize)
+  var output = Array.ofDim[Int](adjustedInitialSize)
 
   var pntr = 0
 
@@ -108,15 +109,26 @@ class TreeWriteBuffer(initialSize: Int){
   }
 
   def ensureAvailableSpace(numNewValues: Int): Unit = {
-
+    val expectedSize = pntr + numNewValues
+    if (expectedSize >= output.length){
+      var nextSize = output.length << 1
+      while(nextSize < expectedSize){
+        nextSize <<= 1
+      }
+      val newOutput = Array.ofDim[Int](nextSize)
+      System.arraycopy(output, 0, newOutput, 0, pntr)
+      output = newOutput
+    }
   }
 
   def putInt(value: Int): Unit = {
+    ensureAvailableSpace(1)
     output(pntr) = value
     pntr += 1
   }
 
   def put(arr: Array[Byte]): Unit = {
+    ensureAvailableSpace(2)
     val combined1 = (arr(3) << 24) | ((arr(2) & 0xff) << 16) | ((arr(1) & 0xff) << 8) | (arr(0) & 0xff)
     output(pntr) = combined1
     val combined2 = (arr(7) << 24) | ((arr(6) & 0xff) << 16) | ((arr(5) & 0xff) << 8) | (arr(4) & 0xff)

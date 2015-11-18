@@ -1,10 +1,12 @@
 package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.fuzzysearch.*;
+import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
 
 import java.io.*;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 public class MnistTest {
 
@@ -63,7 +65,46 @@ public class MnistTest {
         reader.close();
     }
 
+    /*
+    static void compareWithBruteForce(String indexFile, Random rnd, int numQueries, int numResults) throws IOException {
 
+        FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
+        long start = System.currentTimeMillis();
+        FuzzySearchResults testSet = FuzzySearchEvaluationUtils.generateRandomTestSet(rnd, numQueries, numResults, index);
+        long end = System.currentTimeMillis();
+        double queriesPerSecBruteForce = 1000.0*testSet.getNumberOfQueries()/((double)(end - start + 1L));
+
+        Iterator<FuzzySearchQueryResults> queryIterator = testSet.getIterator();
+
+        start = System.currentTimeMillis();
+
+        FuzzySearchResultBuilder resultsBuilder = new FuzzySearchResultBuilder();
+        int numProcessedQueries = 0;
+        while (queryIterator.hasNext()) {
+            String queryId = queryIterator.next().getName();
+            double[] queryVector = index.getItemByName(queryId).getVector();
+            List<FuzzySearchResult> results = index.search(10, queryVector);
+            if (!results.get(0).getName().equals(queryId)){
+                throw new IllegalStateException("The top result should be the query itself");
+            }
+            resultsBuilder.addResult(queryId, results);
+            numProcessedQueries ++;
+        }
+
+        end = System.currentTimeMillis();
+        double timePerQuery = ((double)(end - start))/numQueries;
+        double queriesPerSec = 1000.0*numProcessedQueries/((double)(end - start + 1L));
+
+        System.out.println("Total search time in secs.: " + (((double)(end - start))/1000.0));
+        System.out.println("Num queries: " + numQueries);
+        System.out.println("Time per query in ms.: " + timePerQuery);
+        System.out.println("Queries per sec.: " + queriesPerSec);
+        System.out.println("Queries per sec BRUTE FORCE.: " + queriesPerSecBruteForce);
+        FuzzySearchResults retrieved = resultsBuilder.build();
+
+        RecallEvaluator.evaluateRecall(11, retrieved, testSet).printRecalls();
+    }
+    */
     static void runQueriesFromIndex(String indexFile) throws IOException {
         FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
 
@@ -105,7 +146,8 @@ public class MnistTest {
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromFile(queriesFile, indexFile);
-        runQueriesFromIndex(indexFile);
+        //runQueriesFromIndex(indexFile);
+        FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
     }
     /*
     output:

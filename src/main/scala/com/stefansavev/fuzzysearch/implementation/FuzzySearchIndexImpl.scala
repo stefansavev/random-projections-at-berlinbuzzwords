@@ -22,6 +22,46 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
 
   val searcher = new NonThreadSafeSearcher(searcherSettings)
 
+  def bruteForceSearch(numNeighbors: Int, query: Array[Double]): java.util.List[FuzzySearchResult] = {
+    import java.util.PriorityQueue
+    val pq = new PriorityQueue[PointScore]()
+    var j = 0
+    val numRows = dataset.numRows
+    while(j < numRows) { //TODO: probably you want to process in a randomized order to make sure you don't insert too many itmes in pq
+      val score = dataset.cosineForNormalizedData(query, j)
+      if (pq.size() < numNeighbors ){
+        pq.add(new PointScore(j, score))
+      }
+      else{//it should be exactly k items in pq
+      val minAcceptedScore = pq.peek().score
+        if (score > minAcceptedScore){
+          pq.remove() //remove min
+          pq.add(new PointScore(j, score))
+        }
+      }
+      j += 1
+    }
+    val n = pq.size()
+    val sorted = Array.ofDim[PointScore](n)
+    j = 0
+    while(pq.size() > 0){
+      sorted(n - j - 1) = pq.remove()
+      j += 1
+    }
+    val sortedPoints = sorted //sorted.sortBy(ps => - ps.score)
+    val result = new java.util.ArrayList[FuzzySearchResult]()
+    var i = 0
+    while(i < sortedPoints.length){
+      val idAndScore = sortedPoints(i)
+      val id = idAndScore.pointId
+      val name = dataset.getName(id)
+      val label = dataset.getLabel(id)
+      result.add(new FuzzySearchResult(name, label, idAndScore.score))
+      i += 1
+    }
+    result
+  }
+
   def getNearestNeighborsByQuery(numNeighbors: Int, query: Array[Double]): java.util.List[FuzzySearchResult] = {
     val knns = searcher.getNearestNeighborsByVector(query, numNeighbors)
     val neighbors = knns.neighbors
