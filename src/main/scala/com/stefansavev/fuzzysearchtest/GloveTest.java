@@ -1,8 +1,6 @@
 package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.fuzzysearch.*;
-import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
-import sun.awt.CharsetString;
 
 import java.io.*;
 import java.util.Iterator;

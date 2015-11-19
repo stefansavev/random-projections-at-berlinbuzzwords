@@ -1,11 +1,18 @@
+//File is based on: https://github.com/jitpack/gradle-simple/blob/master/build.gradle
+
 apply plugin: 'maven'
 apply plugin: 'scala'
 apply plugin: 'idea'
-apply plugin: 'maven-publish'
-apply plugin: 'distribution'
 
-version = '0.1'
-group = 'com.stefansavev'
+//apply plugin: 'maven-publish'
+//apply plugin: 'distribution'
+
+version = '0.2'
+
+group = 'com.github.stefansavev'
+
+sourceCompatibility = 1.7 // java 8
+targetCompatibility = 1.7
 
 repositories {
     mavenCentral()
@@ -18,6 +25,37 @@ dependencies {
     compile 'com.googlecode.matrix-toolkits-java:mtj:1.0.1'
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+// To specify a license in the pom:
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+    }
+}
+
+/*
 distributions {
     main {
         contents {
@@ -27,11 +65,13 @@ distributions {
         }
     }
 }
+*/
 
 dependencies {
     testCompile "junit:junit:4.11"
 }
 
+/*
 publishing {
     publications {
         myPublication(MavenPublication) {
@@ -47,3 +87,4 @@ publishing {
         }
     }
 }
+*/
