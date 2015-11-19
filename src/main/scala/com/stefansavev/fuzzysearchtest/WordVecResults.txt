@@ -1,0 +1,154 @@
+D:\Scala\jdklink\bin\java -Didea.launcher.port=7539 "-Didea.launcher.bin.path=D:\Program Files (x86)\JetBrains\IntelliJ IDEA Community Edition 14.1.4\bin" -Dfile.encoding=windows-1252 -classpath "D:\Scala\jdklink\jre\lib\charsets.jar;D:\Scala\jdklink\jre\lib\deploy.jar;D:\Scala\jdklink\jre\lib\javaws.jar;D:\Scala\jdklink\jre\lib\jce.jar;D:\Scala\jdklink\jre\lib\jfr.jar;D:\Scala\jdklink\jre\lib\jfxrt.jar;D:\Scala\jdklink\jre\lib\jsse.jar;D:\Scala\jdklink\jre\lib\management-agent.jar;D:\Scala\jdklink\jre\lib\plugin.jar;D:\Scala\jdklink\jre\lib\resources.jar;D:\Scala\jdklink\jre\lib\rt.jar;D:\Scala\jdklink\jre\lib\ext\access-bridge-64.jar;D:\Scala\jdklink\jre\lib\ext\dnsns.jar;D:\Scala\jdklink\jre\lib\ext\jaccess.jar;D:\Scala\jdklink\jre\lib\ext\localedata.jar;D:\Scala\jdklink\jre\lib\ext\sunec.jar;D:\Scala\jdklink\jre\lib\ext\sunjce_provider.jar;D:\Scala\jdklink\jre\lib\ext\sunmscapi.jar;D:\Scala\jdklink\jre\lib\ext\zipfs.jar;D:\Repositories\random-proj-demo\random-projections-at-berlinbuzzwords\out\production\random-projections-at-berlinbuzzwords;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-library\2.11.4\734ac63e470706015ea786f7780c80db49f001a4\scala-library-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-compiler\2.11.4\fa6eaeeecc9c6080d4b2f407f207339f2ff97ad7\scala-compiler-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.googlecode.matrix-toolkits-java\mtj\1.0.1\2972d710f730ef3d504fa92b7869c7b2f843e8dd\mtj-1.0.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-reflect\2.11.4\a212daed62de3d47034ea171dd3168a4dd85d08c\scala-reflect-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang.modules\scala-xml_2.11\1.0.2\820fbca7e524b530fdadc594c39d49a21ea0337e\scala-xml_2.11-1.0.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang.modules\scala-parser-combinators_2.11\1.0.2\ba0bbca656b10f235b6eb17a541e5d728c29040a\scala-parser-combinators_2.11-1.0.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\net.sourceforge.f2j\arpack_combined_all\0.1\225619a060b42605b4d9fd4af11815664abf26eb\arpack_combined_all-0.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\core\1.1.2\574b480eca62f535fad6d259e144fee3ef24b66e\core-1.1.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-osx-x86_64\1.1\80da53ec862f283dc3b191b9dbd3166ea6671831\netlib-native_ref-osx-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-x86_64\1.1\5a3e5787d03c39790d5ae08cce189dd1ccc4a38\netlib-native_ref-linux-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-i686\1.1\eedd845b214aea560bce317d778ebb52f8f46038\netlib-native_ref-linux-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-win-x86_64\1.1\4ab54511c2844546279d9f8e427c73953b794686\netlib-native_ref-win-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-win-i686\1.1\167fb794a26cb0bfc74890c704c7137b1d5b50fd\netlib-native_ref-win-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-armhf\1.1\ec467162f74710fd8897cff6888534ceaf297d9a\netlib-native_ref-linux-armhf-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-osx-x86_64\1.1\d724e33675dc8eaa5c8fcb05a3aaca6f3339afa7\netlib-native_system-osx-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-x86_64\1.1\163e88facabe7fa29952890dc2d3429e28501120\netlib-native_system-linux-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-i686\1.1\dd43225560dbd9115d306f9be3ca195aed236b78\netlib-native_system-linux-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-armhf\1.1\27ae9f6a9c88b3f8d12ffa52d62941615f8ed416\netlib-native_system-linux-armhf-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-win-x86_64\1.1\222c7915be1daf1c26a4206f375d4957ae5f9d81\netlib-native_system-win-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-win-i686\1.1\c25fd1881cf93f7716f47b7deec859f6b6b7be50\netlib-native_system-win-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\all\1.1.2\f235011206ac009adad2d6607f222649aba5ca9e\all-1.1.2.pom;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\native_ref-java\1.1\408c71ffbc3646dda7bee1e22bf19101e5e9ee90\native_ref-java-1.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\native_system-java\1.1\3c6a2455f96b354a6940dce1393abb35ed7641da\native_system-java-1.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil\jniloader\1.1\4840f897eeb54d67ee14e478f8a45cc9937f3ce1\jniloader-1.1.jar;D:\Program Files (x86)\JetBrains\IntelliJ IDEA Community Edition 14.1.4\lib\idea_rt.jar" com.intellij.rt.execution.application.AppMain com.stefansavev.fuzzysearchtest.WordVecTest
+DataFrameView(71291, 200)
+Using SVD on the full data
+Nov 19, 2015 2:30:30 PM com.github.fommil.netlib.BLAS <clinit>
+WARNING: Failed to load implementation from: com.github.fommil.netlib.NativeSystemBLAS
+Nov 19, 2015 2:30:33 PM com.github.fommil.jni.JniLoader liberalLoad
+INFO: successfully loaded D:\Users\stefan\AppData\Local\Temp\jniloader4909989056463057817netlib-native_ref-win-x86_64.dll
+Nov 19, 2015 2:30:38 PM com.github.fommil.netlib.LAPACK <clinit>
+WARNING: Failed to load implementation from: com.github.fommil.netlib.NativeSystemLAPACK
+Nov 19, 2015 2:30:38 PM com.github.fommil.jni.JniLoader load
+INFO: already loaded netlib-native_ref-win-x86_64.dll
+Started transformation with SVD
+Processed 0 rows
+Processed 5000 rows
+Processed 10000 rows
+Processed 15000 rows
+Processed 20000 rows
+Processed 25000 rows
+Processed 30000 rows
+Processed 35000 rows
+Processed 40000 rows
+Processed 45000 rows
+Processed 50000 rows
+Processed 55000 rows
+Processed 60000 rows
+Processed 65000 rows
+Processed 70000 rows
+Finished transformation with SVD
+#storage of tree: 0.01757049560546875 MB
+Time for 'Build tree 0' 311 ms.
+#storage of tree: 0.017093658447265625 MB
+Time for 'Build tree 1' 119 ms.
+#storage of tree: 0.017131805419921875 MB
+Time for 'Build tree 2' 114 ms.
+#storage of tree: 0.017055511474609375 MB
+Time for 'Build tree 3' 102 ms.
+#storage of tree: 0.017515182495117188 MB
+Time for 'Build tree 4' 82 ms.
+#storage of tree: 0.016969680786132812 MB
+Time for 'Build tree 5' 77 ms.
+#storage of tree: 0.017023086547851562 MB
+Time for 'Build tree 6' 80 ms.
+#storage of tree: 0.01755523681640625 MB
+Time for 'Build tree 7' 77 ms.
+#storage of tree: 0.017730712890625 MB
+Time for 'Build tree 8' 73 ms.
+#storage of tree: 0.017461776733398438 MB
+Time for 'Build tree 9' 64 ms.
+#storage of tree: 0.017665863037109375 MB
+Time for 'Build tree 10' 64 ms.
+#storage of tree: 0.017345428466796875 MB
+Time for 'Build tree 11' 68 ms.
+#storage of tree: 0.017324447631835938 MB
+Time for 'Build tree 12' 71 ms.
+#storage of tree: 0.017354965209960938 MB
+Time for 'Build tree 13' 73 ms.
+#storage of tree: 0.0171051025390625 MB
+Time for 'Build tree 14' 78 ms.
+#storage of tree: 0.01767730712890625 MB
+Time for 'Build tree 15' 58 ms.
+#storage of tree: 0.017019271850585938 MB
+Time for 'Build tree 16' 56 ms.
+#storage of tree: 0.017187118530273438 MB
+Time for 'Build tree 17' 57 ms.
+#storage of tree: 0.017366409301757812 MB
+Time for 'Build tree 18' 57 ms.
+#storage of tree: 0.017728805541992188 MB
+Time for 'Build tree 19' 56 ms.
+#storage of tree: 0.017406463623046875 MB
+Time for 'Build tree 20' 59 ms.
+#storage of tree: 0.017147064208984375 MB
+Time for 'Build tree 21' 57 ms.
+#storage of tree: 0.017179489135742188 MB
+Time for 'Build tree 22' 56 ms.
+#storage of tree: 0.017362594604492188 MB
+Time for 'Build tree 23' 56 ms.
+#storage of tree: 0.01711273193359375 MB
+Time for 'Build tree 24' 58 ms.
+#storage of tree: 0.016992568969726562 MB
+Time for 'Build tree 25' 55 ms.
+#storage of tree: 0.017667770385742188 MB
+Time for 'Build tree 26' 69 ms.
+#storage of tree: 0.01720428466796875 MB
+Time for 'Build tree 27' 56 ms.
+#storage of tree: 0.017292022705078125 MB
+Time for 'Build tree 28' 57 ms.
+#storage of tree: 0.017518997192382812 MB
+Time for 'Build tree 29' 60 ms.
+#storage of tree: 0.017230987548828125 MB
+Time for 'Build tree 30' 58 ms.
+#storage of tree: 0.017400741577148438 MB
+Time for 'Build tree 31' 57 ms.
+#storage of tree: 0.01700592041015625 MB
+Time for 'Build tree 32' 58 ms.
+#storage of tree: 0.0170745849609375 MB
+Time for 'Build tree 33' 61 ms.
+#storage of tree: 0.017290115356445312 MB
+Time for 'Build tree 34' 59 ms.
+#storage of tree: 0.0170745849609375 MB
+Time for 'Build tree 35' 59 ms.
+#storage of tree: 0.017469406127929688 MB
+Time for 'Build tree 36' 59 ms.
+#storage of tree: 0.017269134521484375 MB
+Time for 'Build tree 37' 60 ms.
+#storage of tree: 0.017103195190429688 MB
+Time for 'Build tree 38' 57 ms.
+#storage of tree: 0.01744842529296875 MB
+Time for 'Build tree 39' 57 ms.
+#storage of tree: 0.017269134521484375 MB
+Time for 'Build tree 40' 58 ms.
+#storage of tree: 0.017301559448242188 MB
+Time for 'Build tree 41' 59 ms.
+#storage of tree: 0.017213821411132812 MB
+Time for 'Build tree 42' 75 ms.
+#storage of tree: 0.017183303833007812 MB
+Time for 'Build tree 43' 58 ms.
+#storage of tree: 0.017635345458984375 MB
+Time for 'Build tree 44' 60 ms.
+#storage of tree: 0.016901016235351562 MB
+Time for 'Build tree 45' 56 ms.
+#storage of tree: 0.017421722412109375 MB
+Time for 'Build tree 46' 62 ms.
+#storage of tree: 0.017408370971679688 MB
+Time for 'Build tree 47' 57 ms.
+#storage of tree: 0.01702117919921875 MB
+Time for 'Build tree 48' 59 ms.
+#storage of tree: 0.017129898071289062 MB
+Time for 'Build tree 49' 70 ms.
+Time for 'Create trees' 18.985 secs.
+Total search time in secs.: 1.891
+Num queries: 1000
+Time per query in ms.: 1.891
+Queries per sec.: 528.5412262156448
+Total search time in secs.: 20.398
+Num queries: 1000
+Time per query in ms.: 20.398
+Queries per sec.: 49.02201088288641
+------------------------------
+Total queries: 1000
+Not-retrieved queries: 0
+Recalls from 1000 queries
+Recall@0: 96.09999999999992
+Recall@1: 95.30000000000004
+Recall@2: 94.73333333333343
+Recall@3: 93.99999999999991
+Recall@4: 93.25999999999992
+Recall@5: 92.94999999999992
+Recall@6: 92.38571428571439
+Recall@7: 91.89999999999995
+Recall@8: 91.52222222222217
+Recall@9: 91.09000000000006
+Recall@10: 90.8727272727273
+
+Process finished with exit code 0
