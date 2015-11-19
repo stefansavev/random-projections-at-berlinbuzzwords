@@ -11,7 +11,7 @@ version = '0.2-SNAPSHOT'
 
 group = 'com.github.stefansavev'
 
-sourceCompatibility = 1.7 // java 8
+sourceCompatibility = 1.7 // java 7
 targetCompatibility = 1.7
 
 repositories {
