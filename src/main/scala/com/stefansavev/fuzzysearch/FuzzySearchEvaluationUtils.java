@@ -59,8 +59,8 @@ public class FuzzySearchEvaluationUtils {
     public static void compareWithBruteForce(String indexFile, Random rnd, int numQueries, int numResults) throws IOException {
         FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
         FuzzySearchResults testSet = generateRandomTestSet(rnd, numQueries, index);
-        FuzzySearchResults expected = resultsOnTestSet(index, testSet, 50, true);
-        FuzzySearchResults retrieved = resultsOnTestSet(index, testSet, 50, false);
+        FuzzySearchResults retrieved = resultsOnTestSet(index, testSet, numResults, false); //with the system
+        FuzzySearchResults expected = resultsOnTestSet(index, testSet, numResults, true); //brute force
         RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
     }
 }

@@ -41,8 +41,17 @@ class IntArrayBuffer(preaccloc: Int = 16){
     result
   }
 
+  def set(index: Int, value: Int): Unit = {
+    array(index) = value
+  }
+
   def clear(): Unit = {
     array = Array.ofDim[Int](16)
+  }
+
+  def removeLast(): Int = {
+    current -= 1
+    array(current)
   }
 }
 

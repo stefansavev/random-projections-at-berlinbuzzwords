@@ -177,7 +177,8 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int){
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(8),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
-      randomSeed = 39393
+      randomSeed = 39393,
+      signatureSize = 16
     )
     println(dataset)
 
