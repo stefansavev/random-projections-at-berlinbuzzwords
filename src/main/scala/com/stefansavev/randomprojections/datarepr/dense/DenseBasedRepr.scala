@@ -105,7 +105,7 @@ class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMat
 
   var _currentRow = 0
 
-  val valuesStoreBuilder = new ValuesStoreBuilderAsDouble(numCols)
+  val valuesStoreBuilder = header.getStoreBuilderType().getBuilder(numCols) //new ValuesStoreBuilderAsDouble(numCols)
   val labelsBuilder = new IntArrayBuffer()
 
   override def currentRowId: Int = _currentRow

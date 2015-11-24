@@ -29,7 +29,8 @@ public class WordVecTest {
         int dataDimension = 200;
         int numTrees = 50; //20;
         //create an indexer
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension, FuzzySearchEngines.fastTrees(numTrees));
+        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
+                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector

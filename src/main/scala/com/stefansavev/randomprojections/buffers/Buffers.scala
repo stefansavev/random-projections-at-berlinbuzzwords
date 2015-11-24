@@ -98,4 +98,60 @@ class DoubleArrayBuffer(preaccloc: Int = 16){
 }
 
 
+class ShortArrayBuffer(preaccloc: Int = 16){
+  var array = Array.ofDim[Short](Math.max(preaccloc, 4))
+  var current = 0
+
+  def size = current
+
+  def ++=(values: Array[Short]): Unit = {
+    if (current + values.length > array.length){
+      var newSize = array.length
+      while(current + values.length > newSize){
+        newSize *= 2
+      }
+      val doubleArray = Array.ofDim[Short](newSize)
+      Array.copy(array, 0, doubleArray, 0, array.length)
+      array = doubleArray
+    }
+
+    System.arraycopy(values, 0, array, current, values.length)
+    current += values.length
+  }
+
+  def apply(idx: Int): Int = {
+    array(idx)
+  }
+
+  def +=(value: Short): Unit = {
+    if (current >= array.length){
+      val intArray = Array.ofDim[Short](2*array.length)
+      Array.copy(array, 0, intArray, 0, array.length)
+      array = intArray
+    }
+    array(current) = value
+    current += 1
+  }
+
+  def toArray(): Array[Short] = {
+    val result = Array.ofDim[Short](current)
+    Array.copy(array, 0, result, 0, current)
+    result
+  }
+
+  def set(index: Int, value: Short): Unit = {
+    array(index) = value
+  }
+
+  def clear(): Unit = {
+    array = Array.ofDim[Short](16)
+  }
+
+  def removeLast(): Int = {
+    current -= 1
+    array(current)
+  }
+}
+
+
 

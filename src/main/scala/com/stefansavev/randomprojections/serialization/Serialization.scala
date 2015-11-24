@@ -75,6 +75,28 @@ object IntSerializer{
   }
 }
 
+object ShortSerializer{
+  val bytes = Array.ofDim[Byte](2)
+
+  def toByteArray(value: Short): Array[Byte] = {
+    ByteBuffer.wrap(bytes).putShort(value)
+    bytes
+  }
+
+  def toShort(bytes:  Array[Byte]): Short = {
+    return ByteBuffer.wrap(bytes).getShort()
+  }
+
+  def write(outputStream: OutputStream, value: Short): Unit = {
+    outputStream.write(toByteArray(value))
+  }
+
+  def read(inputStream: InputStream): Short = {
+    inputStream.read(bytes)
+    toShort(bytes)
+  }
+}
+
 object StringSerializer{
 
   def write(outputStream: OutputStream, value: String): Unit = {
@@ -184,6 +206,28 @@ object IntArraySerializer{
     var i = 0
     while(i < len){
       values(i) = IntSerializer.read(inputStream)
+      i += 1
+    }
+    values
+  }
+}
+
+object ShortArraySerializer{
+  def write(outputStream: OutputStream, values: Array[Short]): Unit = {
+    IntSerializer.write(outputStream, values.length)
+    var i = 0
+    while(i < values.length){
+      ShortSerializer.write(outputStream, values(i))
+      i += 1
+    }
+  }
+
+  def read(inputStream: InputStream): Array[Short] = {
+    val len = IntSerializer.read(inputStream)
+    val values = Array.ofDim[Short](len)
+    var i = 0
+    while(i < len){
+      values(i) = ShortSerializer.read(inputStream)
       i += 1
     }
     values

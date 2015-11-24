@@ -2,10 +2,20 @@ package com.stefansavev.fuzzysearch;
 
 public interface FuzzySearchEngine {
     public static class FastTrees implements FuzzySearchEngine{
-        public int numTrees;
+        private int numTrees;
+        private FuzzySearchEngines.FuzzyIndexValueSize valueSize;
 
-        public FastTrees(int numTrees){
+        public FastTrees(int numTrees, FuzzySearchEngines.FuzzyIndexValueSize valueSize){
             this.numTrees = numTrees;
+            this.valueSize = valueSize;
+        }
+
+        public int getNumTrees(){
+            return numTrees;
+        }
+
+        public FuzzySearchEngines.FuzzyIndexValueSize getValueSize(){
+            return valueSize;
         }
     }
 }

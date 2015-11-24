@@ -2,7 +2,7 @@ package com.stefansavev.randomprojections.serialization.core
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.randomprojections.serialization.{DoubleArraySerializer, IntArraySerializer, DoubleSerializer, IntSerializer}
+import com.stefansavev.randomprojections.serialization._
 
 object PrimitiveTypeSerializers {
 
@@ -43,6 +43,16 @@ object PrimitiveTypeSerializers {
 
     def fromBinary(inputStream: InputStream): SerializerType = {
       DoubleArraySerializer.read(inputStream)
+    }
+  }
+
+  implicit object TypedShortArraySerializer extends TypedSerializer[Array[Short]]{
+    def toBinary(outputStream: OutputStream, input: SerializerType): Unit = {
+      ShortArraySerializer.write(outputStream, input)
+    }
+
+    def fromBinary(inputStream: InputStream): SerializerType = {
+      ShortArraySerializer.read(inputStream)
     }
   }
 }

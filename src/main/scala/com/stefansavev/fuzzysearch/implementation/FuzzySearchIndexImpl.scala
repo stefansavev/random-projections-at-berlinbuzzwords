@@ -3,6 +3,7 @@ package com.stefansavev.fuzzysearch.implementation
 import java.io.File
 import java.util
 
+import com.stefansavev.fuzzysearch.FuzzySearchEngines.FuzzyIndexValueSize
 import com.stefansavev.fuzzysearch.{FuzzySearchItem, FuzzySearchResult}
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
@@ -154,9 +155,18 @@ object FuzzySearchIndexWrapper{
   }
 }
 
-class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int){
+class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIndexValueSize){
+  val storageType = valueSize match  {
+    case FuzzyIndexValueSize.AsDouble => {
+      StoreBuilderAsDoubleType
+    }
+    case FuzzyIndexValueSize.As2Byte => {
+      StoreBuilderAsBytesType
+    }
+  }
+
   val columnIds = Array.range(0, dim)
-  val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true)
+  val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageType)
   val names = new ArrayBuffer[String]()
   val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
 

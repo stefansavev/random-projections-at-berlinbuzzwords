@@ -16,6 +16,10 @@ object DataFrameViewSerializers {
       def tag: Int = ValuesStoreAsDoubleSerializationTags.valuesStoreAsDouble
     }
 
+    implicit object ValuesStoreAsBytesSerializationTag extends TypeTag[ValuesStoreAsBytes]{
+      def tag: Int = ValuesStoreAsDoubleSerializationTags.valuesStoreAsBytes
+    }
+
     implicit def valuesStoreAsDoubleSerializer(): TypedSerializer[ValuesStoreAsDouble] = {
 
       implicit def valuesStoreTupleTypeSerializer(): TypedSerializer[ValuesStoreAsDouble.TupleType] = {
@@ -29,7 +33,27 @@ object DataFrameViewSerializers {
 
       isoSerializer[ValuesStoreAsDouble, ValuesStoreAsDouble.TupleType](ValuesStoreIso, valuesStoreTupleTypeSerializer())
     }
-    subtype1Serializer[ValuesStore, ValuesStoreAsDouble](ValuesStoreAsDoubleSerializationTag, valuesStoreAsDoubleSerializer())
+
+    implicit def valuesStoreAsBytesSerializer(): TypedSerializer[ValuesStoreAsBytes] = {
+      type T = ValuesStoreAsBytes
+      type TT = ValuesStoreAsBytes.TupleType
+      implicit def valuesStoreTupleTypeSerializer(): TypedSerializer[TT] = {
+        tuple2Serializer[Int, Array[Short]](TypedIntSerializer, TypedShortArraySerializer)
+      }
+
+      implicit object ValuesStoreIso extends Iso[T, TT]{
+        def from(input: Input): Output = input.toTuple
+        def to(t: Output): Input = ValuesStoreAsBytes.fromTuple(t)
+      }
+
+      isoSerializer[T, TT](ValuesStoreIso, valuesStoreTupleTypeSerializer())
+    }
+
+    subtype2Serializer[ValuesStore, ValuesStoreAsDouble, ValuesStoreAsBytes](
+        ValuesStoreAsDoubleSerializationTag,
+        ValuesStoreAsBytesSerializationTag,
+        valuesStoreAsDoubleSerializer(),
+        valuesStoreAsBytesSerializer())
   }
 
   implicit object DenseRowStoredMatrixViewIso extends Iso[DenseRowStoredMatrixView, DenseRowStoredMatrixView.TupleType]{

@@ -9,7 +9,9 @@ public class FuzzySearchIndexBuilder {
 
     public FuzzySearchIndexBuilder(int dimension, FuzzySearchEngine engine){
         this.dimension = dimension;
-        wrapper = new FuzzySearchIndexBuilderWrapper(dimension, ((FuzzySearchEngine.FastTrees)engine).numTrees);
+        FuzzySearchEngine.FastTrees fastTrees = ((FuzzySearchEngine.FastTrees)engine);
+
+        wrapper = new FuzzySearchIndexBuilderWrapper(dimension, fastTrees.getNumTrees(), fastTrees.getValueSize());
     }
 
     public void addItem(FuzzySearchItem item){
