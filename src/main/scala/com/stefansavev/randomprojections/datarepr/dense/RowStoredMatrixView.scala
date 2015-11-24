@@ -14,8 +14,6 @@ trait RowStoredMatrixView{
   def getPointAsDenseVector(pntId: Int): Array[Double]
   def getPointAsDenseVector(pntId: Int, signs: Array[Int], vec: Array[Double]): Unit
 
-  def dist(id1: Int, id2: Int): Double
-
   def multiplyRowComponentWiseBySparseVector(pntId: Int, sv: SparseVector, output: Array[Double]): Unit
 
   def cosineForNormalizedData(query: Array[Double], id: Int): Double

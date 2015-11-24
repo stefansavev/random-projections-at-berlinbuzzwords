@@ -5,7 +5,7 @@ import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.file.CSVFileOptions
 import com.stefansavev.randomprojections.utils.{StringIdHasherSettings, String2IdHasher}
 
-class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val labels: Array[Int], header: ColumnHeader, rowName2Hash: String2IdHasher = null) extends RowStoredMatrixView{
+class DenseRowStoredMatrixView(_numCols: Int, val data: ValuesStore, val labels: Array[Int], header: ColumnHeader, rowName2Hash: String2IdHasher = null) extends RowStoredMatrixView{
 
   def toTuple: DenseRowStoredMatrixView.TupleType = (_numCols, data, labels, header, rowName2Hash)
 
@@ -46,71 +46,19 @@ class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val label
   def getAllLabels(): Array[Int] = labels
 
   def fillRow(rowId: Int, output: Array[Double], isPos: Boolean): Unit = {
-    var offset = rowId*_numCols
-    var j = 0
-    while(j < _numCols){
-      if (isPos){
-        output(j) += data(offset)
-      } else {
-        output(j) -= data(offset)
-      }
-      offset += 1
-      j += 1
-    }
+    data.fillRow(rowId, output, isPos)
   }
 
   def setRow(rowId: Int, input: Array[Double]): Unit = {
-    var offset = rowId*_numCols
-    var j = 0
-    while(j < _numCols){
-      data(offset) = input(j)
-      offset += 1
-      j += 1
-    }
+    data.setRow(rowId, input)
   }
 
   def fillRow(rowId: Int, columnIds: Array[Int], output: Array[Double]): Unit = {
-    val offset = rowId*_numCols
-    var j = 0
-    while(j < columnIds.length){
-      val columnId = columnIds(j)
-      output(columnId) = data(offset + columnId)
-      j += 1
-    }
+    data.fillRow(rowId, columnIds, output)
   }
 
-
-  override def multiplyRowComponentWiseBySparseVector(rowId: Int, sv: SparseVector, output: Array[Double]): Unit = {
-    val offset = rowId*_numCols
-    val columnIds = sv.ids
-    val values = sv.values
-    val dim = columnIds.length
-    var j = 0
-    while(j < dim){
-      val columnId = columnIds(j)
-      val value = values(j)
-      output(j) = data(offset + columnId)*value
-      j += 1
-    }
-  }
-
-  def fillRows(rowIds: Array[Int], output: Array[Double], isPos: Boolean): Unit = {
-    var i = 0
-    while(i < rowIds.length) {
-      val rowId = rowIds(i)
-      var offset = rowId * _numCols
-      var j = 0
-      while (j < _numCols) {
-        if (isPos) {
-          output(j) += data(offset)
-        } else {
-          output(j) -= data(offset)
-        }
-        offset += 1
-        j += 1
-      }
-      i += 1
-    }
+  def multiplyRowComponentWiseBySparseVector(rowId: Int, sv: SparseVector, output: Array[Double]): Unit = {
+    data.multiplyRowComponentWiseBySparseVector(rowId, sv, output)
   }
 
   override def getPointAsDenseVector(pntId: Int): Array[Double] = {
@@ -123,65 +71,8 @@ class DenseRowStoredMatrixView(_numCols: Int, val data: Array[Double], val label
     fillRow(pntId, columnIds, output)
   }
 
-  override def dist(id1: Int, id2: Int): Double = {
-    var offset1 = id1*_numCols
-    var offset2 = id2*_numCols
-
-    var j = 0
-    var sum = 0.0
-    while(j < _numCols){
-      val v1 = data(offset1)
-      val v2 = data(offset2)
-      val d = v1 - v2
-      sum += d*d
-      offset1 += 1
-      offset2 += 1
-      j += 1
-    }
-    sum
-  }
-
   def cosineForNormalizedData(query: Array[Double], id: Int): Double = {
-
-    var offset = id*_numCols
-    var j = 0
-    var sum = 0.0
-    while(j < _numCols){
-      val v1 = query(j)
-      val v2 = data(offset)
-      val d = v1 - v2
-      sum += d*d
-      offset += 1
-      j += 1
-    }
-    1.0 - 0.5*sum
-
-    /*
-    var offset = id*_numCols
-    var j = 0
-    //var sum = 0.0
-    var n1 = 0.0
-    var n2 = 0.0
-    var dotProduct = 0.0
-    while(j < _numCols){
-      val v1 = query(j)
-      val v2 = data(offset)
-      dotProduct += v1*v2
-      n1 += v1*v1
-      n2 += v2*v2
-      //val d = v1 - v2
-      //sum += d*d
-      offset += 1
-      j += 1
-    }
-    //println("dot prod: " + dotProduct)
-    //(x - y)^2 = x^2 + y^2 - 2*(xy) = 2  - 2*xy
-    //2*xy = 2 - sum of squares
-    //
-    println("n1/n2 " + n1 + " " +  n2)
-    dotProduct/Math.sqrt(n1*n2)
-    //1.0 - 0.5*sum
-    */
+    data.cosineForNormalizedData(query, id)
   }
 
   def getLabel(rowId: Int): Int = labels(rowId)
@@ -193,7 +84,7 @@ object DenseRowStoredMatrixView{
     RowStoredMatrixView.fromFile(fileName, opt, dataFrameOptions)
   }
 
-  type TupleType = (Int, Array[Double], Array[Int], ColumnHeader, String2IdHasher)
+  type TupleType = (Int, ValuesStore, Array[Int], ColumnHeader, String2IdHasher)
 
   def fromTuple(t: DenseRowStoredMatrixView.TupleType): DenseRowStoredMatrixView = {
     new DenseRowStoredMatrixView(t._1, t._2, t._3, t._4, t._5)
@@ -214,7 +105,7 @@ class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMat
 
   var _currentRow = 0
 
-  val valuesBuffer = new DoubleArrayBuffer()
+  val valuesStoreBuilder = new ValuesStoreBuilderAsDouble(numCols)
   val labelsBuilder = new IntArrayBuffer()
 
   override def currentRowId: Int = _currentRow
@@ -253,16 +144,17 @@ class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMat
     }
 
     labelsBuilder += label
-    valuesBuffer ++= orderedValues
+    valuesStoreBuilder.addValues(orderedValues)
+
     _currentRow += 1
   }
 
   override def build(): RowStoredMatrixView = {
-    new DenseRowStoredMatrixView(numCols, valuesBuffer.toArray, labelsBuilder.toArray, header, string2IdHasher)
+    new DenseRowStoredMatrixView(numCols, valuesStoreBuilder.build(), labelsBuilder.toArray, header, string2IdHasher)
   }
 
   def build(newHeader: ColumnHeader): RowStoredMatrixView = {
-    new DenseRowStoredMatrixView(numCols, valuesBuffer.toArray, labelsBuilder.toArray, newHeader)
+    new DenseRowStoredMatrixView(numCols, valuesStoreBuilder.build, labelsBuilder.toArray, newHeader)
   }
 }
 

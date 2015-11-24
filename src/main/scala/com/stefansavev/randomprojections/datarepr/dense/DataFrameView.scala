@@ -65,7 +65,7 @@ class DataFrameView(val indexes: PointIndexes, val rowStoredView: RowStoredMatri
     rowStoredView.getName(rowId)
   }
 
-  def dist(id1: Int, id2: Int): Double = rowStoredView.dist(id1, id2)
+  //def dist(id1: Int, id2: Int): Double = rowStoredView.dist(id1, id2)
 
   def cosineForNormalizedData(query: Array[Double], id: Int): Double = rowStoredView.cosineForNormalizedData(query, id)
 

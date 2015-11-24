@@ -4,6 +4,7 @@ import java.io.PrintWriter
 
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.implementation.{KNN, KNNS}
+import com.stefansavev.randomprojections.utils.Utils
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -15,7 +16,8 @@ object Evaluation {
       val other_knns = knn.neighbors.filter(nn => nn.neighborId != knn.pointId && nn.count >= threshold).take(kNeigbhor)
       val buff = ArrayBuffer[(Double, KNN)]()
       for(nn <- other_knns) {
-        val dist = dataFrame.dist(knn.pointId, nn.neighborId) // diff.values.map(v=>v*v).sum
+        Utils.internalError()
+        val dist = 0.0 //temporary removed dataFrame.dist(knn.pointId, nn.neighborId) // diff.values.map(v=>v*v).sum
         val newNN = new KNN(nn.neighborId, nn.count, nn.label, dist)
         buff += ((dist, newNN))
       }

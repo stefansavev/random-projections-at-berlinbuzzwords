@@ -11,6 +11,27 @@ import com.stefansavev.randomprojections.utils.String2IdHasher
 
 object DataFrameViewSerializers {
 
+  implicit def valuesStoreSerializer(): TypedSerializer[ValuesStore] = {
+    implicit object ValuesStoreAsDoubleSerializationTag extends TypeTag[ValuesStoreAsDouble]{
+      def tag: Int = ValuesStoreAsDoubleSerializationTags.valuesStoreAsDouble
+    }
+
+    implicit def valuesStoreAsDoubleSerializer(): TypedSerializer[ValuesStoreAsDouble] = {
+
+      implicit def valuesStoreTupleTypeSerializer(): TypedSerializer[ValuesStoreAsDouble.TupleType] = {
+        tuple2Serializer[Int, Array[Double]](TypedIntSerializer, TypedDoubleArraySerializer)
+      }
+
+      implicit object ValuesStoreIso extends Iso[ValuesStoreAsDouble, ValuesStoreAsDouble.TupleType]{
+        def from(input: Input): Output = input.toTuple
+        def to(t: Output): Input = ValuesStoreAsDouble.fromTuple(t)
+      }
+
+      isoSerializer[ValuesStoreAsDouble, ValuesStoreAsDouble.TupleType](ValuesStoreIso, valuesStoreTupleTypeSerializer())
+    }
+    subtype1Serializer[ValuesStore, ValuesStoreAsDouble](ValuesStoreAsDoubleSerializationTag, valuesStoreAsDoubleSerializer())
+  }
+
   implicit object DenseRowStoredMatrixViewIso extends Iso[DenseRowStoredMatrixView, DenseRowStoredMatrixView.TupleType]{
     def from(input: Input): Output = input.toTuple
     def to(t: Output): Input = DenseRowStoredMatrixView.fromTuple(t)
@@ -22,13 +43,12 @@ object DataFrameViewSerializers {
 
   //this is how to help the compiler
   implicit def denseRowStoredMatrixViewTupleTypeSerializer(): TypedSerializer[DenseRowStoredMatrixView.TupleType] = {
-    tuple5Serializer[Int, Array[Double], Array[Int], ColumnHeader, String2IdHasher](TypedIntSerializer, TypedDoubleArraySerializer, TypedIntArraySerializer, ColumnHeaderSerializer, String2IdHasherSerializer)
+    tuple5Serializer[Int, ValuesStore, Array[Int], ColumnHeader, String2IdHasher](TypedIntSerializer, valuesStoreSerializer(), TypedIntArraySerializer, ColumnHeaderSerializer, String2IdHasherSerializer)
   }
 
   implicit def denseRowStoredMatrixSerializer(): TypedSerializer[DenseRowStoredMatrixView] = {
     isoSerializer[DenseRowStoredMatrixView, DenseRowStoredMatrixView.TupleType](DenseRowStoredMatrixViewIso, denseRowStoredMatrixViewTupleTypeSerializer())
   }
-
 
   implicit def rowStoredMatrixSerializer(): TypedSerializer[RowStoredMatrixView] = {
     subtype1Serializer[RowStoredMatrixView, DenseRowStoredMatrixView](DenseRowStoredMatrixViewTag, denseRowStoredMatrixSerializer())
