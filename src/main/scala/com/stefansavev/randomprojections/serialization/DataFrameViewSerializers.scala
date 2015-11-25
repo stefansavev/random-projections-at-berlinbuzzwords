@@ -24,6 +24,10 @@ object DataFrameViewSerializers {
       def tag: Int = ValuesStoreAsDoubleSerializationTags.valuesStoreAsSingleByte
     }
 
+    implicit object LazyLoadStoreSerializationTag extends TypeTag[LazyLoadValueStore]{
+      def tag: Int = ValuesStoreAsDoubleSerializationTags.lazyLoadValuesStore
+    }
+
     implicit def valuesStoreAsDoubleSerializer(): TypedSerializer[ValuesStoreAsDouble] = {
 
       implicit def valuesStoreTupleTypeSerializer(): TypedSerializer[ValuesStoreAsDouble.TupleType] = {
@@ -68,13 +72,35 @@ object DataFrameViewSerializers {
       isoSerializer[T, TT](ValuesStoreIso, valuesStoreTupleTypeSerializer())
     }
 
-    subtype3Serializer[ValuesStore, ValuesStoreAsDouble, ValuesStoreAsBytes, ValuesStoreAsSingleByte](
+    implicit def lazyLoadStoreSerializer(): TypedSerializer[LazyLoadValueStore] = {
+      type T = LazyLoadValueStore
+      type TT = LazyLoadValueStore.TupleType
+
+      implicit def valuesStoreTupleTypeSerializer(): TypedSerializer[TT] = {
+        tuple3Serializer[String, Int, Int](TypedStringSerializer, TypedIntSerializer, TypedIntSerializer)
+      }
+
+      implicit object ValuesStoreIso extends Iso[T, TT]{
+        def from(input: Input): Output = input.toTuple
+        def to(t: Output): Input = LazyLoadValueStore.fromTuple(t)
+      }
+
+      isoSerializer[T, TT](ValuesStoreIso, valuesStoreTupleTypeSerializer())
+    }
+
+    subtype4Serializer[ValuesStore,
+                        ValuesStoreAsDouble,
+                        ValuesStoreAsBytes,
+                        ValuesStoreAsSingleByte,
+                        LazyLoadValueStore](
         ValuesStoreAsDoubleSerializationTag,
         ValuesStoreAsBytesSerializationTag,
         ValuesStoreAsSingleByteSerializationTag,
+        LazyLoadStoreSerializationTag,
         valuesStoreAsDoubleSerializer(),
         valuesStoreAsBytesSerializer(),
-        valuesStoreAsSingleByteSerializer())
+        valuesStoreAsSingleByteSerializer(),
+        lazyLoadStoreSerializer())
   }
 
   implicit object DenseRowStoredMatrixViewIso extends Iso[DenseRowStoredMatrixView, DenseRowStoredMatrixView.TupleType]{

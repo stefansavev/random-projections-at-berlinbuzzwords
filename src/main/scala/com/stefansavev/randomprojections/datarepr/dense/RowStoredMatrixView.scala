@@ -17,6 +17,8 @@ trait RowStoredMatrixView{
   def multiplyRowComponentWiseBySparseVector(pntId: Int, sv: SparseVector, output: Array[Double]): Unit
 
   def cosineForNormalizedData(query: Array[Double], id: Int): Double
+
+  def getBuilderType: StoreBuilderType
 }
 
 object RowStoredMatrixView{

@@ -166,6 +166,8 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
       StoreBuilderAsSingleByteType
     }
   }
+  //val storageWithFile = new LazyLoadStoreBuilderType("C:/tmp/backingdir/", storageType)
+  //(new File("C:/tmp/backingdir/")).mkdir()
 
   val columnIds = Array.range(0, dim)
   val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageType)

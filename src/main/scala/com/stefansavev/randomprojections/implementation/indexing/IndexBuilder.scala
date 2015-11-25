@@ -101,7 +101,7 @@ object IndexBuilder{
     val oldHeader = dataFrame.rowStoredView.getColumnHeader
     val newNumCols = projSt.asInstanceOf[SplitIntoKProjectionStrategy].k
     val newF = Array.range(0, newNumCols).map(i => (i.toString,i ))
-    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, false, dataFrame.rowStoredView.getColumnHeader.getStoreBuilderType())
+    val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, false, dataFrame.rowStoredView.getBuilderType)
     val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
     val absprojVec = projSt.nextRandomProjection(0, dataFrame, null)
     val signs = absprojVec.asInstanceOf[HadamardProjectionVector].signs
@@ -197,15 +197,19 @@ object IndexBuilder{
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
 
     //phase 1: dimensionality reduction
-    val svdParams = SVDParams(k, FullDenseSVDLimitedMemory)
+
     val svdTransform = precomputedSVDTransform match {
-      case None => DimensionalityReduction.fit(svdParams, dataFrameView)
-      case Some(t) => {
-        //we can precompute the transform while adding the documents to the index
-        //this is advantageous if the dataset is large and we cannot keep it
-        t.reduceToTopK(k)
+        case None => {
+          val svdParams = SVDParams(k, FullDenseSVDLimitedMemory)
+          DimensionalityReduction.fit(svdParams, dataFrameView)
+        }
+        case Some(t) => {
+          //we can precompute the transform while adding the documents to the index
+          //this is advantageous if the dataset is large and we cannot keep it
+          t.reduceToTopK(k)
+        }
       }
-    }
+
     val datasetAfterSVD = DimensionalityReduction.transform(svdTransform, dataFrameView)
 
     //phase 2 place holder

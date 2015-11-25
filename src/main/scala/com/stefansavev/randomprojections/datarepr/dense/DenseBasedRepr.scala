@@ -7,6 +7,8 @@ import com.stefansavev.randomprojections.utils.{StringIdHasherSettings, String2I
 
 class DenseRowStoredMatrixView(_numCols: Int, val data: ValuesStore, val labels: Array[Int], header: ColumnHeader, rowName2Hash: String2IdHasher = null) extends RowStoredMatrixView{
 
+  def getBuilderType: StoreBuilderType = data.getBuilderType
+
   def toTuple: DenseRowStoredMatrixView.TupleType = (_numCols, data, labels, header, rowName2Hash)
 
   override def numCols: Int = _numCols

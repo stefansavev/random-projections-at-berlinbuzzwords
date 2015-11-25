@@ -1,7 +1,12 @@
 package com.stefansavev.randomprojections.datarepr.dense
 
+import java.io.File
+
 import com.stefansavev.randomprojections.buffers._
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+import com.stefansavev.randomprojections.implementation.HadamardUtils
+
+
 import com.stefansavev.randomprojections.utils.Utils
 
 trait ValuesStore{
@@ -11,7 +16,89 @@ trait ValuesStore{
 
   def multiplyRowComponentWiseBySparseVector(rowId: Int, sv: SparseVector, output: Array[Double]): Unit
   def cosineForNormalizedData(query: Array[Double], id: Int): Double
+
+  def getBuilderType: StoreBuilderType
 }
+
+object ValuesStore{
+
+}
+
+object LazyLoadValueStore{
+  def getPartitionFileName(dirName: String, partitionId: Int): String = {
+    val newFile = new File(dirName, "_partition_" + partitionId)
+    newFile.getAbsolutePath
+  }
+
+  type TupleType = (String, Int, Int)
+
+  def fromTuple(t: TupleType): LazyLoadValueStore = {
+    val (dirName, numPointsInPartition, numPartitions) = t
+    new LazyLoadValueStore(dirName, numPointsInPartition, numPartitions)
+  }
+
+}
+
+class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitions: Int) extends ValuesStore{
+  println("numPointsInPartition " + numPointsInPartition)
+  if (!HadamardUtils.isPowerOf2(numPointsInPartition)){
+    Utils.internalError()
+  }
+
+  def toTuple(): LazyLoadValueStore.TupleType = (dirName, numPointsInPartition, numPartitions)
+
+  var underlyingStore: ValuesStore = null
+  var currentPartition = -1
+
+  def getBuilderType: StoreBuilderType = {
+    if (underlyingStore == null){
+      transformRowId(0) //call for sideeffect to load the data
+    }
+    underlyingStore.getBuilderType
+  }
+
+  def getPartition(rowId: Int): Int = {
+    rowId / numPointsInPartition //TODO: replace by bit shift
+  }
+
+  def transformRowId(rowId: Int): Int = {
+    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    val partitionId = getPartition(rowId)
+   // println("rowid - partitionId " + rowId + " " + partitionId)
+    if (partitionId != currentPartition){
+      underlyingStore = ValuesStore.fromFile(LazyLoadValueStore.getPartitionFileName(dirName, partitionId))
+      currentPartition = partitionId
+    }
+
+    rowId % numPointsInPartition //TODO: replace by bit shift
+  }
+
+  def fillRow(rowId: Int, output: Array[Double], isPos: Boolean): Unit = {
+    val tRowId = transformRowId(rowId)
+    underlyingStore.fillRow(tRowId, output, isPos)
+  }
+
+  def setRow(rowId: Int, input: Array[Double]): Unit = {
+    Utils.internalError() //this store is read only
+  }
+
+  def fillRow(rowId: Int, columnIds: Array[Int], output: Array[Double]): Unit = {
+    val tRowId = transformRowId(rowId)
+    underlyingStore.fillRow(tRowId, columnIds, output)
+  }
+
+  def multiplyRowComponentWiseBySparseVector(rowId: Int, sv: SparseVector, output: Array[Double]): Unit = {
+    val tRowId = transformRowId(rowId)
+    underlyingStore.multiplyRowComponentWiseBySparseVector(tRowId, sv, output)
+  }
+
+  def cosineForNormalizedData(query: Array[Double], rowId: Int): Double = {
+    val tRowId = transformRowId(rowId)
+    underlyingStore.cosineForNormalizedData(query, tRowId)
+  }
+}
+
+
 
 trait ValuesStoreBuilder{
   def getCurrentRowIndex: Int
@@ -23,6 +110,49 @@ object ValuesStoreAsDoubleSerializationTags{
   val valuesStoreAsDouble = 1
   val valuesStoreAsBytes = 2
   val valuesStoreAsSingleByte = 3
+  val lazyLoadValuesStore = 4
+}
+
+class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: StoreBuilderType) extends ValuesStoreBuilder{
+  var currentRow = 0
+  val numPointsInPartition = 1 << 17 //1 << 17 //= 131072
+  var currentPartition = 0
+  var currentBuilder = underlyingBuilder.getBuilder(numCols)
+
+  def getCurrentRowIndex: Int = {
+    currentRow
+  }
+
+  def savePartition(): Unit = {
+    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    println("saving partition " + currentBuilder.getCurrentRowIndex)
+
+    val currentStore = currentBuilder.build()
+    val outputFile = LazyLoadValueStore.getPartitionFileName(backingDir, currentPartition)
+    println("#output file: " + outputFile)
+    if (new File(outputFile).exists()){
+      Utils.internalError()
+    }
+    currentStore.toFile(outputFile)
+    currentBuilder = underlyingBuilder.getBuilder(numCols)
+    currentPartition += 1
+  }
+
+  def addValues(values: Array[Double]): Unit = {
+    if (currentBuilder.getCurrentRowIndex == numPointsInPartition){
+      savePartition()
+    }
+    currentBuilder.addValues(values)
+    currentRow += 1
+  }
+
+  def build(): ValuesStore = {
+    if (currentBuilder.getCurrentRowIndex > 0) {
+      savePartition()
+    }
+    new LazyLoadValueStore(backingDir, numPointsInPartition, currentPartition)
+  }
+
 }
 
 object ValuesStoreAsDouble{
@@ -39,6 +169,8 @@ class ValuesStoreAsDouble(_numCols: Int, data: Array[Double]) extends ValuesStor
   def toTuple(): ValuesStoreAsDouble.TupleType = {
     (_numCols, data)
   }
+
+  def getBuilderType: StoreBuilderType = StoreBuilderAsDoubleType
 
   def fillRow(rowId: Int, output: Array[Double], isPos: Boolean): Unit = {
     var offset = rowId*_numCols
@@ -154,6 +286,9 @@ object FloatToByteEncoder{
 }
 
 class ValuesStoreAsBytes(_numCols: Int, _data: Array[Short]) extends ValuesStore{
+
+  def getBuilderType: StoreBuilderType = StoreBuilderAsBytesType
+
   def getAtIndex(index: Int): Double = {
     FloatToByteEncoder.decodeValue(_data(index))
   }
@@ -532,6 +667,8 @@ object ValuesStoreAsSingleByte{
 
 class ValuesStoreAsSingleByte(_numCols: Int, minValues: Array[Float], maxValues: Array[Float], _data: Array[Byte]) extends ValuesStore{
 
+  def getBuilderType: StoreBuilderType = StoreBuilderAsSingleByteType
+
   def toTuple(): ValuesStoreAsSingleByte.TupleType = {
     (_numCols, minValues, maxValues, _data)
   }
@@ -613,6 +750,15 @@ case object StoreBuilderAsBytesType extends StoreBuilderType{
 case object StoreBuilderAsSingleByteType extends StoreBuilderType{
   def getBuilder(numCols: Int): ValuesStoreBuilder = new ValuesStoreBuilderAsSingleByte(numCols)
 }
+
+case class LazyLoadStoreBuilderType(backingDir: String, underlyingBuilder: StoreBuilderType) extends StoreBuilderType{
+  if (underlyingBuilder.isInstanceOf[LazyLoadStoreBuilderType]){
+    Utils.internalError()
+  }
+
+  def getBuilder(numCols: Int): ValuesStoreBuilder = new LazyLoadValuesStoreBuilder(backingDir, numCols, underlyingBuilder)
+}
+
 /*
 class StoreBuilderFactory(t: StoreBuilderType){
   def getBuilder(numCols: Int): ValuesStoreBuilder = {

@@ -16,6 +16,16 @@ object PrimitiveTypeSerializers {
     }
   }
 
+  implicit object TypedStringSerializer extends TypedSerializer[String] {
+    def toBinary(outputStream: OutputStream, input: String): Unit = {
+      StringSerializer.write(outputStream, input)
+    }
+
+    def fromBinary(inputStream: InputStream): String = {
+      StringSerializer.read(inputStream)
+    }
+  }
+
   implicit object TypedDoubleSerializer extends TypedSerializer[Double] {
     def toBinary(outputStream: OutputStream, input: Double): Unit = {
       DoubleSerializer.write(outputStream, input)
