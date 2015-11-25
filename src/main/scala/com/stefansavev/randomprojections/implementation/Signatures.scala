@@ -2,11 +2,13 @@ package com.stefansavev.randomprojections.implementation
 
 import java.util.Random
 
+import com.stefansavev.randomprojections.buffers.{LongArrayBuffer, IntArrayBuffer}
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.utils.RandomUtils
 
 object Counts{
+  /*
   def numberOf1s(input: Int): Int = {
     var b = input
     var sum = 0
@@ -20,6 +22,7 @@ object Counts{
   }
 
   val table: Array[Int] = Array.range(0, 256).map(i => numberOf1s(i))
+  */
 
   def numberOf1sLong(input: Long): Int = {
     java.lang.Long.bitCount(input)
@@ -165,7 +168,17 @@ object Signatures {
       signatures(i) = sig
       i += 1
     }
-    (new SignatureVectors(vectors), new PointSignatures(signatures))
+    (new SignatureVectors(vectors), PointSignatures.fromPreviousVersion(signatures)) // new PointSignatures(signatures))
+  }
+
+  def computeSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int): SignatureVectors = {
+    val vectors = Array.ofDim[SparseVector](numSignatures)
+    var i = 0
+    while(i < numSignatures){
+      vectors(i) = computeSignatureVectorsHelper(rnd, numColumns)
+      i += 1
+    }
+    new SignatureVectors(vectors)
   }
 
   def computePointSignaturesHelper(rnd: Random, dataFrameView: DataFrameView): (SparseVector, Array[Long]) = {
@@ -188,4 +201,20 @@ object Signatures {
     }
     (signs, signatures)
   }
+
+  def computeSignatureVectorsHelper(rnd: Random, dim: Int): SparseVector = {
+    val signs = RandomUtils.generateRandomVector(rnd, dim, Array.range(0, dim))
+    signs
+  }
+}
+
+class OnlineSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int){
+  val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
+  val buffer = new LongArrayBuffer()
+
+  def pass(vec: Array[Double]): Unit = {
+    val querySigs = sigVectors.computePointSignatures(vec, 0, numSignatures)
+    buffer ++= querySigs
+  }
+
 }

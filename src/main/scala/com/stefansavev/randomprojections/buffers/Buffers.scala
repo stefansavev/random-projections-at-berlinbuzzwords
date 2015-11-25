@@ -251,5 +251,58 @@ class ByteArrayBuffer(preaccloc: Int = 16){
   }
 }
 
+class LongArrayBuffer(preaccloc: Int = 16){
+  var array = Array.ofDim[Long](Math.max(preaccloc, 4))
+  var current = 0
 
+  def size = current
+
+  def ++=(values: Array[Long]): Unit = {
+    if (current + values.length > array.length){
+      var newSize = array.length
+      while(current + values.length > newSize){
+        newSize *= 2
+      }
+      val doubleArray = Array.ofDim[Long](newSize)
+      Array.copy(array, 0, doubleArray, 0, array.length)
+      array = doubleArray
+    }
+
+    System.arraycopy(values, 0, array, current, values.length)
+    current += values.length
+  }
+
+  def apply(idx: Int): Long = {
+    array(idx)
+  }
+
+  def +=(value: Long): Unit = {
+    if (current >= array.length){
+      val intArray = Array.ofDim[Long](2*array.length)
+      Array.copy(array, 0, intArray, 0, array.length)
+      array = intArray
+    }
+    array(current) = value
+    current += 1
+  }
+
+  def toArray(): Array[Long] = {
+    val result = Array.ofDim[Long](current)
+    Array.copy(array, 0, result, 0, current)
+    result
+  }
+
+  def set(index: Int, value: Long): Unit = {
+    array(index) = value
+  }
+
+  def clear(): Unit = {
+    array = Array.ofDim[Long](16)
+  }
+
+  def removeLast(): Long = {
+    current -= 1
+    array(current)
+  }
+}
 

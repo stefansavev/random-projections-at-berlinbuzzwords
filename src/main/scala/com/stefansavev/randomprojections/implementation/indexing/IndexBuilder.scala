@@ -251,7 +251,7 @@ object IndexBuilder{
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
     //if signatures are computed on the SVD??
     val (signatureVecs, signatures) = Signatures.computePointSignatures(16, rnd, dataFrameView)
-    dataFrameView.setPointSignatures(signatures)
+    //dataFrameView.setPointSignatures(signatures)
     val reportingDistanceEvaluator = settings.reportingDistanceEvaluator.build(dataFrameView)
     val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, transformedDataset)
     for(i <- 0 until settings.numTrees){

@@ -449,6 +449,11 @@ object PointSignaturesSerializer{
   import ImplicitSerializers._
 
   def toBinary(outputStream: OutputStream, pointSignatures: PointSignatures): Unit = {
+    LongArraySerializer.write(outputStream, pointSignatures.pointSignatures)
+    IntSerializer.write(outputStream, pointSignatures.numPoints)
+    IntSerializer.write(outputStream, pointSignatures.numSignatures)
+
+    /*
     val signatures = pointSignatures.pointSignatures
     val len = signatures.length
     outputStream.writeInt(len)
@@ -457,9 +462,15 @@ object PointSignaturesSerializer{
       LongArraySerializer.write(outputStream, signatures(i))
       i += 1
     }
+    */
   }
 
   def fromBinary(inputStream: InputStream): PointSignatures = {
+    val signatures = LongArraySerializer.read(inputStream)
+    val numPoints = IntSerializer.read(inputStream)
+    val numSignatures = IntSerializer.read(inputStream)
+    new PointSignatures(signatures, numPoints, numSignatures)
+    /*
     val len = inputStream.readInt()
     val vectors = Array.ofDim[Array[Long]](len)
     var i = 0
@@ -468,6 +479,7 @@ object PointSignaturesSerializer{
       i += 1
     }
     new PointSignatures(vectors)
+    */
   }
 }
 
