@@ -27,7 +27,7 @@ public class MnistTest {
         int numTrees = 10;
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
-                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
+                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
 
         //FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
         //        FuzzySearchEngines.bruteForce(FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));

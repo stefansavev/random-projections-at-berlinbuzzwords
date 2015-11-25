@@ -1,10 +1,12 @@
 package com.stefansavev.randomprojections.implementation
 
+import java.io.{FileOutputStream, BufferedOutputStream, File}
 import java.util.Random
 
 import com.stefansavev.randomprojections.buffers.{LongArrayBuffer, IntArrayBuffer}
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+import com.stefansavev.randomprojections.serialization.LongArraySerializer
 import com.stefansavev.randomprojections.utils.RandomUtils
 
 object Counts{
@@ -211,10 +213,62 @@ object Signatures {
 class OnlineSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int){
   val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
   val buffer = new LongArrayBuffer()
+  var numPoints = 0
 
   def pass(vec: Array[Double]): Unit = {
     val querySigs = sigVectors.computePointSignatures(vec, 0, numSignatures)
     buffer ++= querySigs
+    numPoints += 1
   }
 
+  def buildPointSignatures(): (SignatureVectors, PointSignatures) = {
+    val arr = buffer.toArray()
+    buffer.clear()
+    val pointSig = new PointSignatures(null, -1, arr, numPoints, numSignatures)
+    (sigVectors, pointSig)
+  }
 }
+
+object DiskBackedOnlineSignatureVectorsUtils{
+  def fileName(dirName: String, partitionId: Int): String = {
+    (new File(dirName, "_partition_" + partitionId)).getAbsolutePath
+  }
+}
+
+class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int, numColumns: Int){
+  val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
+  var buffer = new LongArrayBuffer()
+  var numPoints = 0
+  val partitionSize = (1 << 17)
+  var currentPartition = 0
+
+  def storePartition(): Unit = {
+    val fileName = DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, currentPartition)
+    val outputStream = new BufferedOutputStream(new FileOutputStream(fileName))
+    println("Writing signature partioned file:" + fileName)
+    LongArraySerializer.write(outputStream, buffer.toArray())
+    outputStream.close()
+    buffer = new LongArrayBuffer()
+    currentPartition += 1
+  }
+
+  def pass(vec: Array[Double]): Unit = {
+    val querySigs = sigVectors.computePointSignatures(vec, 0, numSignatures)
+    buffer ++= querySigs
+    numPoints += 1
+    if (numPoints % partitionSize == 0){
+      storePartition()
+    }
+  }
+
+  def buildPointSignatures(): (SignatureVectors, PointSignatures) = {
+    if (buffer.size > 0){
+      storePartition()
+    }
+    //need to save the backing directory
+    val pointSig = new PointSignatures(backingDir, currentPartition, null, numPoints, numSignatures)
+    (sigVectors, pointSig)
+  }
+}
+
+

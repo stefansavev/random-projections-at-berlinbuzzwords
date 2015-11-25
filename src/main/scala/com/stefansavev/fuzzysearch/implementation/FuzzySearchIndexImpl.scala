@@ -2,6 +2,7 @@ package com.stefansavev.fuzzysearch.implementation
 
 import java.io.File
 import java.util
+import java.util.Random
 
 import com.stefansavev.fuzzysearch.FuzzySearchEngines.FuzzyIndexValueSize
 import com.stefansavev.fuzzysearch.{FuzzySearchItem, FuzzySearchResult}
@@ -166,16 +167,19 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
       StoreBuilderAsSingleByteType
     }
   }
-  //val storageWithFile = new LazyLoadStoreBuilderType("C:/tmp/backingdir/", storageType)
+  val storageWithFile = storageType // new LazyLoadStoreBuilderType("C:/tmp/backingdir/", storageType)
   //(new File("C:/tmp/backingdir/")).mkdir()
 
   val columnIds = Array.range(0, dim)
-  val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageType)
+  val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageWithFile)
   val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
   val onlineSVDFitter = new OnlineSVDFitter(dim)
+  val sigSize = 16
+  val onlineSigVecs = new DiskBackedOnlineSignatureVectors("C:/tmp/backingdir-sig/", new Random(48186816), sigSize, dim)
 
   def addItem(name: String, label: Int, dataPoint: Array[Double]): Unit = {
     onlineSVDFitter.pass(dataPoint)
+    onlineSigVecs.pass(dataPoint)
     builder.addRow(name, label, columnIds, dataPoint)
   }
 
@@ -193,12 +197,13 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
       projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(8),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393,
-      signatureSize = 16
+      signatureSize = sigSize
     )
     println(dataset)
 
+    val signatures = onlineSigVecs.buildPointSignatures()
     val trees = Utils.timed("Create trees", {
-      IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform))
+      IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform), Some(signatures))
     }).result
     new FuzzySearchIndexWrapper(trees, dataset)
   }

@@ -129,6 +129,34 @@ object IndexBuilder{
     (absprojVec, new DataFrameView(indexes, builder.build()))
   }
 
+  def modifyInPlace(dataFrame: DataFrameView, projSt: ProjectionStrategy): (AbstractProjectionVector, DataFrameView) = {
+    val absprojVec = projSt.nextRandomProjection(0, dataFrame, null)
+    val signs = absprojVec.asInstanceOf[HadamardProjectionVector].signs
+    val vec = Array.ofDim[Double](dataFrame.numCols)
+    val input = Array.ofDim[Double](signs.ids.length)
+    val output = Array.ofDim[Double](signs.ids.length)
+    val newIds = Array.range(0, dataFrame.numCols)
+    val denseRowStoredMatrix = dataFrame.rowStoredView.asInstanceOf[DenseRowStoredMatrixView]
+    var i = 0
+    while(i < dataFrame.numRows){
+      dataFrame.getPointAsDenseVector(i, signs.ids, vec)
+      var j = 0
+      while(j < signs.ids.length){
+        val index = signs.ids(j)
+        val b = signs.values(j)
+        val a = vec(index)
+        input(j) = a*b
+        j += 1
+      }
+      HadamardUtils.multiplyInto(dataFrame.numCols, input, output)
+      denseRowStoredMatrix.setRow(i, output)
+      i += 1
+    }
+
+    val indexes = dataFrame.indexes
+    (absprojVec, dataFrame)
+  }
+
   private def requiresStorageOfOriginalDataset(evaluator: ReportingDistanceEvaluator): Boolean = {
     val req = evaluator.dataSetSerializationRequirement
     req match {
@@ -190,7 +218,20 @@ object IndexBuilder{
     RandomTree2EfficientlyStoredTreeConverter.toEfficientlyStoredTree(tree)
   }
 
-  def buildWithSVDAndRandomRotation(k: Int, settings: IndexSettings, dataFrameView: DataFrameView, precomputedSVDTransform: Option[SVDTransform] = None): RandomTrees = {
+  def computeSignatures(rnd: Random, numSig: Int, dataFrameView: DataFrameView): (SignatureVectors, PointSignatures) = {
+    val onlineSigVecs = new OnlineSignatureVectors(rnd, numSig, dataFrameView.numCols)
+    var i = 0
+    while(i < dataFrameView.numRows){
+      onlineSigVecs.pass(dataFrameView.getPointAsDenseVector(i))
+      i += 1
+    }
+    val (signatureVecs, signatures) = onlineSigVecs.buildPointSignatures()
+    (signatureVecs, signatures)
+  }
+
+  def buildWithSVDAndRandomRotation(k: Int, settings: IndexSettings, dataFrameView: DataFrameView,
+                                    precomputedSVDTransform: Option[SVDTransform] = None,
+                                    precomputedSigVec: Option[(SignatureVectors, PointSignatures)] = None): RandomTrees = {
     val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
     val logger = new IndexCounters()
@@ -214,17 +255,25 @@ object IndexBuilder{
 
     //phase 2 place holder
     val newIndexes = PointIndexes(dataFrameView.indexes.indexes)
-    val rotatedDatasetPlaceHolder = new DataFrameView(newIndexes, datasetAfterSVD.rowStoredView)
+    //!!!val rotatedDatasetPlaceHolder = new DataFrameView(newIndexes, datasetAfterSVD.rowStoredView)
 
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
-    val (signatureVecs, signatures) = Signatures.computePointSignatures(settings.signatureSize, rnd, dataFrameView)
-    dataFrameView.setPointSignatures(signatures)
+    //val (signatureVecs, signatures) = Signatures.computePointSignatures(settings.signatureSize, rnd, dataFrameView)
+    val (signatureVecs, signatures) = precomputedSigVec match {
+      case None => computeSignatures(rnd, settings.signatureSize, dataFrameView)
+      case Some(sv) => sv
+    }
+
+    //dataFrameView.setPointSignatures(signatures) //pointSig. from dataFrame will be removed
+
     val reportingDistanceEvaluator = settings.reportingDistanceEvaluator.build(dataFrameView)
 
     for(i <- 0 until settings.numTrees){
       //phase 3: run fast trees
       val randomRotation = ProjectionStrategies.splitIntoKRandomProjection(k).build(settings, rnd, datasetAfterSVD)
-      val (rotationTransform, rotatedDataFrameView)= modifyDataFrame(rotatedDatasetPlaceHolder, randomRotation)
+      //!!!val (rotationTransform, rotatedDataFrameView)= modifyDataFrame(rotatedDatasetPlaceHolder, randomRotation)
+      val (rotationTransform, rotatedDataFrameView) = modifyInPlace(datasetAfterSVD, randomRotation)
+
       val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, rotatedDataFrameView)
       val randomTree = Utils.timed(s"Build tree ${i}", {toEfficientlyStoredTree(buildTree(i, rnd, settings, rotatedDataFrameView, bucketCollector, splitStrategy, projStrategy, logger))}).result
       randomTrees(i) = RandomTreeNodeRoot(rotationTransform, randomTree)

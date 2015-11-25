@@ -103,7 +103,7 @@ public class WordVecTest {
 
     public static void main(String[] args) throws Exception {
         String inputTextFile = "D:/RandomTreesData-144818512896186816/input/" + "wordvec/wordvec.txt";
-        String indexFile = "C:/tmp/output-index-wordvec/";
+        String indexFile = "C:/tmp/output-index-wordvec-1/";
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);

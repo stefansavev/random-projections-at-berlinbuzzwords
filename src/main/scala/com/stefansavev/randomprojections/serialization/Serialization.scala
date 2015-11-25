@@ -8,6 +8,7 @@ import com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransfor
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.datarepr.dense.{DataFrameView, ColumnHeaderImpl, ColumnHeader}
 import com.stefansavev.randomprojections.serialization.core.TypedSerializer
+import com.stefansavev.randomprojections.utils.Utils
 import no.uib.cipr.matrix.DenseMatrix
 
 object BinaryFileSerializerSig{
@@ -449,9 +450,20 @@ object PointSignaturesSerializer{
   import ImplicitSerializers._
 
   def toBinary(outputStream: OutputStream, pointSignatures: PointSignatures): Unit = {
-    LongArraySerializer.write(outputStream, pointSignatures.pointSignatures)
-    IntSerializer.write(outputStream, pointSignatures.numPoints)
-    IntSerializer.write(outputStream, pointSignatures.numSignatures)
+    //TODO: this functionality should be split into 2 classes
+    if (pointSignatures.backingDir != null){
+      IntSerializer.write(outputStream, 1) //case 1
+      StringSerializer.write(outputStream, pointSignatures.backingDir)
+      IntSerializer.write(outputStream, pointSignatures.numPartitions)
+      IntSerializer.write(outputStream, pointSignatures.numPoints)
+      IntSerializer.write(outputStream, pointSignatures.numSignatures)
+    }
+    else {
+      IntSerializer.write(outputStream, 2) //case 2
+      LongArraySerializer.write(outputStream, pointSignatures.pointSignatures)
+      IntSerializer.write(outputStream, pointSignatures.numPoints)
+      IntSerializer.write(outputStream, pointSignatures.numSignatures)
+    }
 
     /*
     val signatures = pointSignatures.pointSignatures
@@ -466,10 +478,39 @@ object PointSignaturesSerializer{
   }
 
   def fromBinary(inputStream: InputStream): PointSignatures = {
-    val signatures = LongArraySerializer.read(inputStream)
-    val numPoints = IntSerializer.read(inputStream)
-    val numSignatures = IntSerializer.read(inputStream)
-    new PointSignatures(signatures, numPoints, numSignatures)
+    val caseId = IntSerializer.read(inputStream)
+    if (caseId == 1){
+      val backingDir = StringSerializer.read(inputStream)
+      val numPartitions = IntSerializer.read(inputStream)
+      val numPoints = IntSerializer.read(inputStream)
+      val numSig = IntSerializer.read(inputStream)
+      val data = Array.ofDim[Long](numPoints*numSig)
+      var offset = 0
+      var i = 0
+      while(i < numPartitions){
+        val subStream = new BufferedInputStream(new FileInputStream(DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, i)))
+        val output = LongArraySerializer.read(subStream)
+        println("output.len: " + output.length)
+        subStream.close()
+        System.arraycopy(output, 0, data, offset, output.length)
+        offset += output.length
+        i += 1
+      }
+
+      if (offset != data.length){
+        Utils.internalError()
+      }
+      new PointSignatures(null, -1, data, numPoints, numSig)
+    }
+    else if (caseId == 2) {
+      val signatures = LongArraySerializer.read(inputStream)
+      val numPoints = IntSerializer.read(inputStream)
+      val numSignatures = IntSerializer.read(inputStream)
+      new PointSignatures(null, -1, signatures, numPoints, numSignatures)
+    }
+    else{
+      Utils.internalError()
+    }
     /*
     val len = inputStream.readInt()
     val vectors = Array.ofDim[Array[Long]](len)

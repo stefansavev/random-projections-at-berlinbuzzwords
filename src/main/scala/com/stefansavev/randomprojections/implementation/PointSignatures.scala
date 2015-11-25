@@ -32,6 +32,7 @@ class SignatureVectors(val signatureVectors: Array[SparseVector]){
 }
 
 //TODO: maybe reorganize the arrays to be by pointid =? [sig1, sig2, ...] and not by sig
+/*
 class PointSignatures__Old(val pointSignatures: Array[Array[Long]]) {
   def overlap(querySig: Array[Long], pointId: Int): Int = {
     val pointSignatures = this.pointSignatures
@@ -71,6 +72,7 @@ class PointSignatures__Old(val pointSignatures: Array[Array[Long]]) {
   }
 
 }
+*/
 
 object PointSignatures{
   def fromPreviousVersion(data: Array[Array[Long]]): PointSignatures = {
@@ -88,11 +90,12 @@ object PointSignatures{
       }
       pntId += 1
     }
-    new PointSignatures(newData, numPoints, numSignatures)
+    new PointSignatures(null, -1, newData, numPoints, numSignatures)
   }
 }
 
-class PointSignatures(val pointSignatures: Array[Long], val numPoints: Int, val numSignatures: Int) {
+
+class PointSignatures(val backingDir: String, val numPartitions: Int, val pointSignatures: Array[Long], val numPoints: Int, val numSignatures: Int) {
   def overlap(querySig: Array[Long], pointId: Int): Int = {
     val pointSignatures = this.pointSignatures
     val len = querySig.size
@@ -120,7 +123,6 @@ class PointSignatures(val pointSignatures: Array[Long], val numPoints: Int, val 
   }
 
   def overlap(querySig: Array[Long], pointId: Int, fromIndex: Int, toIndex: Int): Int = {
-    //TODO: it will be good to align the accesses (store all signature longs consequtively)
     val pointSignatures = this.pointSignatures
     val len = toIndex - fromIndex //should be equal to querySig.size
     var sum = 0
