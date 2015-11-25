@@ -99,7 +99,7 @@ object DenseRowStoredMatrixViewBuilderFactory extends RowStoredMatrixViewBuilder
 }
 
 class DenseRowStoredMatrixViewBuilder(header: ColumnHeader) extends RowStoredMatrixViewBuilder{
-  val maxRows: Int = 2 << 19 //maximum number of rows is just above 3 million
+  val maxRows: Int = 2 << 22 //maximum number of rows is just above 4 million
   val string2IdHasher = if (header.hasRowNames()) new String2IdHasher(StringIdHasherSettings(maxRows, 50, 4)) else null
   val numCols = header.numCols
 

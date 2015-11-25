@@ -28,6 +28,10 @@ public class MnistTest {
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
+
+        //FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
+        //        FuzzySearchEngines.bruteForce(FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
+
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector
         BufferedReader reader = new BufferedReader(new FileReader(inputFile));
@@ -147,7 +151,17 @@ public class MnistTest {
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromFile(queriesFile, indexFile);
         //runQueriesFromIndex(indexFile);
-        FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
+        FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
+
+        //FuzzySearchResults testSet = FuzzySearchEvaluationUtils.generateRandomTestSet(new Random(481868), 1000, index);
+        //
+        //FuzzySearchResults expected = FuzzySearchEvaluationUtils.resultsOnTestSet(index, testSet, 50, true); //brute force
+        //expected.toTextFile("C:/tmp/mnist-testset.txt");
+        FuzzySearchResults expected = FuzzySearchResults.fromTextFile("C:/tmp/mnist-testset.txt");
+        FuzzySearchResults retrieved =  FuzzySearchEvaluationUtils.resultsOnTestSet(index, expected, 1000, false); //with the system
+        RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
+
+        //FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
     }
     /*
     output:

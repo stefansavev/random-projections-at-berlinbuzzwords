@@ -55,4 +55,24 @@ object PrimitiveTypeSerializers {
       ShortArraySerializer.read(inputStream)
     }
   }
+
+  implicit object TypedFloatArraySerializer extends TypedSerializer[Array[Float]]{
+    def toBinary(outputStream: OutputStream, input: SerializerType): Unit = {
+      FloatArraySerializer.write(outputStream, input)
+    }
+
+    def fromBinary(inputStream: InputStream): SerializerType = {
+      FloatArraySerializer.read(inputStream)
+    }
+  }
+
+  implicit object TypedByteArraySerializer extends TypedSerializer[Array[Byte]]{
+    def toBinary(outputStream: OutputStream, input: SerializerType): Unit = {
+      ByteArraySerializer.write(outputStream, input)
+    }
+
+    def fromBinary(inputStream: InputStream): SerializerType = {
+      ByteArraySerializer.read(inputStream)
+    }
+  }
 }

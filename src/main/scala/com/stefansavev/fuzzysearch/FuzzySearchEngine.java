@@ -18,4 +18,16 @@ public interface FuzzySearchEngine {
             return valueSize;
         }
     }
+
+    public static class BruteForce implements FuzzySearchEngine{
+        private FuzzySearchEngines.FuzzyIndexValueSize valueSize;
+
+        public BruteForce(FuzzySearchEngines.FuzzyIndexValueSize valueSize) {
+            this.valueSize = valueSize;
+        }
+
+        public FuzzySearchEngines.FuzzyIndexValueSize getValueSize(){
+            return valueSize;
+        }
+    }
 }

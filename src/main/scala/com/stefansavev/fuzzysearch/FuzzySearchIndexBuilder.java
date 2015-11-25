@@ -9,9 +9,15 @@ public class FuzzySearchIndexBuilder {
 
     public FuzzySearchIndexBuilder(int dimension, FuzzySearchEngine engine){
         this.dimension = dimension;
-        FuzzySearchEngine.FastTrees fastTrees = ((FuzzySearchEngine.FastTrees)engine);
-
-        wrapper = new FuzzySearchIndexBuilderWrapper(dimension, fastTrees.getNumTrees(), fastTrees.getValueSize());
+        if (engine instanceof FuzzySearchEngine.FastTrees){
+            FuzzySearchEngine.FastTrees fastTrees = ((FuzzySearchEngine.FastTrees)engine);
+            wrapper = new FuzzySearchIndexBuilderWrapper(dimension, fastTrees.getNumTrees(), fastTrees.getValueSize());
+        }
+        else{
+            //for the moment use numTrees == 0 as a brute force flag
+            FuzzySearchEngine.BruteForce bruteForce = ((FuzzySearchEngine.BruteForce)engine);
+            wrapper = new FuzzySearchIndexBuilderWrapper(dimension, 0, bruteForce.getValueSize());
+        }
     }
 
     public void addItem(FuzzySearchItem item){

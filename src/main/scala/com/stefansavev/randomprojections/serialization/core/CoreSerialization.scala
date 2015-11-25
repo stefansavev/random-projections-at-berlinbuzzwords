@@ -99,6 +99,68 @@ object Core{
     }
   }
 
+  class Subtype3Serializer[BaseType,
+                           SubType1 <: BaseType,
+                           SubType2 <: BaseType,
+                           SubType3 <: BaseType](
+                                tag1: TypeTag[SubType1],
+                                tag2: TypeTag[SubType2],
+                                tag3: TypeTag[SubType3],
+                                subTypeSer1 : TypedSerializer[SubType1],
+                                subTypeSer2 : TypedSerializer[SubType2],
+                                subTypeSer3 : TypedSerializer[SubType3]) extends TypedSerializer[BaseType] {
+
+    if (tag1.tag == tag2.tag || tag1.tag == tag3.tag || tag2.tag == tag3.tag){
+      throw new IllegalStateException("Subtypes should have different tags")
+    }
+
+    if (tag1.manifest.runtimeClass.equals(tag2.manifest.runtimeClass)){
+      throw new IllegalStateException("Subtypes should be of different classes")
+    }
+
+    if (tag1.manifest.runtimeClass.equals(tag3.manifest.runtimeClass)){
+      throw new IllegalStateException("Subtypes should be of different classes")
+    }
+
+    if (tag2.manifest.runtimeClass.equals(tag3.manifest.runtimeClass)){
+      throw new IllegalStateException("Subtypes should be of different classes")
+    }
+
+    def toBinary(outputStream: OutputStream, input: BaseType): Unit = {
+      if (tag1.manifest.runtimeClass.equals(input.getClass)){
+        TypedIntSerializer.toBinary(outputStream, tag1.tag)
+        subTypeSer1.toBinary(outputStream, input.asInstanceOf[SubType1])
+      }
+      else if (tag2.manifest.runtimeClass.equals(input.getClass)){
+        TypedIntSerializer.toBinary(outputStream, tag2.tag)
+        subTypeSer2.toBinary(outputStream, input.asInstanceOf[SubType2])
+      }
+      else if (tag3.manifest.runtimeClass.equals(input.getClass)){
+        TypedIntSerializer.toBinary(outputStream, tag3.tag)
+        subTypeSer3.toBinary(outputStream, input.asInstanceOf[SubType3])
+      }
+      else{
+        throw new IllegalStateException("Unsupported subtype in serialization")
+      }
+    }
+
+    def fromBinary(inputStream: InputStream): BaseType = {
+      val inputTag = TypedIntSerializer.fromBinary(inputStream)
+      if (inputTag == tag1.tag) {
+        subTypeSer1.fromBinary(inputStream)
+      }
+      else if (inputTag == tag2.tag){
+        subTypeSer2.fromBinary(inputStream)
+      }
+      else if (inputTag == tag3.tag){
+        subTypeSer3.fromBinary(inputStream)
+      }
+      else{
+        throw new IllegalStateException("Unknown tag in deserialization")
+      }
+    }
+  }
+
   implicit def subtype1Serializer[BaseType, SubType1 <: BaseType](implicit typeTag1: TypeTag[SubType1], subTypeSer1 : TypedSerializer[SubType1]): Subtype1Serializer[BaseType, SubType1] = {
     new Subtype1Serializer[BaseType, SubType1](typeTag1, subTypeSer1)
   }
@@ -110,6 +172,17 @@ object Core{
        subTypeSer1 : TypedSerializer[SubType1],
        subTypeSer2 : TypedSerializer[SubType2]): Subtype2Serializer[BaseType, SubType1, SubType2] = {
     new Subtype2Serializer[BaseType, SubType1, SubType2](typeTag1, typeTag2, subTypeSer1, subTypeSer2)
+  }
+
+  implicit def subtype3Serializer[BaseType, SubType1 <: BaseType, SubType2 <: BaseType, SubType3 <: BaseType](
+                                                                                         implicit
+                                                                                         typeTag1: TypeTag[SubType1],
+                                                                                         typeTag2: TypeTag[SubType2],
+                                                                                         typeTag3: TypeTag[SubType3],
+                                                                                         subTypeSer1 : TypedSerializer[SubType1],
+                                                                                         subTypeSer2 : TypedSerializer[SubType2],
+                                                                                         subTypeSer3 : TypedSerializer[SubType3]): Subtype3Serializer[BaseType, SubType1, SubType2, SubType3] = {
+    new Subtype3Serializer[BaseType, SubType1, SubType2, SubType3](typeTag1, typeTag2, typeTag3, subTypeSer1, subTypeSer2, subTypeSer3)
   }
 
   //Iso means isomorphism, just mapping from A to B, and back

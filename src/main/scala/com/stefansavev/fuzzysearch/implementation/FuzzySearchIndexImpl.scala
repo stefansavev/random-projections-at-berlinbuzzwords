@@ -12,8 +12,6 @@ import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.serialization.{DataFrameViewSerializationExt, DataFrameViewSerializers, RandomTreesSerialization}
 import com.stefansavev.randomprojections.utils.Utils
 
-import scala.collection.mutable.ArrayBuffer
-
 class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
   val searcherSettings = SearcherSettings (
     bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 100),
@@ -163,21 +161,21 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
     case FuzzyIndexValueSize.As2Byte => {
       StoreBuilderAsBytesType
     }
+    case FuzzyIndexValueSize.AsSingleByte => {
+      StoreBuilderAsSingleByteType
+    }
   }
 
   val columnIds = Array.range(0, dim)
   val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageType)
-  val names = new ArrayBuffer[String]()
   val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
 
   def addItem(name: String, label: Int, dataPoint: Array[Double]): Unit = {
-    names += name
     builder.addRow(name, label, columnIds, dataPoint)
   }
 
   def build(): FuzzySearchIndexWrapper = {
-    builder.build()
-    val numRows = names.size
+    val numRows = builder.currentRowId
     val indexes = PointIndexes(Array.range(0, numRows))
     val dataset = new DataFrameView(indexes, builder.asInstanceOf[DenseRowStoredMatrixViewBuilder].build())
 
@@ -191,7 +189,6 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
       signatureSize = 16
     )
     println(dataset)
-
 
     val trees = Utils.timed("Create trees", {
       IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset)
