@@ -37,7 +37,6 @@ class ColumnHeaderImpl(_numCols: Int,
       false
     }
   }
-
 }
 
 object ColumnHeaderBuilder{

@@ -6,10 +6,9 @@ import java.util.Random
 import com.github.fommil.netlib.BLAS
 import com.stefansavev.randomprojections.datarepr.dense.{DenseRowStoredMatrixViewBuilderFactory, ColumnHeaderBuilder, DataFrameView}
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{DimensionalityReductionTransform, DimensionalityReductionParams}
+import com.stefansavev.randomprojections.utils.DenseMatrixUtils
 import no.uib.cipr.matrix.{SVD => MatrixSVD, DenseMatrix}
 
-//how to tune k? (one way is that some large fraction of points have error in SVD less than)
-//need to know the noise model (A = Structure + Noise) //need to estimate the noise
 trait SVDMethod{
   def fit(params: SVDParams, dataFrame: DataFrameView): SVDTransform
 }
@@ -49,13 +48,9 @@ object SVDUtils{
   }
 
   def weightVt(Vt: DenseMatrix, s: Array[Double]): Unit = {
-    //the rows are the projections for embedding in a low dim. space
-    //you can do the row multiplied by s
-    //the scale of s matters
-    val max_s = 10.0 //s(0) worked before
+
     def computeWeight(s_i: Double): Double = {
-      1.0 //s_i/(s_i + max_s) //s_i/(s_i + 100.0)
-      //10000.0/((s_i + 10000.0)) //ignore s(why?)
+      1.0 //there are some reasonable weightings but they don't matter so much
     }
 
     var i = 0
@@ -114,7 +109,7 @@ object FullDenseSVD extends SVDMethod {
       1,
       output.getData,
       numCols /*first dimension of output*/)
-    //return C
+    //returns C
     output
   }
 
@@ -260,5 +255,71 @@ object SVD {
     val result = svdTransform.projectDataset(inputData)
     println("Finished transformation with SVD")
     result
+  }
+}
+
+trait OnlineFitter{
+  def pass(vec: Array[Double]): Unit
+  def finalizeFit(): DimensionalityReductionTransform
+}
+
+trait OnlineTransform{
+  def getFitter(): OnlineFitter
+}
+
+class OnlineSVDFitter(numOrigColumns: Int) extends OnlineFitter{
+  val maxRows = 100000
+  var numRowsInStore = 0
+  var totalRows = 0.0
+  var currentStore = new DenseMatrix(maxRows, numOrigColumns)
+  val XtX = new DenseMatrix(numOrigColumns, numOrigColumns)
+
+  def pass(vec: Array[Double]): Unit = {
+    DenseMatrixUtils.addToRow(currentStore, numRowsInStore, vec)
+    numRowsInStore += 1
+
+    if (numRowsInStore == maxRows){
+      val partialXtX = FullDenseSVD.XtTimesX(currentStore)
+      DenseMatrixUtils.addMatrixTo(XtX, partialXtX)
+      totalRows += numRowsInStore
+      //reset rows
+      numRowsInStore = 0
+    }
+  }
+
+  def finalizeFit(): DimensionalityReductionTransform = {
+    if (numRowsInStore > 0){
+      val partialStore = DenseMatrixUtils.takeRows(currentStore, numRowsInStore)
+      val partialXtX = FullDenseSVD.XtTimesX(partialStore)
+      DenseMatrixUtils.addMatrixTo(XtX, partialXtX)
+      totalRows += numRowsInStore
+    }
+    numRowsInStore = -1
+    currentStore = null //invalidate the object
+    val denom = totalRows - 1.0
+    SVDUtils.divideEntriesBy(XtX, denom)
+    val svd = MatrixSVD.factorize(XtX)
+    val s = svd.getS()
+    val Vt = svd.getVt
+    new SVDTransform(numOrigColumns, Vt)
+  }
+}
+
+class OnlineSVD(k: Int) extends OnlineTransform{
+  def getFitter(): OnlineFitter = null
+}
+
+object FullDenseSVDLimitedMemory extends SVDMethod{
+  def fit(params: SVDParams, dataFrame: DataFrameView): SVDTransform = {
+    val fitter = new OnlineSVDFitter(dataFrame.numCols)
+    var i = 0
+    while(i < dataFrame.numRows){
+      fitter.pass(dataFrame.getPointAsDenseVector(i))
+      i += 1
+    }
+
+    val svdTransform = fitter.finalizeFit().asInstanceOf[SVDTransform]
+    val k = params.k
+    new SVDTransform(k, DenseMatrixUtils.takeRows(svdTransform.weightedVt, k))
   }
 }

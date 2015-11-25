@@ -6,7 +6,7 @@ import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.interface.BucketCollector
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReduction}
-import com.stefansavev.randomprojections.dimensionalityreduction.svd.{FullDenseSVD, SVDFromRandomizedDataEmbedding, SVDParams}
+import com.stefansavev.randomprojections.dimensionalityreduction.svd.{FullDenseSVDLimitedMemory, FullDenseSVD, SVDFromRandomizedDataEmbedding, SVDParams}
 import com.stefansavev.randomprojections.utils.Utils
 
 trait Point2LeavesMap{
@@ -197,7 +197,7 @@ object IndexBuilder{
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
 
     //phase 1: dimensionality reduction
-    val svdParams = SVDParams(k, FullDenseSVD)
+    val svdParams = SVDParams(k, FullDenseSVDLimitedMemory)
     val svdTransform = DimensionalityReduction.fitTransform(svdParams, dataFrameView)
     val datasetAfterSVD = svdTransform.transformedDataset
 
