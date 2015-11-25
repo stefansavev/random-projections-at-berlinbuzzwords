@@ -6,7 +6,7 @@ import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.interface.BucketCollector
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReduction}
-import com.stefansavev.randomprojections.dimensionalityreduction.svd.{FullDenseSVDLimitedMemory, FullDenseSVD, SVDFromRandomizedDataEmbedding, SVDParams}
+import com.stefansavev.randomprojections.dimensionalityreduction.svd._
 import com.stefansavev.randomprojections.utils.Utils
 
 trait Point2LeavesMap{
@@ -190,7 +190,7 @@ object IndexBuilder{
     RandomTree2EfficientlyStoredTreeConverter.toEfficientlyStoredTree(tree)
   }
 
-  def buildWithSVDAndRandomRotation(k: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
+  def buildWithSVDAndRandomRotation(k: Int, settings: IndexSettings, dataFrameView: DataFrameView, precomputedSVDTransform: Option[SVDTransform] = None): RandomTrees = {
     val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
     val logger = new IndexCounters()
@@ -198,8 +198,15 @@ object IndexBuilder{
 
     //phase 1: dimensionality reduction
     val svdParams = SVDParams(k, FullDenseSVDLimitedMemory)
-    val svdTransform = DimensionalityReduction.fitTransform(svdParams, dataFrameView)
-    val datasetAfterSVD = svdTransform.transformedDataset
+    val svdTransform = precomputedSVDTransform match {
+      case None => DimensionalityReduction.fit(svdParams, dataFrameView)
+      case Some(t) => {
+        //we can precompute the transform while adding the documents to the index
+        //this is advantageous if the dataset is large and we cannot keep it
+        t.reduceToTopK(k)
+      }
+    }
+    val datasetAfterSVD = DimensionalityReduction.transform(svdTransform, dataFrameView)
 
     //phase 2 place holder
     val newIndexes = PointIndexes(dataFrameView.indexes.indexes)
@@ -219,7 +226,7 @@ object IndexBuilder{
       randomTrees(i) = RandomTreeNodeRoot(rotationTransform, randomTree)
     }
 
-    new RandomTrees(svdTransform.transform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
+    new RandomTrees(svdTransform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
 
   def deprecate_buildWithSVD(k: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {

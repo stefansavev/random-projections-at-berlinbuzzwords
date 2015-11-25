@@ -6,6 +6,7 @@ import java.util
 import com.stefansavev.fuzzysearch.FuzzySearchEngines.FuzzyIndexValueSize
 import com.stefansavev.fuzzysearch.{FuzzySearchItem, FuzzySearchResult}
 import com.stefansavev.randomprojections.datarepr.dense._
+import com.stefansavev.randomprojections.dimensionalityreduction.svd.{SVDTransform, OnlineSVDFitter}
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
 import com.stefansavev.randomprojections.implementation._
@@ -169,8 +170,10 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
   val columnIds = Array.range(0, dim)
   val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageType)
   val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
+  val onlineSVDFitter = new OnlineSVDFitter(dim)
 
   def addItem(name: String, label: Int, dataPoint: Array[Double]): Unit = {
+    onlineSVDFitter.pass(dataPoint)
     builder.addRow(name, label, columnIds, dataPoint)
   }
 
@@ -178,6 +181,8 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
     val numRows = builder.currentRowId
     val indexes = PointIndexes(Array.range(0, numRows))
     val dataset = new DataFrameView(indexes, builder.asInstanceOf[DenseRowStoredMatrixViewBuilder].build())
+
+    val svdTransform = onlineSVDFitter.finalizeFit().asInstanceOf[SVDTransform]
 
     val randomTreeSettings = IndexSettings(
       maxPntsPerBucket=50,
@@ -191,7 +196,7 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
     println(dataset)
 
     val trees = Utils.timed("Create trees", {
-      IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset)
+      IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform))
     }).result
     new FuzzySearchIndexWrapper(trees, dataset)
   }

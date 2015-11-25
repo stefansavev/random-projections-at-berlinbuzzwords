@@ -6,7 +6,7 @@ import java.util.Random
 import com.github.fommil.netlib.BLAS
 import com.stefansavev.randomprojections.datarepr.dense.{DenseRowStoredMatrixViewBuilderFactory, ColumnHeaderBuilder, DataFrameView}
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{DimensionalityReductionTransform, DimensionalityReductionParams}
-import com.stefansavev.randomprojections.utils.DenseMatrixUtils
+import com.stefansavev.randomprojections.utils.{Utils, DenseMatrixUtils}
 import no.uib.cipr.matrix.{SVD => MatrixSVD, DenseMatrix}
 
 trait SVDMethod{
@@ -193,6 +193,18 @@ case class SVDParams(k: Int, svdMethod: SVDMethod) extends DimensionalityReducti
 }
 
 class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends DimensionalityReductionTransform{
+  def reduceToTopK(newK: Int): SVDTransform = {
+    if (newK == k){
+      this
+    }
+    else if (newK < k){
+      new SVDTransform(newK, DenseMatrixUtils.takeRows(weightedVt, newK))
+    }
+    else{
+      Utils.internalError()
+    }
+  }
+
   private def projectOnToRowsVt(k: Int, vec: Array[Double], weightedVt: DenseMatrix, out: Array[Double]): Unit = {
     val numOrigFeatures = weightedVt.numColumns()
     var i = 0
