@@ -46,7 +46,7 @@ public class MnistTest {
         reader.close();
 
         //build the index
-        FuzzySearchIndex index = indexBuilder.build();
+        indexBuilder.build();
     }
 
     static void runQueriesFromFile(String queriesFile, String indexFile) throws IOException {

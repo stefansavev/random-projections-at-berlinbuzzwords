@@ -166,7 +166,7 @@ object IndexBuilder{
   }
 
   def deprecate_build(settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
-    val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
+    val bucketCollector = new BucketCollectorImpl(null, dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
     val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, dataFrameView)
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
@@ -188,7 +188,7 @@ object IndexBuilder{
   }
 
   def deprecate_buildWithPreprocessing(numInterProj: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
-    val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
+    val bucketCollector = new BucketCollectorImpl(null, dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
     val logger = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
@@ -229,10 +229,10 @@ object IndexBuilder{
     (signatureVecs, signatures)
   }
 
-  def buildWithSVDAndRandomRotation(k: Int, settings: IndexSettings, dataFrameView: DataFrameView,
+  def buildWithSVDAndRandomRotation(treesBackingDir: String, k: Int, settings: IndexSettings, dataFrameView: DataFrameView,
                                     precomputedSVDTransform: Option[SVDTransform] = None,
                                     precomputedSigVec: Option[(SignatureVectors, PointSignatures)] = None): RandomTrees = {
-    val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
+    val bucketCollector = new BucketCollectorImpl(treesBackingDir, dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
     val logger = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
@@ -283,7 +283,7 @@ object IndexBuilder{
   }
 
   def deprecate_buildWithSVD(k: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
-    val bucketCollector = new BucketCollectorImpl(dataFrameView.numRows)
+    val bucketCollector = new BucketCollectorImpl(null, dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
     val logger = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)

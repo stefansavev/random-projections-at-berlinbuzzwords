@@ -33,7 +33,7 @@ object TestOnRandomData {
       println("Number of Rows: " + randomBitStringsDataset.numRows)
 
       val trees = Utils.timed("Build Index", {
-        IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
+        IndexBuilder.buildWithSVDAndRandomRotation(null, 32, settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
       }).result
 
       val searcherSettings = SearcherSettings (

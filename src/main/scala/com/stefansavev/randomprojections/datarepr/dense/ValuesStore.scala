@@ -130,7 +130,7 @@ object ValuesStoreAsDoubleSerializationTags{
 
 class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: StoreBuilderType) extends ValuesStoreBuilder{
   var currentRow = 0
-  val numPointsInPartition = 1 << 10 // 1 << 17 //1 << 17 //= 131072
+  val numPointsInPartition = 1 << 17 //1 << 17 //= 131072
   var currentPartition = 0
   var currentBuilder = underlyingBuilder.getBuilder(numCols)
 
@@ -290,7 +290,6 @@ class ValuesStoreBuilderAsDouble(numCols: Int) extends ValuesStoreBuilder{
 
 class ValuesStoreBuilderAsFloat{
 }
-
 
 object ValuesStoreAsBytes{
   type TupleType = (Int, Array[Short])

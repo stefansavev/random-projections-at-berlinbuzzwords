@@ -3,7 +3,7 @@ package com.stefansavev.randomprojections.serialization
 import java.io._
 import java.nio.ByteBuffer
 
-import com.stefansavev.randomprojections.implementation.{RandomTrees, IndexImpl, Leaf2Points}
+import com.stefansavev.randomprojections.implementation.{BucketCollectorImpl, RandomTrees, IndexImpl, Leaf2Points}
 import com.stefansavev.randomprojections.serialization.RandomTreesSerialization.BinaryFileDeserializer
 
 import scala.collection.mutable.ArrayBuffer
@@ -14,14 +14,28 @@ object InvertedIndexSerializer{
     val deser = new BinaryFileDeserializer(file)
 
     val signatures = PointSignaturesSerializer.fromBinary(deser.stream)
-    val leafArrays = deser.getIntArrays(2)
-    val numLeaves = deser.getInt()
+
+    val leafPointsTag = deser.getInt()
+
+    val leaf2Points =
+      if (leafPointsTag == 0) {
+        val leafArrays = deser.getIntArrays(2)
+        val numLeaves = deser.getInt()
+        new Leaf2Points(leafArrays(0), leafArrays(1))
+      }
+      else{
+        val leaf2PointsDir = StringSerializer.read(deser.stream)
+        val startBufferLen = deser.getInt()
+        val numPoints = deser.getInt()
+        val numPartitions = deser.getInt()
+        BucketCollectorImpl.mergeLeafData(leaf2PointsDir, startBufferLen, numPoints, numPartitions)
+      }
 
     val numPoints = deser.getInt()
 
     val labels = deser.getIntArray()
 
-    val index = new IndexImpl(signatures, numPoints, new Leaf2Points(leafArrays(0), leafArrays(1)),
+    val index = new IndexImpl(signatures, numPoints, None, leaf2Points,
       /*new Point2Leaves(pointArrays(0), pointArrays(1), numPoints),*/ labels)
 
     deser.close()

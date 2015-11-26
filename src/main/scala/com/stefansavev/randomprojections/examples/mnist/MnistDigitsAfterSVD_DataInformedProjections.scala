@@ -39,7 +39,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
 
     if (doTrain) {
       val trees = Utils.timed("Create trees", {
-        IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset)
+        IndexBuilder.buildWithSVDAndRandomRotation(null, 32, settings = randomTreeSettings, dataFrameView = dataset)
       }).result
       trees.toFile(indexFile)
     }

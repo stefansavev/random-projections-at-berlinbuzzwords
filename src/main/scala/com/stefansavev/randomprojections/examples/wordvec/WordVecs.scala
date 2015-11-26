@@ -123,7 +123,7 @@ object WordVecs {
     println(dataset)
 
     val trees = Utils.timed("Build index", {
-      IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings,dataFrameView = dataset)
+      IndexBuilder.buildWithSVDAndRandomRotation(null, 32, settings = randomTreeSettings,dataFrameView = dataset)
     }).result
 
     val searcherSettings = SearcherSettings (

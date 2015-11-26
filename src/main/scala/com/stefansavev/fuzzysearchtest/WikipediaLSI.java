@@ -56,7 +56,7 @@ public class WikipediaLSI {
         reader.close();
 
         //build the index
-        FuzzySearchIndex index = indexBuilder.build();
+        indexBuilder.build();
     }
 
     static void runQueriesFromIndex(String indexFile) throws IOException {

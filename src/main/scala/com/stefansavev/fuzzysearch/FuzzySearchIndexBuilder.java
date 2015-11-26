@@ -38,8 +38,8 @@ public class FuzzySearchIndexBuilder {
         wrapper.addItem(name, label, normalizedPoint);
     }
 
-    public FuzzySearchIndex build(){
+    public void build(){
         FuzzySearchIndexWrapper wrappedIndex =  wrapper.build();
-        return new FuzzySearchIndex(wrappedIndex);
+        //use FuzzySearchIndex.open to open the index
     }
 }

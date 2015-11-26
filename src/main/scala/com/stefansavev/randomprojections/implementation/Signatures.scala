@@ -240,13 +240,13 @@ class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSigna
   val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
   var buffer = new LongArrayBuffer()
   var numPoints = 0
-  val partitionSize = (1 << 10)
+  val partitionSize = (1 << 17)
   var currentPartition = 0
 
   def storePartition(): Unit = {
     val fileName = DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, currentPartition)
     val outputStream = new BufferedOutputStream(new FileOutputStream(fileName))
-    println("Writing signature partioned file:" + fileName)
+    println("Writing signature partitioned file:" + fileName)
     LongArraySerializer.write(outputStream, buffer.toArray())
     outputStream.close()
     buffer = new LongArrayBuffer()

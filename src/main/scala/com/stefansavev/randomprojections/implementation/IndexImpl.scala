@@ -5,16 +5,25 @@ import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer
 import com.stefansavev.randomprojections.interface.Index
-import com.stefansavev.randomprojections.serialization.{PointSignaturesSerializer, BinaryFileSerializer}
+import com.stefansavev.randomprojections.serialization.{StringSerializer, PointSignaturesSerializer, BinaryFileSerializer}
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 
-class IndexImpl(val signatures: PointSignatures, val totalNumPoints: Int, val leaf2Points: Leaf2Points, val id2Label: Array[Int]) extends Index{
+class IndexImpl(val signatures: PointSignatures, val totalNumPoints: Int, val leaf2PointsDir: Option[(String, Int, Int, Int)], val leaf2Points: Leaf2Points, val id2Label: Array[Int]) extends Index{
   def toFile(file: File): Unit = {
     val ser = new BinaryFileSerializer(file)
     PointSignaturesSerializer.toBinary(ser.stream, signatures)
-    ser.putIntArrays(leaf2Points.starts, leaf2Points.points)
-    ser.putInt(leaf2Points.numberOfLeaves())
-
+    if (leaf2Points != null) {
+      ser.putInt(0)
+      ser.putIntArrays(leaf2Points.starts, leaf2Points.points)
+      ser.putInt(leaf2Points.numberOfLeaves())
+    }
+    else{
+      ser.putInt(1)
+      StringSerializer.write(ser.stream, leaf2PointsDir.get._1)
+      ser.putInt(leaf2PointsDir.get._2)
+      ser.putInt(leaf2PointsDir.get._3)
+      ser.putInt(leaf2PointsDir.get._4)
+    }
     ser.putInt(totalNumPoints)
 
     ser.putIntArray(id2Label)

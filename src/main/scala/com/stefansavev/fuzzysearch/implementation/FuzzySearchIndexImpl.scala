@@ -126,6 +126,8 @@ object FuzzySearchIndexWrapper{
   val signaturePartitionFile = DiskBackedOnlineSignatureVectorsUtils.partitionFileNamePrefix
   val randomTreesModelFile = RandomTreesSerialization.Implicits.modelFileName
   val randomTreesIndexFile = RandomTreesSerialization.Implicits.indexFileName
+  val randomTreesPartitionsDir =  "fuzzysearch_tree_partitions_8686116"
+  val randomTreesPartitionFile = BucketCollectorImplUtils.partitionFileSuffix
 
   def open(fileName: String): FuzzySearchIndexWrapper = {
     import RandomTreesSerialization.Implicits._
@@ -193,6 +195,7 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
 
     cleanDir(FuzzySearchIndexWrapper.datasetPartitionsDir, file => file.getName.startsWith(FuzzySearchIndexWrapper.datasetPartitionFile))
     cleanDir(FuzzySearchIndexWrapper.signaturePartitionsDir, file => file.getName.startsWith(FuzzySearchIndexWrapper.signaturePartitionFile))
+    cleanDir(FuzzySearchIndexWrapper.randomTreesPartitionsDir, file => file.getName.startsWith(FuzzySearchIndexWrapper.randomTreesPartitionFile))
   }
 
   checkDirectories(backingFile)
@@ -246,7 +249,8 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
 
     val signatures = onlineSigVecs.buildPointSignatures()
     val trees = Utils.timed("Create trees", {
-      IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform), Some(signatures))
+      val treePartitionsDir = new File(backingFile, FuzzySearchIndexWrapper.randomTreesPartitionsDir).getAbsolutePath
+      IndexBuilder.buildWithSVDAndRandomRotation(treePartitionsDir, 32, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform), Some(signatures))
     }).result
 
     def save(fileName: String): Unit = {
