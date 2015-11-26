@@ -12,10 +12,6 @@ public class FuzzySearchIndex {
         this.wrapper = wrapper;
     }
 
-    public void save(String fileName){
-        wrapper.save(fileName);
-    }
-
     public static FuzzySearchIndex open(String fileName){
         return new FuzzySearchIndex(FuzzySearchIndexWrapper.open(fileName));
     }

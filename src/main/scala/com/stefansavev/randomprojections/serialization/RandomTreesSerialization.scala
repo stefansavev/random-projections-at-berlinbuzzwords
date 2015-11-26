@@ -130,7 +130,7 @@ object RandomTreesSerialization{
 
       def fromFile(file:File): RandomTrees = {
         if (!file.exists()) {
-          throw new IllegalStateException("file does not exist")
+          throw new IllegalStateException("file does not exist: " + file)
         }
 
         if (!file.isDirectory()){

@@ -26,7 +26,7 @@ public class MnistTest {
         int dataDimension = 100;
         int numTrees = 10;
         //create an indexer
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
+        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
 
         //FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
@@ -47,9 +47,6 @@ public class MnistTest {
 
         //build the index
         FuzzySearchIndex index = indexBuilder.build();
-
-        //save the index to file
-        index.save(outputIndexFile);
     }
 
     static void runQueriesFromFile(String queriesFile, String indexFile) throws IOException {
@@ -146,7 +143,7 @@ public class MnistTest {
     public static void main(String[] args) throws Exception {
         String inputTextFile = "D:/RandomTreesData-144818512896186816/input/" + "mnist/svdpreprocessed/train.csv";
         String queriesFile = inputTextFile; //same as training in this example
-        String indexFile = "C:/tmp/output-index/";
+        String indexFile = "C:/tmp/output-index-mnist/";
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromFile(queriesFile, indexFile);

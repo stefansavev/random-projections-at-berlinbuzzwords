@@ -230,8 +230,9 @@ class OnlineSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int){
 }
 
 object DiskBackedOnlineSignatureVectorsUtils{
+  val partitionFileNamePrefix = "_signature_partition_"
   def fileName(dirName: String, partitionId: Int): String = {
-    (new File(dirName, "_partition_" + partitionId)).getAbsolutePath
+    (new File(dirName, partitionFileNamePrefix + partitionId)).getAbsolutePath
   }
 }
 
@@ -239,7 +240,7 @@ class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSigna
   val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
   var buffer = new LongArrayBuffer()
   var numPoints = 0
-  val partitionSize = (1 << 17)
+  val partitionSize = (1 << 10)
   var currentPartition = 0
 
   def storePartition(): Unit = {

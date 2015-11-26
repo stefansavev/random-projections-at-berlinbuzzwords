@@ -5,6 +5,8 @@ import com.stefansavev.randomprojections.datarepr.dense.PointIndexes
 import com.stefansavev.randomprojections.interface.{BucketCollector, Index}
 
 class BucketCollectorImpl(totalRows: Int) extends BucketCollector{
+  val pointIdsThreshold = 1 << 10
+
   var leafId = 0
   var starts = new IntArrayBuffer()
   var pointIds = new IntArrayBuffer()
@@ -16,7 +18,6 @@ class BucketCollectorImpl(totalRows: Int) extends BucketCollector{
     starts += globalIndex
     globalIndex += names.size
     pointIds ++= names.indexes
-
     leafId += 1
 
     leaf

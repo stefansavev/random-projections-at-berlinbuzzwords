@@ -1,6 +1,6 @@
 package com.stefansavev.fuzzysearch.implementation
 
-import java.io.File
+import java.io.{FileFilter, File}
 import java.util
 import java.util.Random
 
@@ -80,27 +80,6 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
     result
   }
 
-  def save(fileName: String): Unit = {
-    import RandomTreesSerialization.Implicits._
-    import DataFrameViewSerializationExt._
-    val file = new File(fileName)
-    if (!file.exists()) {
-      throw new IllegalStateException(s"Directory should exist: ${fileName}")
-    }
-
-    if (!file.isDirectory()){
-      throw new IllegalStateException(s"File is not a directory ${fileName}")
-    }
-    val treesFullDir = new File(fileName, FuzzySearchIndexWrapper.treesSubDir)
-    if (!treesFullDir.exists()){
-      treesFullDir.mkdir()
-    }
-
-    val datasetFullFile = new File(fileName, FuzzySearchIndexWrapper.datasetFile)
-    trees.toFile(treesFullDir)
-    dataset.toFile(datasetFullFile)
-  }
-
   def getItemByName(name: String): FuzzySearchItem = {
     val i = dataset.getRowIdByName(name)
     getItemById(i)
@@ -141,6 +120,12 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
 object FuzzySearchIndexWrapper{
   val treesSubDir = "fuzzysearch_trees_dir_8686116"
   val datasetFile = "fuzzysearch_dataset_file_8686116"
+  val datasetPartitionsDir = "fuzzysearch_dataset_partitions_8686116"
+  val datasetPartitionFile = LazyLoadValueStore.partitionFileNamePrefix
+  val signaturePartitionsDir = "fuzzysearch_signature_partitions_8686116"
+  val signaturePartitionFile = DiskBackedOnlineSignatureVectorsUtils.partitionFileNamePrefix
+  val randomTreesModelFile = RandomTreesSerialization.Implicits.modelFileName
+  val randomTreesIndexFile = RandomTreesSerialization.Implicits.indexFileName
 
   def open(fileName: String): FuzzySearchIndexWrapper = {
     import RandomTreesSerialization.Implicits._
@@ -155,7 +140,63 @@ object FuzzySearchIndexWrapper{
   }
 }
 
-class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIndexValueSize){
+class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: Int, valueSize: FuzzyIndexValueSize){
+  def checkDirectories(dirName: String): Unit = {
+    val file = new File(dirName)
+    if (!file.exists()) {
+      throw new IllegalStateException(s"Directory should exist: ${dirName}")
+    }
+
+    if (!file.isDirectory()){
+      throw new IllegalStateException(s"File is not a directory ${dirName}")
+    }
+
+    def cleanDir(subDir: String, acceptsFile: File => Boolean): Unit = {
+      val fullDir = new File(dirName, subDir)
+      if (!fullDir.exists()){
+        fullDir.mkdir()
+      }
+      val unrecognizedFiles = fullDir.listFiles(new FileFilter {
+        override def accept(pathName: File): Boolean = {
+          ! acceptsFile(pathName)
+        }
+      })
+      if (unrecognizedFiles.length > 0){
+        val unrecognizedFile = unrecognizedFiles(0)
+        Utils.failWith(s"Directory ${fullDir} contains an unrecognized file: " + unrecognizedFile.getName)
+      }
+      val filesToBeDeleted = fullDir.listFiles(new FileFilter {
+        override def accept(pathName: File): Boolean = {
+          acceptsFile(pathName)
+        }
+      })
+      filesToBeDeleted.foreach(f => {
+        println("FILE TO BE DELETED " + f)
+        f.delete()
+      })
+      if (fullDir.listFiles().length > 0){
+        Utils.failWith(s"Directory contains files that could not be deleted")
+      }
+    }
+
+    /*
+    val treesFullDir = new File(fileName, FuzzySearchIndexWrapper.treesSubDir)
+    if (!treesFullDir.exists()){
+      treesFullDir.mkdir()
+    }
+    */
+
+    cleanDir(FuzzySearchIndexWrapper.treesSubDir, file => {
+      file.getName.startsWith(FuzzySearchIndexWrapper.randomTreesModelFile) ||
+        file.getName.startsWith(FuzzySearchIndexWrapper.randomTreesIndexFile)
+    })
+
+    cleanDir(FuzzySearchIndexWrapper.datasetPartitionsDir, file => file.getName.startsWith(FuzzySearchIndexWrapper.datasetPartitionFile))
+    cleanDir(FuzzySearchIndexWrapper.signaturePartitionsDir, file => file.getName.startsWith(FuzzySearchIndexWrapper.signaturePartitionFile))
+  }
+
+  checkDirectories(backingFile)
+
   val storageType = valueSize match  {
     case FuzzyIndexValueSize.AsDouble => {
       StoreBuilderAsDoubleType
@@ -167,15 +208,17 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
       StoreBuilderAsSingleByteType
     }
   }
-  val storageWithFile = storageType // new LazyLoadStoreBuilderType("C:/tmp/backingdir/", storageType)
-  //(new File("C:/tmp/backingdir/")).mkdir()
+
+  val datasetBackingDir = new File(backingFile, FuzzySearchIndexWrapper.datasetPartitionsDir).getAbsolutePath
+  val storageWithFile = new LazyLoadStoreBuilderType(datasetBackingDir, storageType)
 
   val columnIds = Array.range(0, dim)
   val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageWithFile)
   val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
   val onlineSVDFitter = new OnlineSVDFitter(dim)
   val sigSize = 16
-  val onlineSigVecs = new DiskBackedOnlineSignatureVectors("C:/tmp/backingdir-sig/", new Random(48186816), sigSize, dim)
+  val signatureBackedDir = new File(backingFile, FuzzySearchIndexWrapper.signaturePartitionsDir).getAbsolutePath
+  val onlineSigVecs = new DiskBackedOnlineSignatureVectors(signatureBackedDir, new Random(48186816), sigSize, dim)
 
   def addItem(name: String, label: Int, dataPoint: Array[Double]): Unit = {
     onlineSVDFitter.pass(dataPoint)
@@ -205,6 +248,29 @@ class FuzzySearchIndexBuilderWrapper(dim: Int, numTrees: Int, valueSize: FuzzyIn
     val trees = Utils.timed("Create trees", {
       IndexBuilder.buildWithSVDAndRandomRotation(32, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform), Some(signatures))
     }).result
+
+    def save(fileName: String): Unit = {
+      import RandomTreesSerialization.Implicits._
+      import DataFrameViewSerializationExt._
+      val file = new File(fileName)
+      if (!file.exists()) {
+        throw new IllegalStateException(s"Directory should exist: ${fileName}")
+      }
+
+      if (!file.isDirectory()){
+        throw new IllegalStateException(s"File is not a directory ${fileName}")
+      }
+      val treesFullDir = new File(fileName, FuzzySearchIndexWrapper.treesSubDir)
+      if (!treesFullDir.exists()){
+        treesFullDir.mkdir()
+      }
+
+      val datasetFullFile = new File(fileName, FuzzySearchIndexWrapper.datasetFile)
+      trees.toFile(treesFullDir)
+      dataset.toFile(datasetFullFile)
+    }
+    save(backingFile)
+
     new FuzzySearchIndexWrapper(trees, dataset)
   }
 }

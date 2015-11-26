@@ -27,9 +27,9 @@ public class WikipediaLSI {
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 128;
-        int numTrees = 50;
+        int numTrees = 25;
         //create an indexer
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
+        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees,
                                                 FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
 
@@ -57,9 +57,6 @@ public class WikipediaLSI {
 
         //build the index
         FuzzySearchIndex index = indexBuilder.build();
-
-        //save the index to file
-        index.save(outputIndexFile);
     }
 
     static void runQueriesFromIndex(String indexFile) throws IOException {

@@ -1,5 +1,7 @@
 package com.stefansavev.randomprojections.serialization
 
+import java.io.{InputStream, OutputStream}
+
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.serialization.String2IdHasherSerialization.String2IdHasherSerializer
 import com.stefansavev.randomprojections.serialization.core.Core._
@@ -77,7 +79,7 @@ object DataFrameViewSerializers {
       type TT = LazyLoadValueStore.TupleType
 
       implicit def valuesStoreTupleTypeSerializer(): TypedSerializer[TT] = {
-        tuple3Serializer[String, Int, Int](TypedStringSerializer, TypedIntSerializer, TypedIntSerializer)
+        tuple5Serializer[String, Int, Int, Int, Int](TypedStringSerializer, TypedIntSerializer, TypedIntSerializer, TypedIntSerializer, TypedIntSerializer)
       }
 
       implicit object ValuesStoreIso extends Iso[T, TT]{
@@ -88,7 +90,7 @@ object DataFrameViewSerializers {
       isoSerializer[T, TT](ValuesStoreIso, valuesStoreTupleTypeSerializer())
     }
 
-    subtype4Serializer[ValuesStore,
+    val valueStoreSerializer = subtype4Serializer[ValuesStore,
                         ValuesStoreAsDouble,
                         ValuesStoreAsBytes,
                         ValuesStoreAsSingleByte,
@@ -101,6 +103,23 @@ object DataFrameViewSerializers {
         valuesStoreAsBytesSerializer(),
         valuesStoreAsSingleByteSerializer(),
         lazyLoadStoreSerializer())
+
+    object ValueStoreWithTransformedTypeSerializer extends TypedSerializer[ValuesStore] {
+      def toBinary(outputStream: OutputStream, input: ValuesStore): Unit = {
+        valueStoreSerializer.toBinary(outputStream, input)
+      }
+
+      def fromBinary(inputStream: InputStream): ValuesStore = {
+        val vs = valueStoreSerializer.fromBinary(inputStream)
+        vs match {
+          case lazyLoadStore: LazyLoadValueStore => {
+            lazyLoadStore.loadAll()
+          }
+          case _ => vs
+        }
+      }
+    }
+    ValueStoreWithTransformedTypeSerializer
   }
 
   implicit object DenseRowStoredMatrixViewIso extends Iso[DenseRowStoredMatrixView, DenseRowStoredMatrixView.TupleType]{

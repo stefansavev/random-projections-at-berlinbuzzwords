@@ -29,7 +29,7 @@ public class WordVecTest {
         int dataDimension = 200;
         int numTrees = 50; //20;
         //create an indexer
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
+        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
 
         //read the data points from a file and add them to the indexer one by one
@@ -48,8 +48,7 @@ public class WordVecTest {
         FuzzySearchIndex index = indexBuilder.build();
 
         //save the index to file
-        index.save(outputIndexFile);
-    }
+     }
 
     static void runQueriesFromIndex(String indexFile) throws IOException {
         FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);

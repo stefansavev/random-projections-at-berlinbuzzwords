@@ -25,7 +25,7 @@ public class GloveTest {
         int dataDimension = 100;
         int numTrees = 150;
         //create an indexer
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
+        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
 
         //read the data points from a file and add them to the indexer one by one
@@ -43,9 +43,6 @@ public class GloveTest {
 
         //build the index
         FuzzySearchIndex index = indexBuilder.build();
-
-        //save the index to file
-        index.save(outputIndexFile);
     }
 
     static void runQueriesFromIndex(String indexFile) throws IOException {

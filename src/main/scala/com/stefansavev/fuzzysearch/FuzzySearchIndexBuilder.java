@@ -7,16 +7,16 @@ public class FuzzySearchIndexBuilder {
     FuzzySearchIndexBuilderWrapper wrapper;
     int dimension;
 
-    public FuzzySearchIndexBuilder(int dimension, FuzzySearchEngine engine){
+    public FuzzySearchIndexBuilder(String backingFile, int dimension, FuzzySearchEngine engine){
         this.dimension = dimension;
         if (engine instanceof FuzzySearchEngine.FastTrees){
             FuzzySearchEngine.FastTrees fastTrees = ((FuzzySearchEngine.FastTrees)engine);
-            wrapper = new FuzzySearchIndexBuilderWrapper(dimension, fastTrees.getNumTrees(), fastTrees.getValueSize());
+            wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, fastTrees.getNumTrees(), fastTrees.getValueSize());
         }
         else{
             //for the moment use numTrees == 0 as a brute force flag
             FuzzySearchEngine.BruteForce bruteForce = ((FuzzySearchEngine.BruteForce)engine);
-            wrapper = new FuzzySearchIndexBuilderWrapper(dimension, 0, bruteForce.getValueSize());
+            wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, 0, bruteForce.getValueSize());
         }
     }
 

@@ -5,9 +5,9 @@ import java.io.File
 import com.stefansavev.randomprojections.buffers._
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.implementation.HadamardUtils
-
-
 import com.stefansavev.randomprojections.utils.Utils
+
+import scala.reflect.ClassTag
 
 trait ValuesStore{
   def fillRow(rowId: Int, output: Array[Double], isPos: Boolean): Unit
@@ -25,27 +25,29 @@ object ValuesStore{
 }
 
 object LazyLoadValueStore{
+  val partitionFileNamePrefix = "_dataset_partition_"
+
   def getPartitionFileName(dirName: String, partitionId: Int): String = {
-    val newFile = new File(dirName, "_partition_" + partitionId)
+    val newFile = new File(dirName, partitionFileNamePrefix  + partitionId)
     newFile.getAbsolutePath
   }
 
-  type TupleType = (String, Int, Int)
+  type TupleType = (String, Int, Int, Int, Int)
 
   def fromTuple(t: TupleType): LazyLoadValueStore = {
-    val (dirName, numPointsInPartition, numPartitions) = t
-    new LazyLoadValueStore(dirName, numPointsInPartition, numPartitions)
+    val (dirName, numPointsInPartition, numPartitions, numTotalRows, numColumns) = t
+    new LazyLoadValueStore(dirName, numPointsInPartition, numPartitions, numTotalRows, numColumns)
   }
 
 }
 
-class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitions: Int) extends ValuesStore{
+class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitions: Int, numTotalRows: Int, numColumns: Int) extends ValuesStore{
   println("numPointsInPartition " + numPointsInPartition)
   if (!HadamardUtils.isPowerOf2(numPointsInPartition)){
     Utils.internalError()
   }
 
-  def toTuple(): LazyLoadValueStore.TupleType = (dirName, numPointsInPartition, numPartitions)
+  def toTuple(): LazyLoadValueStore.TupleType = (dirName, numPointsInPartition, numPartitions, numTotalRows, numColumns)
 
   var underlyingStore: ValuesStore = null
   var currentPartition = -1
@@ -96,6 +98,17 @@ class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitio
     val tRowId = transformRowId(rowId)
     underlyingStore.cosineForNormalizedData(query, tRowId)
   }
+
+  def loadAll(): ValuesStore = {
+    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    def loadFile(partitionId: Int): ValuesStore = {
+      ValuesStore.fromFile(LazyLoadValueStore.getPartitionFileName(dirName, partitionId))
+    }
+    val head:ValuesStore = loadFile(0)
+    val rest = Iterator.range(1, numPartitions).map(partitionId => loadFile(partitionId))
+    val iter = Iterator(head) ++ rest
+    head.getBuilderType.getBuilder(numColumns).merge(numTotalRows, iter)
+  }
 }
 
 
@@ -104,6 +117,8 @@ trait ValuesStoreBuilder{
   def getCurrentRowIndex: Int
   def addValues(values: Array[Double]): Unit
   def build(): ValuesStore
+
+  def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore
 }
 
 object ValuesStoreAsDoubleSerializationTags{
@@ -115,7 +130,7 @@ object ValuesStoreAsDoubleSerializationTags{
 
 class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: StoreBuilderType) extends ValuesStoreBuilder{
   var currentRow = 0
-  val numPointsInPartition = 1 << 17 //1 << 17 //= 131072
+  val numPointsInPartition = 1 << 10 // 1 << 17 //1 << 17 //= 131072
   var currentPartition = 0
   var currentBuilder = underlyingBuilder.getBuilder(numCols)
 
@@ -150,9 +165,12 @@ class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBui
     if (currentBuilder.getCurrentRowIndex > 0) {
       savePartition()
     }
-    new LazyLoadValueStore(backingDir, numPointsInPartition, currentPartition)
+    new LazyLoadValueStore(backingDir, numPointsInPartition, currentPartition, currentRow, numCols)
   }
 
+  def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
+    underlyingBuilder.getBuilder(numCols).merge(numTotalRows, valueStores)
+  }
 }
 
 object ValuesStoreAsDouble{
@@ -164,7 +182,7 @@ object ValuesStoreAsDouble{
   }
 }
 
-class ValuesStoreAsDouble(_numCols: Int, data: Array[Double]) extends ValuesStore{
+class ValuesStoreAsDouble(val _numCols: Int, val data: Array[Double]) extends ValuesStore{
 
   def toTuple(): ValuesStoreAsDouble.TupleType = {
     (_numCols, data)
@@ -256,6 +274,18 @@ class ValuesStoreBuilderAsDouble(numCols: Int) extends ValuesStoreBuilder{
     val values = valuesBuffer.toArray()
     new ValuesStoreAsDouble(numCols, values)
   }
+
+  def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
+    val buffer = new FixedLengthBuffer[Double](numTotalRows*numCols)
+    for(store <- valueStores){
+      val typedStore = store.asInstanceOf[ValuesStoreAsDouble]
+      buffer ++= typedStore.data
+      if (typedStore._numCols != numCols){
+        Utils.internalError()
+      }
+    }
+    new ValuesStoreAsDouble(numCols, buffer.array)
+  }
 }
 
 class ValuesStoreBuilderAsFloat{
@@ -285,14 +315,13 @@ object FloatToByteEncoder{
 
 }
 
-class ValuesStoreAsBytes(_numCols: Int, _data: Array[Short]) extends ValuesStore{
+class ValuesStoreAsBytes(val _numCols: Int, val _data: Array[Short]) extends ValuesStore{
 
   def getBuilderType: StoreBuilderType = StoreBuilderAsBytesType
 
   def getAtIndex(index: Int): Double = {
     FloatToByteEncoder.decodeValue(_data(index))
   }
-
 
   def toTuple(): ValuesStoreAsBytes.TupleType = {
     (_numCols, _data)
@@ -405,6 +434,23 @@ class ValuesStoreBuilderAsBytes(numCols: Int) extends ValuesStoreBuilder{
   def build(): ValuesStore = {
     val values = valuesBuffer.toArray()
     new ValuesStoreAsBytes(numCols, values)
+  }
+
+  def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
+    var numColumns = -1
+    val buffer = new ShortArrayBuffer(numTotalRows)
+    for(store <- valueStores){
+      val typedStore = store.asInstanceOf[ValuesStoreAsBytes]
+      buffer ++= typedStore._data
+      if (numColumns >= 0 && typedStore._numCols != numColumns){
+        Utils.internalError()
+      }
+      numColumns = typedStore._numCols
+    }
+    if (buffer.array.length != buffer.size){
+      Utils.internalError()
+    }
+    new ValuesStoreAsBytes(numColumns, buffer.array)
   }
 }
 
@@ -654,6 +700,34 @@ class ValuesStoreBuilderAsSingleByte(numCols: Int) extends ValuesStoreBuilder{
     //val values = valuesBuffer.toArray()
     new ValuesStoreAsSingleByte(numCols, minValuePerRecord.toArray(), maxValuePerRecord.toArray(), valuesBuffer.toArray())
   }
+
+  def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
+    println("totalnumrows: " + numTotalRows)
+    val minValuePerRecord = new FixedLengthBuffer[Float](numTotalRows)
+    val maxValuePerRecord = new FixedLengthBuffer[Float](numTotalRows)
+    val valuesBuffer = new FixedLengthBuffer[Byte](numTotalRows*numCols)
+    for(store <- valueStores){
+      val typedStore = store.asInstanceOf[ValuesStoreAsSingleByte]
+      println("minValuesLen: " + typedStore.minValues.length)
+      minValuePerRecord ++= typedStore.minValues
+      maxValuePerRecord ++= typedStore.maxValues
+      valuesBuffer ++= typedStore._data
+      if (typedStore._numCols != this.numCols){
+        Utils.internalError()
+      }
+    }
+    new ValuesStoreAsSingleByte(this.numCols, minValuePerRecord.array, maxValuePerRecord.array, valuesBuffer.array)
+  }
+}
+
+class FixedLengthBuffer[T : ClassTag](val size: Int){
+  val buffer = Array.ofDim[T](size)
+  var offset = 0
+  def ++= (values: Array[T]): Unit = {
+    System.arraycopy(values, 0, buffer, offset, values.length)
+    offset += values.length
+  }
+  def array = buffer
 }
 
 object ValuesStoreAsSingleByte{
@@ -665,7 +739,7 @@ object ValuesStoreAsSingleByte{
   }
 }
 
-class ValuesStoreAsSingleByte(_numCols: Int, minValues: Array[Float], maxValues: Array[Float], _data: Array[Byte]) extends ValuesStore{
+class ValuesStoreAsSingleByte(val _numCols: Int, val minValues: Array[Float], val maxValues: Array[Float], val _data: Array[Byte]) extends ValuesStore{
 
   def getBuilderType: StoreBuilderType = StoreBuilderAsSingleByteType
 
