@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 
 import com.stefansavev.randomprojections.implementation.{BucketCollectorImpl, RandomTrees, IndexImpl, Leaf2Points}
 import com.stefansavev.randomprojections.serialization.RandomTreesSerialization.BinaryFileDeserializer
+import com.stefansavev.randomprojections.serialization.RandomTreesSerializersV2.RandomTreesSerializer
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -153,7 +154,13 @@ object RandomTreesSerialization{
 
         val invIndex = InvertedIndexSerializer.fromFile(invIndexFile)
         val bos = new BufferedInputStream(new FileInputStream(modelFile))
-        val trees = RandomTreesSerializer.fromBinary(bos, invIndex)
+        val trees_0 = RandomTreesSerializer.fromBinary(bos)
+        //must set the index
+        val trees = new RandomTrees(trees_0.dimReductionTransform, trees_0.reportingDistanceEvaluator,
+                                    trees_0.signatureVecs, trees_0.datasetSplitStrategy,
+                                    trees_0.header, invIndex, trees_0.trees)
+
+        
         bos.close()
         trees
       }
