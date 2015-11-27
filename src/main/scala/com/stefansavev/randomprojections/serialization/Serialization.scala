@@ -74,6 +74,10 @@ object IntSerializer{
     inputStream.read(bytes)
     toInt(bytes)
   }
+
+  def sizeInBytes: Long = {
+    2
+  }
 }
 
 object ShortSerializer{
@@ -96,6 +100,10 @@ object ShortSerializer{
     inputStream.read(bytes)
     toShort(bytes)
   }
+
+  def sizeInBytes: Long = {
+    2
+  }
 }
 
 object FloatSerializer{
@@ -117,6 +125,10 @@ object FloatSerializer{
   def read(inputStream: InputStream): Float = {
     inputStream.read(bytes)
     toShort(bytes)
+  }
+
+  def sizeInBytes: Long = {
+    4
   }
 }
 
@@ -147,6 +159,10 @@ object StringSerializer{
     }
     new String(output)
   }
+
+  def sizeInBytes(input: String): Long = {
+    4 + 2*input.length
+  }
 }
 
 object DoubleSerializer{
@@ -168,10 +184,15 @@ object DoubleSerializer{
     inputStream.read(bytes)
     toDouble(bytes)
   }
+
+  def sizeInBytes: Long = {
+    8
+  }
 }
 
 object LongSerializer{
   val bytes = Array.ofDim[Byte](8)
+
   def toByteArray(value: Long): Array[Byte] = {
     ByteBuffer.wrap(bytes).putLong(value)
     bytes
@@ -189,9 +210,14 @@ object LongSerializer{
     inputStream.read(bytes)
     toLong(bytes)
   }
+
+  def sizeInBytes: Long = {
+    4
+  }
 }
 
 object DoubleArraySerializer{
+
   def write(outputStream: OutputStream, values: Array[Double]): Unit = {
     IntSerializer.write(outputStream, values.length)
     var i = 0
@@ -210,6 +236,10 @@ object DoubleArraySerializer{
       i += 1
     }
     values
+  }
+
+  def sizeInBytes(input: Array[Double]): Long = {
+    IntSerializer.sizeInBytes + DoubleSerializer.sizeInBytes*input.length
   }
 }
 
@@ -232,6 +262,10 @@ object IntArraySerializer{
       i += 1
     }
     values
+  }
+
+  def sizeInBytes(input: Array[Int]): Long = {
+    IntSerializer.sizeInBytes + IntSerializer.sizeInBytes*input.length
   }
 }
 
@@ -256,6 +290,10 @@ object FloatArraySerializer{
     }
     values
   }
+
+  def sizeInBytes(input: Array[Float]): Long = {
+    IntSerializer.sizeInBytes + FloatSerializer.sizeInBytes*input.length
+  }
 }
 
 object ByteArraySerializer{
@@ -269,6 +307,10 @@ object ByteArraySerializer{
     val values = Array.ofDim[Byte](len)
     inputStream.read(values)
     values
+  }
+
+  def sizeInBytes(input: Array[Byte]): Long = {
+    IntSerializer.sizeInBytes + input.length
   }
 }
 
@@ -292,6 +334,10 @@ object ShortArraySerializer{
     }
     values
   }
+
+  def sizeInBytes(input: Array[Short]): Long = {
+    IntSerializer.sizeInBytes + ShortSerializer.sizeInBytes*input.length
+  }
 }
 
 object LongArraySerializer{
@@ -313,6 +359,10 @@ object LongArraySerializer{
       i += 1
     }
     values
+  }
+
+  def sizeInBytes(input: Array[Long]): Long = {
+    IntSerializer.sizeInBytes + LongSerializer.sizeInBytes*input.length
   }
 }
 

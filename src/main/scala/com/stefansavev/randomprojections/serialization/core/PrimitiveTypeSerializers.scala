@@ -14,6 +14,10 @@ object PrimitiveTypeSerializers {
     def fromBinary(inputStream: InputStream): Int = {
       IntSerializer.read(inputStream)
     }
+
+    def sizeInBytes(input: Int): Long = {
+      4
+    }
   }
 
   implicit object TypedStringSerializer extends TypedSerializer[String] {
@@ -23,6 +27,10 @@ object PrimitiveTypeSerializers {
 
     def fromBinary(inputStream: InputStream): String = {
       StringSerializer.read(inputStream)
+    }
+
+    def sizeInBytes(input: String): Long = {
+      StringSerializer.sizeInBytes(input)
     }
   }
 
@@ -34,6 +42,10 @@ object PrimitiveTypeSerializers {
     def fromBinary(inputStream: InputStream): Double = {
       DoubleSerializer.read(inputStream)
     }
+
+    def sizeInBytes(input: Double): Long = {
+      DoubleSerializer.sizeInBytes
+    }
   }
 
   implicit object TypedIntArraySerializer extends TypedSerializer[Array[Int]]{
@@ -43,6 +55,10 @@ object PrimitiveTypeSerializers {
 
     def fromBinary(inputStream: InputStream): SerializerType = {
       IntArraySerializer.read(inputStream)
+    }
+
+    def sizeInBytes(input: SerializerType): Long = {
+      IntSerializer.sizeInBytes
     }
   }
 
@@ -54,6 +70,10 @@ object PrimitiveTypeSerializers {
     def fromBinary(inputStream: InputStream): SerializerType = {
       DoubleArraySerializer.read(inputStream)
     }
+
+    def sizeInBytes(input: SerializerType): Long = {
+      DoubleArraySerializer.sizeInBytes(input)
+    }
   }
 
   implicit object TypedShortArraySerializer extends TypedSerializer[Array[Short]]{
@@ -63,6 +83,10 @@ object PrimitiveTypeSerializers {
 
     def fromBinary(inputStream: InputStream): SerializerType = {
       ShortArraySerializer.read(inputStream)
+    }
+
+    def sizeInBytes(input: SerializerType): Long = {
+      ShortArraySerializer.sizeInBytes(input)
     }
   }
 
@@ -74,6 +98,10 @@ object PrimitiveTypeSerializers {
     def fromBinary(inputStream: InputStream): SerializerType = {
       FloatArraySerializer.read(inputStream)
     }
+
+    def sizeInBytes(input: SerializerType): Long = {
+      FloatArraySerializer.sizeInBytes(input)
+    }
   }
 
   implicit object TypedByteArraySerializer extends TypedSerializer[Array[Byte]]{
@@ -83,6 +111,10 @@ object PrimitiveTypeSerializers {
 
     def fromBinary(inputStream: InputStream): SerializerType = {
       ByteArraySerializer.read(inputStream)
+    }
+
+    def sizeInBytes(input: SerializerType): Long = {
+      ByteArraySerializer.sizeInBytes(input)
     }
   }
 }

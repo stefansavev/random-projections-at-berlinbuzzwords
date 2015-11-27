@@ -16,6 +16,11 @@ object TupleSerializers {
       val a2 = serA2.fromBinary(inputStream)
       (a1, a2)
     }
+
+    def sizeInBytes(input: (A1, A2)): Long = {
+      val (a1, a2) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2)
+    }
   }
 
   implicit def tuple2Serializer[A1, A2](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2]): Tuple2Serializer[A1, A2] = {
@@ -38,6 +43,11 @@ object TupleSerializers {
       val a2 = serA2.fromBinary(inputStream)
       val a3 = serA3.fromBinary(inputStream)
       (a1, a2, a3)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3)): Long = {
+      val (a1, a2, a3) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3)
     }
   }
 
@@ -63,6 +73,11 @@ object TupleSerializers {
       val a3 = serA3.fromBinary(inputStream)
       val a4 = serA4.fromBinary(inputStream)
       (a1, a2, a3, a4)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4)): Long = {
+      val (a1, a2, a3, a4) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) + serA4.sizeInBytes(a4)
     }
   }
 
@@ -90,6 +105,11 @@ object TupleSerializers {
       val a4 = serA4.fromBinary(inputStream)
       val a5 = serA5.fromBinary(inputStream)
       (a1, a2, a3, a4, a5)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5)): Long = {
+      val (a1, a2, a3, a4, a5) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) + serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5)
     }
   }
 
@@ -119,6 +139,12 @@ object TupleSerializers {
       val a5 = serA5.fromBinary(inputStream)
       val a6 = serA6.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6)): Long = {
+      val (a1, a2, a3, a4, a5, a6) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+          serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6)
     }
   }
 
@@ -150,6 +176,12 @@ object TupleSerializers {
       val a6 = serA6.fromBinary(inputStream)
       val a7 = serA7.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7)): Long = {
+      val (a1, a2, a3, a4, a5, a6, a7) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) + serA7.sizeInBytes(a7)
     }
   }
 
@@ -183,6 +215,13 @@ object TupleSerializers {
       val a7 = serA7.fromBinary(inputStream)
       val a8 = serA8.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8)): Long = {
+      val (a1, a2, a3, a4, a5, a6, a7, a8) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
+          serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8)
     }
   }
 
@@ -218,6 +257,13 @@ object TupleSerializers {
       val a8 = serA8.fromBinary(inputStream)
       val a9 = serA9.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9)): Long = {
+      val (a1, a2, a3, a4, a5, a6, a7, a8, a9) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
+          serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9)
     }
   }
 
@@ -255,6 +301,14 @@ object TupleSerializers {
       val a9 = serA9.fromBinary(inputStream)
       val a10 = serA10.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)): Long = {
+      val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
+          serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
+            serA10.sizeInBytes(a10)
     }
   }
 
@@ -294,6 +348,14 @@ object TupleSerializers {
       val a10 = serA10.fromBinary(inputStream)
       val a11 = serA11.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11)): Long = {
+      val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
+        serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
+          serA10.sizeInBytes(a10) +  serA11.sizeInBytes(a11)
     }
   }
 
@@ -335,6 +397,14 @@ object TupleSerializers {
       val a11 = serA11.fromBinary(inputStream)
       val a12 = serA12.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)): Long = {
+      val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
+        serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
+        serA10.sizeInBytes(a10) + serA11.sizeInBytes(a11) + serA12.sizeInBytes(a12)
     }
   }
 
@@ -378,6 +448,15 @@ object TupleSerializers {
       val a12 = serA12.fromBinary(inputStream)
       val a13 = serA13.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)): Long = {
+      val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
+        serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
+        serA10.sizeInBytes(a10) + serA11.sizeInBytes(a11) + serA12.sizeInBytes(a12) +
+        serA13.sizeInBytes(a13)
     }
   }
 
@@ -423,6 +502,15 @@ object TupleSerializers {
       val a13 = serA13.fromBinary(inputStream)
       val a14 = serA14.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14)
+    }
+
+    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14)): Long = {
+      val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14) = input
+      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
+        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
+        serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
+        serA10.sizeInBytes(a10) + serA11.sizeInBytes(a11) + serA12.sizeInBytes(a12) +
+        serA13.sizeInBytes(a13) + serA14.sizeInBytes(a14)
     }
   }
 

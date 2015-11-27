@@ -45,6 +45,25 @@ object String2IdHasherSerialization {
       }
       string2IdHasher
     }
+
+    def sizeInBytes(string2Id: String2IdHasher): Long = {
+      //probably its stored more efficiently on disk than in memory
+      if (string2Id == null){
+        throw new IllegalStateException("string2IdHasher cannot be null")
+      }
+      val settings = string2Id.getSettings()
+      var sumSizes = 3*IntSerializer.sizeInBytes
+
+      var id = 0
+      val numStrings = string2Id.numberOfUniqueStrings()
+      sumSizes += IntSerializer.sizeInBytes
+      while(id < numStrings){
+        val str = string2Id.getStringAtInternalIndex(id).get
+        sumSizes += StringSerializer.sizeInBytes(str)
+        id += 1
+      }
+      sumSizes
+    }
   }
 
 

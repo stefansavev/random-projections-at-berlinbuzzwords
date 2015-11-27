@@ -10,6 +10,7 @@ trait TypedSerializer[T]{
   type SerializerType = T
   def toBinary(outputStream: OutputStream, input: T): Unit
   def fromBinary(inputStream: InputStream): T
+  def sizeInBytes(input: T): Long
 }
 
 object Core{
@@ -57,6 +58,15 @@ object Core{
           throw new IllegalStateException("Unknown tag in deserialization")
       }
     }
+
+    def sizeInBytes(input: BaseType): Long = {
+      if (tag1.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer1.sizeInBytes(input.asInstanceOf[SubType1])
+      }
+      else{
+        throw new IllegalStateException("Unsupported subtype in serialization")
+      }
+    }
   }
 
   class Subtype2Serializer[BaseType, SubType1 <: BaseType, SubType2 <: BaseType](
@@ -95,6 +105,18 @@ object Core{
       }
       else{
         throw new IllegalStateException("Unknown tag in deserialization")
+      }
+    }
+
+    def sizeInBytes(input: BaseType): Long = {
+      if (tag1.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer1.sizeInBytes(input.asInstanceOf[SubType1])
+      }
+      else if (tag2.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer2.sizeInBytes(input.asInstanceOf[SubType2])
+      }
+      else{
+        throw new IllegalStateException("Unsupported subtype in serialization")
       }
     }
   }
@@ -157,6 +179,21 @@ object Core{
       }
       else{
         throw new IllegalStateException("Unknown tag in deserialization")
+      }
+    }
+
+    def sizeInBytes(input: BaseType): Long = {
+      if (tag1.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer1.sizeInBytes(input.asInstanceOf[SubType1])
+      }
+      else if (tag2.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer2.sizeInBytes(input.asInstanceOf[SubType2])
+      }
+      else if (tag3.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer3.sizeInBytes(input.asInstanceOf[SubType3])
+      }
+      else{
+        throw new IllegalStateException("Unsupported subtype in serialization")
       }
     }
   }
@@ -222,6 +259,24 @@ object Core{
       }
       else{
         throw new IllegalStateException("Unknown tag in deserialization")
+      }
+    }
+
+    def sizeInBytes(input: BaseType): Long = {
+      if (tag1.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer1.sizeInBytes(input.asInstanceOf[SubType1])
+      }
+      else if (tag2.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer2.sizeInBytes(input.asInstanceOf[SubType2])
+      }
+      else if (tag3.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer3.sizeInBytes(input.asInstanceOf[SubType3])
+      }
+      else if (tag4.manifest.runtimeClass.equals(input.getClass)){
+        subTypeSer4.sizeInBytes(input.asInstanceOf[SubType4])
+      }
+      else{
+        throw new IllegalStateException("Unsupported subtype in serialization")
       }
     }
   }
@@ -300,6 +355,10 @@ object Core{
 
     def fromBinary(inputStream: InputStream): A = {
       iso.to(serB.fromBinary(inputStream))
+    }
+
+    def sizeInBytes(input: A): Long = {
+      serB.sizeInBytes(iso.from(input))
     }
   }
 

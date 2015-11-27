@@ -43,8 +43,6 @@ object InvertedIndexSerializer{
   }
 }
 
-
-
 object RandomTreesSerialization{
 
   class BinaryFileDeserializer(file: File){
