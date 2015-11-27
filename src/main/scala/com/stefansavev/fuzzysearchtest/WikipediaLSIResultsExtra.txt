@@ -1,0 +1,137 @@
+D:\Scala\jdklink\bin\java -Xmx4G -Didea.launcher.port=7539 "-Didea.launcher.bin.path=D:\Program Files (x86)\JetBrains\IntelliJ IDEA Community Edition 14.1.4\bin" -Dfile.encoding=windows-1252 -classpath "D:\Scala\jdklink\jre\lib\charsets.jar;D:\Scala\jdklink\jre\lib\deploy.jar;D:\Scala\jdklink\jre\lib\javaws.jar;D:\Scala\jdklink\jre\lib\jce.jar;D:\Scala\jdklink\jre\lib\jfr.jar;D:\Scala\jdklink\jre\lib\jfxrt.jar;D:\Scala\jdklink\jre\lib\jsse.jar;D:\Scala\jdklink\jre\lib\management-agent.jar;D:\Scala\jdklink\jre\lib\plugin.jar;D:\Scala\jdklink\jre\lib\resources.jar;D:\Scala\jdklink\jre\lib\rt.jar;D:\Scala\jdklink\jre\lib\ext\access-bridge-64.jar;D:\Scala\jdklink\jre\lib\ext\dnsns.jar;D:\Scala\jdklink\jre\lib\ext\jaccess.jar;D:\Scala\jdklink\jre\lib\ext\localedata.jar;D:\Scala\jdklink\jre\lib\ext\sunec.jar;D:\Scala\jdklink\jre\lib\ext\sunjce_provider.jar;D:\Scala\jdklink\jre\lib\ext\sunmscapi.jar;D:\Scala\jdklink\jre\lib\ext\zipfs.jar;D:\Repositories\random-proj-demo\v4\random-projections-at-berlinbuzzwords\out\production\random-projections-at-berlinbuzzwords;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-library\2.11.4\734ac63e470706015ea786f7780c80db49f001a4\scala-library-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-compiler\2.11.4\fa6eaeeecc9c6080d4b2f407f207339f2ff97ad7\scala-compiler-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.googlecode.matrix-toolkits-java\mtj\1.0.1\2972d710f730ef3d504fa92b7869c7b2f843e8dd\mtj-1.0.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-reflect\2.11.4\a212daed62de3d47034ea171dd3168a4dd85d08c\scala-reflect-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang.modules\scala-xml_2.11\1.0.2\820fbca7e524b530fdadc594c39d49a21ea0337e\scala-xml_2.11-1.0.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang.modules\scala-parser-combinators_2.11\1.0.2\ba0bbca656b10f235b6eb17a541e5d728c29040a\scala-parser-combinators_2.11-1.0.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\net.sourceforge.f2j\arpack_combined_all\0.1\225619a060b42605b4d9fd4af11815664abf26eb\arpack_combined_all-0.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\core\1.1.2\574b480eca62f535fad6d259e144fee3ef24b66e\core-1.1.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-osx-x86_64\1.1\80da53ec862f283dc3b191b9dbd3166ea6671831\netlib-native_ref-osx-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-x86_64\1.1\5a3e5787d03c39790d5ae08cce189dd1ccc4a38\netlib-native_ref-linux-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-i686\1.1\eedd845b214aea560bce317d778ebb52f8f46038\netlib-native_ref-linux-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-win-x86_64\1.1\4ab54511c2844546279d9f8e427c73953b794686\netlib-native_ref-win-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-win-i686\1.1\167fb794a26cb0bfc74890c704c7137b1d5b50fd\netlib-native_ref-win-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-armhf\1.1\ec467162f74710fd8897cff6888534ceaf297d9a\netlib-native_ref-linux-armhf-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-osx-x86_64\1.1\d724e33675dc8eaa5c8fcb05a3aaca6f3339afa7\netlib-native_system-osx-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-x86_64\1.1\163e88facabe7fa29952890dc2d3429e28501120\netlib-native_system-linux-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-i686\1.1\dd43225560dbd9115d306f9be3ca195aed236b78\netlib-native_system-linux-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-armhf\1.1\27ae9f6a9c88b3f8d12ffa52d62941615f8ed416\netlib-native_system-linux-armhf-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-win-x86_64\1.1\222c7915be1daf1c26a4206f375d4957ae5f9d81\netlib-native_system-win-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-win-i686\1.1\c25fd1881cf93f7716f47b7deec859f6b6b7be50\netlib-native_system-win-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\all\1.1.2\f235011206ac009adad2d6607f222649aba5ca9e\all-1.1.2.pom;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\native_ref-java\1.1\408c71ffbc3646dda7bee1e22bf19101e5e9ee90\native_ref-java-1.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\native_system-java\1.1\3c6a2455f96b354a6940dce1393abb35ed7641da\native_system-java-1.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil\jniloader\1.1\4840f897eeb54d67ee14e478f8a45cc9937f3ce1\jniloader-1.1.jar;D:\Program Files (x86)\JetBrains\IntelliJ IDEA Community Edition 14.1.4\lib\idea_rt.jar" com.intellij.rt.execution.application.AppMain com.stefansavev.fuzzysearchtest.WikipediaLSI
+Free memory: 90674
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 1222384
+numPointsInPartition 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_0
+totalnumrows: 4270703
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_1
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_2
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_3
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_4
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_5
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_6
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_7
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_8
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_9
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_10
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_11
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_12
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_13
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_14
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_15
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_16
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_17
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_18
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_19
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_20
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_21
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_22
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_23
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_24
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_25
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_26
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_27
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_28
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_29
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_30
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_31
+minValuesLen: 131072
+Loading file: C:\tmp\output-index-wikipedia-lsi\fuzzysearch_dataset_partitions_8686116\_dataset_partition_32
+minValuesLen: 76399
+Free memory: 459994
+Total search time in secs.: 2.098
+Num queries: 100
+Time per query in ms.: 20.98
+Queries per sec.: 47.641734159123395
+Total search time in secs.: 0.408
+Num queries: 100
+Time per query in ms.: 4.08
+Queries per sec.: 244.49877750611248
+Total search time in secs.: 0.371
+Num queries: 100
+Time per query in ms.: 3.71
+Queries per sec.: 268.81720430107526
+Total search time in secs.: 562.94
+Num queries: 100
+Time per query in ms.: 5629.4
+Queries per sec.: 0.1776385091865755
+------------------------------
+Total queries: 100
+Not-retrieved queries: 0
+Recalls from 100 queries
+Recall@0: 92.00000000000001
+Recall@1: 93.00000000000003
+Recall@2: 92.33333333333331
+Recall@3: 91.25
+Recall@4: 89.0
+Recall@5: 87.66666666666666
+Recall@6: 87.00000000000001
+Recall@7: 86.49999999999999
+Recall@8: 86.22222222222226
+Recall@9: 86.10000000000002
+Recall@10: 85.63636363636363
+
+Process finished with exit code 0

@@ -29,6 +29,7 @@ public class FuzzySearchEvaluationUtils {
         int numProcessedQueries = 0;
         while (queryIterator.hasNext()) {
             String queryId = queryIterator.next().getName();
+            //System.out.println("Running query " + queryId + " " + numProcessedQueries + "/" + testSet.getNumberOfQueries());
             double[] queryVector = index.getItemByName(queryId).getVector();
             List<FuzzySearchResult> results;
             if ( bruteForce) {
@@ -37,9 +38,9 @@ public class FuzzySearchEvaluationUtils {
             else{
                 results = index.search(numResults, queryVector);
             }
-            if (!results.get(0).getName().equals(queryId)){
-                throw new IllegalStateException("The top result should be the query itself");
-            }
+            //if (!results.get(0).getName().equals(queryId)){
+            //    throw new IllegalStateException("The top result should be the query itself");
+            //}
             resultsBuilder.addResult(queryId, results);
             numProcessedQueries ++;
         }
@@ -58,8 +59,14 @@ public class FuzzySearchEvaluationUtils {
 
     public static void compareWithBruteForce(String indexFile, Random rnd, int numQueries, int numResults) throws IOException {
         FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
+        System.out.println("Free memory: " + Runtime.getRuntime().freeMemory()/(1024));
         FuzzySearchResults testSet = generateRandomTestSet(rnd, numQueries, index);
+
+        resultsOnTestSet(index, testSet, numResults, false); //with the system
+        resultsOnTestSet(index, testSet, numResults, false); //with the system
+
         FuzzySearchResults retrieved = resultsOnTestSet(index, testSet, numResults, false); //with the system
+
         FuzzySearchResults expected = resultsOnTestSet(index, testSet, numResults, true); //brute force
         RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
     }

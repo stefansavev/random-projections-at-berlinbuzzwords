@@ -27,7 +27,7 @@ public class WikipediaLSI {
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 128;
-        int numTrees = 25;
+        int numTrees = 50;
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees,
@@ -114,9 +114,10 @@ public class WikipediaLSI {
         String inputTextFile = "C:\\wikipedia-parsed\\lsi\\extracted\\wikipedia_lsi128.txt";
         String indexFile = "C:/tmp/output-index-wikipedia-lsi/";
 
-        buildIndex(inputTextFile, indexFile);
+        //buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);
-        FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
+        System.out.println("Free memory: " + Runtime.getRuntime().freeMemory()/(1024));
+        FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 100, 50);
     }
 
 
