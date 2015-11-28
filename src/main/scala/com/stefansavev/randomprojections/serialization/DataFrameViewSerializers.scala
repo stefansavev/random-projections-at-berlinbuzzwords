@@ -8,7 +8,7 @@ import com.stefansavev.randomprojections.serialization.core.Core._
 import com.stefansavev.randomprojections.serialization.core.TupleSerializers._
 import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers._
 import com.stefansavev.randomprojections.serialization.ColumnHeaderSerialization._
-import com.stefansavev.randomprojections.serialization.core.TypedSerializer
+import com.stefansavev.randomprojections.serialization.core.{MemoryTracker, TypedSerializer}
 import com.stefansavev.randomprojections.utils.String2IdHasher
 
 object DataFrameViewSerializers {
@@ -119,8 +119,8 @@ object DataFrameViewSerializers {
         }
       }
 
-      def sizeInBytes(input: ValuesStore): Long = {
-        valueStoreSerializer.sizeInBytes(input)
+      def sizeInBytes(memoryTracker: MemoryTracker, input: ValuesStore): Long = {
+        valueStoreSerializer.sizeInBytes(memoryTracker, input)
       }
     }
     ValueStoreWithTransformedTypeSerializer

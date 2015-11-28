@@ -59,7 +59,6 @@ public class FuzzySearchEvaluationUtils {
 
     public static void compareWithBruteForce(String indexFile, Random rnd, int numQueries, int numResults) throws IOException {
         FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
-        System.out.println("Free memory: " + Runtime.getRuntime().freeMemory()/(1024));
         FuzzySearchResults testSet = generateRandomTestSet(rnd, numQueries, index);
 
         resultsOnTestSet(index, testSet, numResults, false); //with the system

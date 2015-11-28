@@ -148,7 +148,16 @@ public class MnistTest {
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromFile(queriesFile, indexFile);
         //runQueriesFromIndex(indexFile);
+        Runtime runtime = Runtime.getRuntime();
+        int mb = 1024*1024;
+        //Print used memory
+        System.out.println("Before index load: Used Memory [in MB]:"
+                + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+
         FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
+        System.out.println("After index load: Used Memory [in MB]:"
+                + (runtime.totalMemory() - runtime.freeMemory()) / mb);
+
 
         //FuzzySearchResults testSet = FuzzySearchEvaluationUtils.generateRandomTestSet(new Random(481868), 1000, index);
         //

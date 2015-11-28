@@ -17,9 +17,9 @@ object TupleSerializers {
       (a1, a2)
     }
 
-    def sizeInBytes(input: (A1, A2)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2)): Long = {
       val (a1, a2) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2)
     }
   }
 
@@ -45,9 +45,9 @@ object TupleSerializers {
       (a1, a2, a3)
     }
 
-    def sizeInBytes(input: (A1, A2, A3)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3)): Long = {
       val (a1, a2, a3) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3)
     }
   }
 
@@ -75,9 +75,9 @@ object TupleSerializers {
       (a1, a2, a3, a4)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4)): Long = {
       val (a1, a2, a3, a4) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) + serA4.sizeInBytes(a4)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) + serA4.sizeInBytes(memoryTracker, a4)
     }
   }
 
@@ -107,9 +107,9 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5)): Long = {
       val (a1, a2, a3, a4, a5) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) + serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) + serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5)
     }
   }
 
@@ -141,10 +141,10 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6)): Long = {
       val (a1, a2, a3, a4, a5, a6) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-          serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+          serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6)
     }
   }
 
@@ -178,10 +178,10 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6, a7)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6, A7)): Long = {
       val (a1, a2, a3, a4, a5, a6, a7) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) + serA7.sizeInBytes(a7)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+        serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6) + serA7.sizeInBytes(memoryTracker, a7)
     }
   }
 
@@ -217,11 +217,11 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6, a7, a8)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6, A7, A8)): Long = {
       val (a1, a2, a3, a4, a5, a6, a7, a8) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
-          serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+        serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6) +
+          serA7.sizeInBytes(memoryTracker, a7) + serA8.sizeInBytes(memoryTracker, a8)
     }
   }
 
@@ -259,11 +259,11 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6, a7, a8, a9)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6, A7, A8, A9)): Long = {
       val (a1, a2, a3, a4, a5, a6, a7, a8, a9) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
-          serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+        serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6) +
+          serA7.sizeInBytes(memoryTracker, a7) + serA8.sizeInBytes(memoryTracker, a8) + serA9.sizeInBytes(memoryTracker, a9)
     }
   }
 
@@ -303,12 +303,12 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)): Long = {
       val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
-          serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
-            serA10.sizeInBytes(a10)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+        serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6) +
+          serA7.sizeInBytes(memoryTracker, a7) + serA8.sizeInBytes(memoryTracker, a8) + serA9.sizeInBytes(memoryTracker, a9) +
+            serA10.sizeInBytes(memoryTracker, a10)
     }
   }
 
@@ -350,12 +350,12 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11)): Long = {
       val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
-        serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
-          serA10.sizeInBytes(a10) +  serA11.sizeInBytes(a11)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+        serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6) +
+        serA7.sizeInBytes(memoryTracker, a7) + serA8.sizeInBytes(memoryTracker, a8) + serA9.sizeInBytes(memoryTracker, a9) +
+          serA10.sizeInBytes(memoryTracker, a10) +  serA11.sizeInBytes(memoryTracker, a11)
     }
   }
 
@@ -399,12 +399,12 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)): Long = {
       val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
-        serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
-        serA10.sizeInBytes(a10) + serA11.sizeInBytes(a11) + serA12.sizeInBytes(a12)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+        serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6) +
+        serA7.sizeInBytes(memoryTracker, a7) + serA8.sizeInBytes(memoryTracker, a8) + serA9.sizeInBytes(memoryTracker, a9) +
+        serA10.sizeInBytes(memoryTracker, a10) + serA11.sizeInBytes(memoryTracker, a11) + serA12.sizeInBytes(memoryTracker, a12)
     }
   }
 
@@ -450,13 +450,13 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)): Long = {
       val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
-        serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
-        serA10.sizeInBytes(a10) + serA11.sizeInBytes(a11) + serA12.sizeInBytes(a12) +
-        serA13.sizeInBytes(a13)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+        serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6) +
+        serA7.sizeInBytes(memoryTracker, a7) + serA8.sizeInBytes(memoryTracker, a8) + serA9.sizeInBytes(memoryTracker, a9) +
+        serA10.sizeInBytes(memoryTracker, a10) + serA11.sizeInBytes(memoryTracker, a11) + serA12.sizeInBytes(memoryTracker, a12) +
+        serA13.sizeInBytes(memoryTracker, a13)
     }
   }
 
@@ -504,13 +504,13 @@ object TupleSerializers {
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14)
     }
 
-    def sizeInBytes(input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14)): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14)): Long = {
       val (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14) = input
-      serA1.sizeInBytes(a1) + serA2.sizeInBytes(a2) + serA3.sizeInBytes(a3) +
-        serA4.sizeInBytes(a4) + serA5.sizeInBytes(a5) + serA6.sizeInBytes(a6) +
-        serA7.sizeInBytes(a7) + serA8.sizeInBytes(a8) + serA9.sizeInBytes(a9) +
-        serA10.sizeInBytes(a10) + serA11.sizeInBytes(a11) + serA12.sizeInBytes(a12) +
-        serA13.sizeInBytes(a13) + serA14.sizeInBytes(a14)
+      serA1.sizeInBytes(memoryTracker, a1) + serA2.sizeInBytes(memoryTracker, a2) + serA3.sizeInBytes(memoryTracker, a3) +
+        serA4.sizeInBytes(memoryTracker, a4) + serA5.sizeInBytes(memoryTracker, a5) + serA6.sizeInBytes(memoryTracker, a6) +
+        serA7.sizeInBytes(memoryTracker, a7) + serA8.sizeInBytes(memoryTracker, a8) + serA9.sizeInBytes(memoryTracker, a9) +
+        serA10.sizeInBytes(memoryTracker, a10) + serA11.sizeInBytes(memoryTracker, a11) + serA12.sizeInBytes(memoryTracker, a12) +
+        serA13.sizeInBytes(memoryTracker, a13) + serA14.sizeInBytes(memoryTracker, a14)
     }
   }
 

@@ -6,11 +6,76 @@ import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSeriali
 
 //approach is losely based on "Scala for generic programmers"
 
+trait MemoryTracker{
+  def beginObject(inst: Any): Unit
+  def endObject(inst: Any, reportedMemory: Long): Unit
+  //def trackMemory(typeName: String, fieldName: String, memory: Long): Unit
+}
+
+class MemoryTrackerImpl extends MemoryTracker{
+  var depth = 0
+  def padToDepth(): String = Range(0, depth).map(_=> " ").mkString("")
+
+  def beginObject(inst: Any): Unit = {
+    val typeName = inst.getClass
+    println(padToDepth() + typeName.getName)
+    depth += 1
+  }
+
+  def endObject(inst: Any, reportedMemory: Long): Unit = {
+    val typeName = inst.getClass
+    depth -= 1
+    val formattedInfo = inst match {
+      case anyArray: Array[_] => {
+        "size: " + (anyArray.length)
+      }
+      case _ => ""
+    }
+    println(padToDepth() + typeName.getName + " memory: " + reportedMemory + " " + formattedInfo)
+  }
+
+  def trackMemory(typeName: String, fieldName: String, memory: Long): Unit = {
+    println(padToDepth() + typeName + ": " + fieldName + " " + memory)
+  }
+}
+
+object MemoryTrackingUtils{
+  /*
+  def withNestingInfo(memoryTracker: MemoryTracker, clazz: Class[_], block: => Long): Long = {
+    memoryTracker.beginObject(clazz)
+    val result = block
+    memoryTracker.endObject(clazz)
+    result
+  }
+  */
+
+  def withNestingInfo(memoryTracker: MemoryTracker, instance: Any, block: => Long): Long = {
+    memoryTracker.beginObject(instance)
+    val reportedMem = block
+    memoryTracker.endObject(instance, reportedMem)
+    reportedMem
+  }
+
+  def withGenericImplementation[T](memoryTracker: MemoryTracker, ser: TypedSerializer[T], inst: T): Long = {
+    withNestingInfo(memoryTracker, inst, {
+      var sum = 0L
+      val dummyOutputStream = new OutputStream {
+        override def write(b: Int): Unit = {
+          sum += 1
+        }
+      }
+      ser.toBinary(dummyOutputStream, inst)
+      sum
+    })
+  }
+
+}
+
 trait TypedSerializer[T]{
   type SerializerType = T
   def toBinary(outputStream: OutputStream, input: T): Unit
   def fromBinary(inputStream: InputStream): T
-  def sizeInBytes(input: T): Long
+  def sizeInBytes(memoryTracker: MemoryTracker, input: T): Long
 }
 
 object Core{
@@ -59,9 +124,9 @@ object Core{
       }
     }
 
-    def sizeInBytes(input: BaseType): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: BaseType): Long = {
       if (tag1.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer1.sizeInBytes(input.asInstanceOf[SubType1])
+        subTypeSer1.sizeInBytes(memoryTracker, input.asInstanceOf[SubType1])
       }
       else{
         throw new IllegalStateException("Unsupported subtype in serialization")
@@ -108,12 +173,12 @@ object Core{
       }
     }
 
-    def sizeInBytes(input: BaseType): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: BaseType): Long = {
       if (tag1.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer1.sizeInBytes(input.asInstanceOf[SubType1])
+        subTypeSer1.sizeInBytes(memoryTracker, input.asInstanceOf[SubType1])
       }
       else if (tag2.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer2.sizeInBytes(input.asInstanceOf[SubType2])
+        subTypeSer2.sizeInBytes(memoryTracker, input.asInstanceOf[SubType2])
       }
       else{
         throw new IllegalStateException("Unsupported subtype in serialization")
@@ -182,15 +247,15 @@ object Core{
       }
     }
 
-    def sizeInBytes(input: BaseType): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: BaseType): Long = {
       if (tag1.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer1.sizeInBytes(input.asInstanceOf[SubType1])
+        subTypeSer1.sizeInBytes(memoryTracker, input.asInstanceOf[SubType1])
       }
       else if (tag2.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer2.sizeInBytes(input.asInstanceOf[SubType2])
+        subTypeSer2.sizeInBytes(memoryTracker, input.asInstanceOf[SubType2])
       }
       else if (tag3.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer3.sizeInBytes(input.asInstanceOf[SubType3])
+        subTypeSer3.sizeInBytes(memoryTracker, input.asInstanceOf[SubType3])
       }
       else{
         throw new IllegalStateException("Unsupported subtype in serialization")
@@ -262,18 +327,18 @@ object Core{
       }
     }
 
-    def sizeInBytes(input: BaseType): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: BaseType): Long = {
       if (tag1.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer1.sizeInBytes(input.asInstanceOf[SubType1])
+        subTypeSer1.sizeInBytes(memoryTracker, input.asInstanceOf[SubType1])
       }
       else if (tag2.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer2.sizeInBytes(input.asInstanceOf[SubType2])
+        subTypeSer2.sizeInBytes(memoryTracker, input.asInstanceOf[SubType2])
       }
       else if (tag3.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer3.sizeInBytes(input.asInstanceOf[SubType3])
+        subTypeSer3.sizeInBytes(memoryTracker, input.asInstanceOf[SubType3])
       }
       else if (tag4.manifest.runtimeClass.equals(input.getClass)){
-        subTypeSer4.sizeInBytes(input.asInstanceOf[SubType4])
+        subTypeSer4.sizeInBytes(memoryTracker, input.asInstanceOf[SubType4])
       }
       else{
         throw new IllegalStateException("Unsupported subtype in serialization")
@@ -357,8 +422,8 @@ object Core{
       iso.to(serB.fromBinary(inputStream))
     }
 
-    def sizeInBytes(input: A): Long = {
-      serB.sizeInBytes(iso.from(input))
+    def sizeInBytes(memoryTracker: MemoryTracker, input: A): Long = {
+      serB.sizeInBytes(memoryTracker, iso.from(input))
     }
   }
 

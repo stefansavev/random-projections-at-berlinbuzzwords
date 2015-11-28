@@ -6,6 +6,7 @@ import java.nio.ByteBuffer
 import com.stefansavev.randomprojections.implementation.{BucketCollectorImpl, RandomTrees, IndexImpl, Leaf2Points}
 import com.stefansavev.randomprojections.serialization.RandomTreesSerialization.BinaryFileDeserializer
 import com.stefansavev.randomprojections.serialization.RandomTreesSerializersV2.RandomTreesSerializer
+import com.stefansavev.randomprojections.serialization.core.MemoryTrackerImpl
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -160,8 +161,11 @@ object RandomTreesSerialization{
                                     trees_0.signatureVecs, trees_0.datasetSplitStrategy,
                                     trees_0.header, invIndex, trees_0.trees)
 
-        
+
         bos.close()
+        val tracker = new MemoryTrackerImpl()
+        println("size of trees: " + RandomTreesSerializer.sizeInBytes(tracker, trees))
+        //println("size of index: " + InvertedIndexSerializer.sizeInBytes(tracker, invIndex))
         trees
       }
 

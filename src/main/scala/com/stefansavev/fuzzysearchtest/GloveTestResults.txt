@@ -1,15 +1,32 @@
-D:\Scala\jdklink\bin\java -Xmx3G -Didea.launcher.port=7535 "-Didea.launcher.bin.path=D:\Program Files (x86)\JetBrains\IntelliJ IDEA Community Edition 14.1.4\bin" -Dfile.encoding=windows-1252 -classpath "D:\Scala\jdklink\jre\lib\charsets.jar;D:\Scala\jdklink\jre\lib\deploy.jar;D:\Scala\jdklink\jre\lib\javaws.jar;D:\Scala\jdklink\jre\lib\jce.jar;D:\Scala\jdklink\jre\lib\jfr.jar;D:\Scala\jdklink\jre\lib\jfxrt.jar;D:\Scala\jdklink\jre\lib\jsse.jar;D:\Scala\jdklink\jre\lib\management-agent.jar;D:\Scala\jdklink\jre\lib\plugin.jar;D:\Scala\jdklink\jre\lib\resources.jar;D:\Scala\jdklink\jre\lib\rt.jar;D:\Scala\jdklink\jre\lib\ext\access-bridge-64.jar;D:\Scala\jdklink\jre\lib\ext\dnsns.jar;D:\Scala\jdklink\jre\lib\ext\jaccess.jar;D:\Scala\jdklink\jre\lib\ext\localedata.jar;D:\Scala\jdklink\jre\lib\ext\sunec.jar;D:\Scala\jdklink\jre\lib\ext\sunjce_provider.jar;D:\Scala\jdklink\jre\lib\ext\sunmscapi.jar;D:\Scala\jdklink\jre\lib\ext\zipfs.jar;D:\Repositories\random-proj-demo\v4\random-projections-at-berlinbuzzwords\out\production\random-projections-at-berlinbuzzwords;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-library\2.11.4\734ac63e470706015ea786f7780c80db49f001a4\scala-library-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-compiler\2.11.4\fa6eaeeecc9c6080d4b2f407f207339f2ff97ad7\scala-compiler-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.googlecode.matrix-toolkits-java\mtj\1.0.1\2972d710f730ef3d504fa92b7869c7b2f843e8dd\mtj-1.0.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-reflect\2.11.4\a212daed62de3d47034ea171dd3168a4dd85d08c\scala-reflect-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang.modules\scala-xml_2.11\1.0.2\820fbca7e524b530fdadc594c39d49a21ea0337e\scala-xml_2.11-1.0.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang.modules\scala-parser-combinators_2.11\1.0.2\ba0bbca656b10f235b6eb17a541e5d728c29040a\scala-parser-combinators_2.11-1.0.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\net.sourceforge.f2j\arpack_combined_all\0.1\225619a060b42605b4d9fd4af11815664abf26eb\arpack_combined_all-0.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\core\1.1.2\574b480eca62f535fad6d259e144fee3ef24b66e\core-1.1.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-osx-x86_64\1.1\80da53ec862f283dc3b191b9dbd3166ea6671831\netlib-native_ref-osx-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-x86_64\1.1\5a3e5787d03c39790d5ae08cce189dd1ccc4a38\netlib-native_ref-linux-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-i686\1.1\eedd845b214aea560bce317d778ebb52f8f46038\netlib-native_ref-linux-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-win-x86_64\1.1\4ab54511c2844546279d9f8e427c73953b794686\netlib-native_ref-win-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-win-i686\1.1\167fb794a26cb0bfc74890c704c7137b1d5b50fd\netlib-native_ref-win-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-armhf\1.1\ec467162f74710fd8897cff6888534ceaf297d9a\netlib-native_ref-linux-armhf-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-osx-x86_64\1.1\d724e33675dc8eaa5c8fcb05a3aaca6f3339afa7\netlib-native_system-osx-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-x86_64\1.1\163e88facabe7fa29952890dc2d3429e28501120\netlib-native_system-linux-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-i686\1.1\dd43225560dbd9115d306f9be3ca195aed236b78\netlib-native_system-linux-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-armhf\1.1\27ae9f6a9c88b3f8d12ffa52d62941615f8ed416\netlib-native_system-linux-armhf-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-win-x86_64\1.1\222c7915be1daf1c26a4206f375d4957ae5f9d81\netlib-native_system-win-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-win-i686\1.1\c25fd1881cf93f7716f47b7deec859f6b6b7be50\netlib-native_system-win-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\all\1.1.2\f235011206ac009adad2d6607f222649aba5ca9e\all-1.1.2.pom;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\native_ref-java\1.1\408c71ffbc3646dda7bee1e22bf19101e5e9ee90\native_ref-java-1.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\native_system-java\1.1\3c6a2455f96b354a6940dce1393abb35ed7641da\native_system-java-1.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil\jniloader\1.1\4840f897eeb54d67ee14e478f8a45cc9937f3ce1\jniloader-1.1.jar;D:\Program Files (x86)\JetBrains\IntelliJ IDEA Community Edition 14.1.4\lib\idea_rt.jar" com.intellij.rt.execution.application.AppMain com.stefansavev.fuzzysearchtest.GloveTest
-DataFrameView(400000, 100)
-Using SVD on the full data
-Nov 24, 2015 2:24:22 PM com.github.fommil.netlib.BLAS <clinit>
+D:\Scala\jdklink\bin\java -Xmx2G -Didea.launcher.port=7536 "-Didea.launcher.bin.path=D:\Program Files (x86)\JetBrains\IntelliJ IDEA Community Edition 14.1.4\bin" -Dfile.encoding=windows-1252 -classpath "D:\Scala\jdklink\jre\lib\charsets.jar;D:\Scala\jdklink\jre\lib\deploy.jar;D:\Scala\jdklink\jre\lib\javaws.jar;D:\Scala\jdklink\jre\lib\jce.jar;D:\Scala\jdklink\jre\lib\jfr.jar;D:\Scala\jdklink\jre\lib\jfxrt.jar;D:\Scala\jdklink\jre\lib\jsse.jar;D:\Scala\jdklink\jre\lib\management-agent.jar;D:\Scala\jdklink\jre\lib\plugin.jar;D:\Scala\jdklink\jre\lib\resources.jar;D:\Scala\jdklink\jre\lib\rt.jar;D:\Scala\jdklink\jre\lib\ext\access-bridge-64.jar;D:\Scala\jdklink\jre\lib\ext\dnsns.jar;D:\Scala\jdklink\jre\lib\ext\jaccess.jar;D:\Scala\jdklink\jre\lib\ext\localedata.jar;D:\Scala\jdklink\jre\lib\ext\sunec.jar;D:\Scala\jdklink\jre\lib\ext\sunjce_provider.jar;D:\Scala\jdklink\jre\lib\ext\sunmscapi.jar;D:\Scala\jdklink\jre\lib\ext\zipfs.jar;D:\Repositories\random-proj-demo\v4\random-projections-at-berlinbuzzwords\out\production\random-projections-at-berlinbuzzwords;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-library\2.11.4\734ac63e470706015ea786f7780c80db49f001a4\scala-library-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-compiler\2.11.4\fa6eaeeecc9c6080d4b2f407f207339f2ff97ad7\scala-compiler-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.googlecode.matrix-toolkits-java\mtj\1.0.1\2972d710f730ef3d504fa92b7869c7b2f843e8dd\mtj-1.0.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang\scala-reflect\2.11.4\a212daed62de3d47034ea171dd3168a4dd85d08c\scala-reflect-2.11.4.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang.modules\scala-xml_2.11\1.0.2\820fbca7e524b530fdadc594c39d49a21ea0337e\scala-xml_2.11-1.0.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\org.scala-lang.modules\scala-parser-combinators_2.11\1.0.2\ba0bbca656b10f235b6eb17a541e5d728c29040a\scala-parser-combinators_2.11-1.0.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\net.sourceforge.f2j\arpack_combined_all\0.1\225619a060b42605b4d9fd4af11815664abf26eb\arpack_combined_all-0.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\core\1.1.2\574b480eca62f535fad6d259e144fee3ef24b66e\core-1.1.2.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-osx-x86_64\1.1\80da53ec862f283dc3b191b9dbd3166ea6671831\netlib-native_ref-osx-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-x86_64\1.1\5a3e5787d03c39790d5ae08cce189dd1ccc4a38\netlib-native_ref-linux-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-i686\1.1\eedd845b214aea560bce317d778ebb52f8f46038\netlib-native_ref-linux-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-win-x86_64\1.1\4ab54511c2844546279d9f8e427c73953b794686\netlib-native_ref-win-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-win-i686\1.1\167fb794a26cb0bfc74890c704c7137b1d5b50fd\netlib-native_ref-win-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_ref-linux-armhf\1.1\ec467162f74710fd8897cff6888534ceaf297d9a\netlib-native_ref-linux-armhf-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-osx-x86_64\1.1\d724e33675dc8eaa5c8fcb05a3aaca6f3339afa7\netlib-native_system-osx-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-x86_64\1.1\163e88facabe7fa29952890dc2d3429e28501120\netlib-native_system-linux-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-i686\1.1\dd43225560dbd9115d306f9be3ca195aed236b78\netlib-native_system-linux-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-linux-armhf\1.1\27ae9f6a9c88b3f8d12ffa52d62941615f8ed416\netlib-native_system-linux-armhf-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-win-x86_64\1.1\222c7915be1daf1c26a4206f375d4957ae5f9d81\netlib-native_system-win-x86_64-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\netlib-native_system-win-i686\1.1\c25fd1881cf93f7716f47b7deec859f6b6b7be50\netlib-native_system-win-i686-1.1-natives.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\all\1.1.2\f235011206ac009adad2d6607f222649aba5ca9e\all-1.1.2.pom;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\native_ref-java\1.1\408c71ffbc3646dda7bee1e22bf19101e5e9ee90\native_ref-java-1.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil.netlib\native_system-java\1.1\3c6a2455f96b354a6940dce1393abb35ed7641da\native_system-java-1.1.jar;D:\Users\stefan\.gradle\caches\modules-2\files-2.1\com.github.fommil\jniloader\1.1\4840f897eeb54d67ee14e478f8a45cc9937f3ce1\jniloader-1.1.jar;D:\Program Files (x86)\JetBrains\IntelliJ IDEA Community Edition 14.1.4\lib\idea_rt.jar" com.intellij.rt.execution.application.AppMain com.stefansavev.fuzzysearchtest.GloveTest
+FILE TO BE DELETED C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_0
+FILE TO BE DELETED C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_1
+FILE TO BE DELETED C:\tmp\output-index-glove\fuzzysearch_signature_partitions_8686116\_signature_partition_0
+FILE TO BE DELETED C:\tmp\output-index-glove\fuzzysearch_signature_partitions_8686116\_signature_partition_1
+Nov 28, 2015 12:02:07 PM com.github.fommil.netlib.BLAS <clinit>
 WARNING: Failed to load implementation from: com.github.fommil.netlib.NativeSystemBLAS
-Nov 24, 2015 2:24:23 PM com.github.fommil.jni.JniLoader liberalLoad
-INFO: successfully loaded D:\Users\stefan\AppData\Local\Temp\jniloader8135191593916895198netlib-native_ref-win-x86_64.dll
-Nov 24, 2015 2:24:29 PM com.github.fommil.netlib.LAPACK <clinit>
+Nov 28, 2015 12:02:09 PM com.github.fommil.jni.JniLoader liberalLoad
+INFO: successfully loaded D:\Users\stefan\AppData\Local\Temp\jniloader21536782925614889netlib-native_ref-win-x86_64.dll
+Writing signature partitioned file:C:\tmp\output-index-glove\fuzzysearch_signature_partitions_8686116\_signature_partition_0
+saving partition 131072
+#output file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_0
+Writing signature partitioned file:C:\tmp\output-index-glove\fuzzysearch_signature_partitions_8686116\_signature_partition_1
+saving partition 131072
+#output file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_1
+Writing signature partitioned file:C:\tmp\output-index-glove\fuzzysearch_signature_partitions_8686116\_signature_partition_2
+saving partition 131072
+#output file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_2
+saving partition 6784
+#output file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_3
+numPointsInPartition 131072
+Nov 28, 2015 12:03:40 PM com.github.fommil.netlib.LAPACK <clinit>
 WARNING: Failed to load implementation from: com.github.fommil.netlib.NativeSystemLAPACK
-Nov 24, 2015 2:24:29 PM com.github.fommil.jni.JniLoader load
+Nov 28, 2015 12:03:40 PM com.github.fommil.jni.JniLoader load
 INFO: already loaded netlib-native_ref-win-x86_64.dll
+DataFrameView(400000, 100)
+Writing signature partitioned file:C:\tmp\output-index-glove\fuzzysearch_signature_partitions_8686116\_signature_partition_3
 Started transformation with SVD
+Loading file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_0
 Processed 0 rows
 Processed 5000 rows
 Processed 10000 rows
@@ -37,6 +54,7 @@ Processed 115000 rows
 Processed 120000 rows
 Processed 125000 rows
 Processed 130000 rows
+Loading file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_1
 Processed 135000 rows
 Processed 140000 rows
 Processed 145000 rows
@@ -63,6 +81,7 @@ Processed 245000 rows
 Processed 250000 rows
 Processed 255000 rows
 Processed 260000 rows
+Loading file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_2
 Processed 265000 rows
 Processed 270000 rows
 Processed 275000 rows
@@ -89,331 +108,862 @@ Processed 375000 rows
 Processed 380000 rows
 Processed 385000 rows
 Processed 390000 rows
+Loading file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_3
 Processed 395000 rows
 Finished transformation with SVD
-#storage of tree: 0.10161590576171875 MB
-Time for 'Build tree 0' 2.523 secs.
-#storage of tree: 0.10192680358886719 MB
-Time for 'Build tree 1' 592 ms.
-#storage of tree: 0.10099029541015625 MB
-Time for 'Build tree 2' 492 ms.
-#storage of tree: 0.10156631469726562 MB
-Time for 'Build tree 3' 483 ms.
-#storage of tree: 0.10173606872558594 MB
-Time for 'Build tree 4' 486 ms.
-#storage of tree: 0.1011505126953125 MB
-Time for 'Build tree 5' 477 ms.
-#storage of tree: 0.10091781616210938 MB
-Time for 'Build tree 6' 476 ms.
-#storage of tree: 0.10067939758300781 MB
-Time for 'Build tree 7' 475 ms.
-#storage of tree: 0.10109901428222656 MB
-Time for 'Build tree 8' 474 ms.
-#storage of tree: 0.1015167236328125 MB
-Time for 'Build tree 9' 477 ms.
-#storage of tree: 0.10181045532226562 MB
-Time for 'Build tree 10' 484 ms.
-#storage of tree: 0.10124969482421875 MB
-Time for 'Build tree 11' 472 ms.
-#storage of tree: 0.10089874267578125 MB
-Time for 'Build tree 12' 466 ms.
-#storage of tree: 0.10010910034179688 MB
-Time for 'Build tree 13' 476 ms.
-#storage of tree: 0.10051727294921875 MB
-Time for 'Build tree 14' 465 ms.
-#storage of tree: 0.10258674621582031 MB
-Time for 'Build tree 15' 469 ms.
-#storage of tree: 0.10134696960449219 MB
-Time for 'Build tree 16' 479 ms.
-#storage of tree: 0.101043701171875 MB
-Time for 'Build tree 17' 522 ms.
-#storage of tree: 0.10058021545410156 MB
-Time for 'Build tree 18' 488 ms.
-#storage of tree: 0.10064125061035156 MB
-Time for 'Build tree 19' 471 ms.
-#storage of tree: 0.10098648071289062 MB
-Time for 'Build tree 20' 497 ms.
-#storage of tree: 0.09996795654296875 MB
-Time for 'Build tree 21' 482 ms.
-#storage of tree: 0.10077285766601562 MB
-Time for 'Build tree 22' 472 ms.
-#storage of tree: 0.10241317749023438 MB
-Time for 'Build tree 23' 479 ms.
-#storage of tree: 0.10076141357421875 MB
-Time for 'Build tree 24' 484 ms.
-#storage of tree: 0.10125923156738281 MB
-Time for 'Build tree 25' 477 ms.
-#storage of tree: 0.10118293762207031 MB
-Time for 'Build tree 26' 484 ms.
-#storage of tree: 0.10175514221191406 MB
-Time for 'Build tree 27' 478 ms.
-#storage of tree: 0.1021575927734375 MB
-Time for 'Build tree 28' 505 ms.
-#storage of tree: 0.10135459899902344 MB
-Time for 'Build tree 29' 481 ms.
-#storage of tree: 0.10161590576171875 MB
-Time for 'Build tree 30' 473 ms.
-#storage of tree: 0.10046577453613281 MB
-Time for 'Build tree 31' 499 ms.
-#storage of tree: 0.10056877136230469 MB
-Time for 'Build tree 32' 470 ms.
-#storage of tree: 0.10159873962402344 MB
-Time for 'Build tree 33' 479 ms.
-#storage of tree: 0.10091209411621094 MB
-Time for 'Build tree 34' 471 ms.
-#storage of tree: 0.101776123046875 MB
-Time for 'Build tree 35' 476 ms.
-#storage of tree: 0.09998703002929688 MB
-Time for 'Build tree 36' 480 ms.
-#storage of tree: 0.1008148193359375 MB
-Time for 'Build tree 37' 474 ms.
-#storage of tree: 0.10082244873046875 MB
-Time for 'Build tree 38' 465 ms.
-#storage of tree: 0.10096168518066406 MB
-Time for 'Build tree 39' 485 ms.
-#storage of tree: 0.10058403015136719 MB
-Time for 'Build tree 40' 477 ms.
-#storage of tree: 0.09968948364257812 MB
-Time for 'Build tree 41' 483 ms.
-#storage of tree: 0.10052490234375 MB
-Time for 'Build tree 42' 481 ms.
-#storage of tree: 0.10140228271484375 MB
-Time for 'Build tree 43' 471 ms.
-#storage of tree: 0.10150527954101562 MB
-Time for 'Build tree 44' 469 ms.
-#storage of tree: 0.10162544250488281 MB
-Time for 'Build tree 45' 478 ms.
-#storage of tree: 0.10178375244140625 MB
-Time for 'Build tree 46' 499 ms.
-#storage of tree: 0.10036468505859375 MB
-Time for 'Build tree 47' 491 ms.
-#storage of tree: 0.10139656066894531 MB
-Time for 'Build tree 48' 482 ms.
-#storage of tree: 0.10209465026855469 MB
-Time for 'Build tree 49' 475 ms.
-#storage of tree: 0.10033226013183594 MB
-Time for 'Build tree 50' 482 ms.
-#storage of tree: 0.100738525390625 MB
-Time for 'Build tree 51' 473 ms.
-#storage of tree: 0.10068511962890625 MB
-Time for 'Build tree 52' 468 ms.
-#storage of tree: 0.10065650939941406 MB
-Time for 'Build tree 53' 483 ms.
-#storage of tree: 0.10023880004882812 MB
-Time for 'Build tree 54' 475 ms.
-#storage of tree: 0.10154151916503906 MB
-Time for 'Build tree 55' 480 ms.
-#storage of tree: 0.10199546813964844 MB
-Time for 'Build tree 56' 477 ms.
-#storage of tree: 0.10150718688964844 MB
-Time for 'Build tree 57' 476 ms.
-#storage of tree: 0.10149574279785156 MB
-Time for 'Build tree 58' 472 ms.
-#storage of tree: 0.10111427307128906 MB
-Time for 'Build tree 59' 484 ms.
-#storage of tree: 0.10004425048828125 MB
-Time for 'Build tree 60' 475 ms.
-#storage of tree: 0.100860595703125 MB
-Time for 'Build tree 61' 483 ms.
-#storage of tree: 0.10099411010742188 MB
-Time for 'Build tree 62' 478 ms.
-#storage of tree: 0.1009674072265625 MB
-Time for 'Build tree 63' 665 ms.
-#storage of tree: 0.10081672668457031 MB
-Time for 'Build tree 64' 489 ms.
-#storage of tree: 0.10029411315917969 MB
-Time for 'Build tree 65' 477 ms.
-#storage of tree: 0.10063552856445312 MB
-Time for 'Build tree 66' 484 ms.
-#storage of tree: 0.10109138488769531 MB
-Time for 'Build tree 67' 472 ms.
-#storage of tree: 0.10176658630371094 MB
-Time for 'Build tree 68' 480 ms.
-#storage of tree: 0.10117340087890625 MB
-Time for 'Build tree 69' 470 ms.
-#storage of tree: 0.10157203674316406 MB
-Time for 'Build tree 70' 475 ms.
-#storage of tree: 0.10113143920898438 MB
-Time for 'Build tree 71' 470 ms.
-#storage of tree: 0.10028839111328125 MB
-Time for 'Build tree 72' 494 ms.
-#storage of tree: 0.10230636596679688 MB
-Time for 'Build tree 73' 473 ms.
-#storage of tree: 0.10134315490722656 MB
-Time for 'Build tree 74' 490 ms.
-#storage of tree: 0.10079765319824219 MB
-Time for 'Build tree 75' 472 ms.
-#storage of tree: 0.10088729858398438 MB
-Time for 'Build tree 76' 472 ms.
-#storage of tree: 0.10053634643554688 MB
-Time for 'Build tree 77' 475 ms.
-#storage of tree: 0.10084724426269531 MB
-Time for 'Build tree 78' 473 ms.
-#storage of tree: 0.10025405883789062 MB
-Time for 'Build tree 79' 486 ms.
-#storage of tree: 0.10110664367675781 MB
-Time for 'Build tree 80' 465 ms.
-#storage of tree: 0.100677490234375 MB
-Time for 'Build tree 81' 495 ms.
-#storage of tree: 0.10031700134277344 MB
-Time for 'Build tree 82' 467 ms.
-#storage of tree: 0.10100936889648438 MB
-Time for 'Build tree 83' 535 ms.
-#storage of tree: 0.10107994079589844 MB
-Time for 'Build tree 84' 488 ms.
-#storage of tree: 0.10094833374023438 MB
-Time for 'Build tree 85' 480 ms.
-#storage of tree: 0.09956741333007812 MB
-Time for 'Build tree 86' 518 ms.
-#storage of tree: 0.10072898864746094 MB
-Time for 'Build tree 87' 479 ms.
-#storage of tree: 0.10144805908203125 MB
-Time for 'Build tree 88' 494 ms.
-#storage of tree: 0.10017013549804688 MB
-Time for 'Build tree 89' 487 ms.
-#storage of tree: 0.10067176818847656 MB
-Time for 'Build tree 90' 467 ms.
-#storage of tree: 0.10039329528808594 MB
-Time for 'Build tree 91' 484 ms.
-#storage of tree: 0.10171890258789062 MB
-Time for 'Build tree 92' 476 ms.
-#storage of tree: 0.10004806518554688 MB
-Time for 'Build tree 93' 480 ms.
-#storage of tree: 0.10138893127441406 MB
-Time for 'Build tree 94' 483 ms.
-#storage of tree: 0.10041618347167969 MB
-Time for 'Build tree 95' 680 ms.
-#storage of tree: 0.10135078430175781 MB
-Time for 'Build tree 96' 482 ms.
-#storage of tree: 0.10077667236328125 MB
-Time for 'Build tree 97' 489 ms.
-#storage of tree: 0.10128021240234375 MB
-Time for 'Build tree 98' 484 ms.
-#storage of tree: 0.10054206848144531 MB
-Time for 'Build tree 99' 479 ms.
-#storage of tree: 0.10035514831542969 MB
-Time for 'Build tree 100' 508 ms.
-#storage of tree: 0.10167694091796875 MB
-Time for 'Build tree 101' 541 ms.
-#storage of tree: 0.10052299499511719 MB
-Time for 'Build tree 102' 482 ms.
-#storage of tree: 0.10052680969238281 MB
-Time for 'Build tree 103' 490 ms.
-#storage of tree: 0.10144805908203125 MB
-Time for 'Build tree 104' 689 ms.
-#storage of tree: 0.10117912292480469 MB
-Time for 'Build tree 105' 478 ms.
-#storage of tree: 0.10162162780761719 MB
-Time for 'Build tree 106' 473 ms.
-#storage of tree: 0.09999847412109375 MB
-Time for 'Build tree 107' 474 ms.
-#storage of tree: 0.10150718688964844 MB
-Time for 'Build tree 108' 479 ms.
-#storage of tree: 0.10194587707519531 MB
-Time for 'Build tree 109' 494 ms.
-#storage of tree: 0.10007858276367188 MB
-Time for 'Build tree 110' 470 ms.
-#storage of tree: 0.10062217712402344 MB
-Time for 'Build tree 111' 537 ms.
-#storage of tree: 0.10152053833007812 MB
-Time for 'Build tree 112' 594 ms.
-#storage of tree: 0.10173225402832031 MB
-Time for 'Build tree 113' 671 ms.
-#storage of tree: 0.1002349853515625 MB
-Time for 'Build tree 114' 497 ms.
-#storage of tree: 0.10147285461425781 MB
-Time for 'Build tree 115' 483 ms.
-#storage of tree: 0.10056114196777344 MB
-Time for 'Build tree 116' 480 ms.
-#storage of tree: 0.10112762451171875 MB
-Time for 'Build tree 117' 472 ms.
-#storage of tree: 0.101226806640625 MB
-Time for 'Build tree 118' 478 ms.
-#storage of tree: 0.1008453369140625 MB
-Time for 'Build tree 119' 483 ms.
-#storage of tree: 0.10164070129394531 MB
-Time for 'Build tree 120' 472 ms.
-#storage of tree: 0.10128593444824219 MB
-Time for 'Build tree 121' 473 ms.
-#storage of tree: 0.10169410705566406 MB
-Time for 'Build tree 122' 667 ms.
-#storage of tree: 0.10164642333984375 MB
-Time for 'Build tree 123' 472 ms.
-#storage of tree: 0.10216140747070312 MB
-Time for 'Build tree 124' 487 ms.
-#storage of tree: 0.09975814819335938 MB
-Time for 'Build tree 125' 470 ms.
-#storage of tree: 0.100738525390625 MB
-Time for 'Build tree 126' 473 ms.
-#storage of tree: 0.10052871704101562 MB
-Time for 'Build tree 127' 469 ms.
-#storage of tree: 0.10089111328125 MB
-Time for 'Build tree 128' 476 ms.
-#storage of tree: 0.10099220275878906 MB
-Time for 'Build tree 129' 478 ms.
-#storage of tree: 0.10155868530273438 MB
-Time for 'Build tree 130' 486 ms.
-#storage of tree: 0.09987258911132812 MB
-Time for 'Build tree 131' 653 ms.
-#storage of tree: 0.10220718383789062 MB
-Time for 'Build tree 132' 476 ms.
-#storage of tree: 0.10017204284667969 MB
-Time for 'Build tree 133' 478 ms.
-#storage of tree: 0.10086250305175781 MB
-Time for 'Build tree 134' 472 ms.
-#storage of tree: 0.10195541381835938 MB
-Time for 'Build tree 135' 484 ms.
-#storage of tree: 0.1010894775390625 MB
-Time for 'Build tree 136' 483 ms.
-#storage of tree: 0.10087203979492188 MB
-Time for 'Build tree 137' 477 ms.
+#storage of tree: 0.10016632080078125 MB
+Time for 'Build tree 0' 965 ms.
+#storage of tree: 0.10010528564453125 MB
+Time for 'Build tree 1' 593 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_0
+#storage of tree: 0.10078048706054688 MB
+Time for 'Build tree 2' 544 ms.
+#storage of tree: 0.09933090209960938 MB
+Time for 'Build tree 3' 515 ms.
+#storage of tree: 0.10013008117675781 MB
+Time for 'Build tree 4' 500 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_1
+#storage of tree: 0.099761962890625 MB
+Time for 'Build tree 5' 594 ms.
+#storage of tree: 0.09932708740234375 MB
+Time for 'Build tree 6' 491 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_2
+#storage of tree: 0.1000213623046875 MB
+Time for 'Build tree 7' 524 ms.
+#storage of tree: 0.10031509399414062 MB
+Time for 'Build tree 8' 493 ms.
+#storage of tree: 0.10101509094238281 MB
+Time for 'Build tree 9' 498 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_3
+#storage of tree: 0.09960365295410156 MB
+Time for 'Build tree 10' 599 ms.
+#storage of tree: 0.09995079040527344 MB
+Time for 'Build tree 11' 495 ms.
+#storage of tree: 0.10167312622070312 MB
+Time for 'Build tree 12' 493 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_4
+#storage of tree: 0.09962654113769531 MB
+Time for 'Build tree 13' 512 ms.
+#storage of tree: 0.10015106201171875 MB
+Time for 'Build tree 14' 469 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_5
+#storage of tree: 0.10039901733398438 MB
+Time for 'Build tree 15' 540 ms.
+#storage of tree: 0.09997367858886719 MB
+Time for 'Build tree 16' 487 ms.
+#storage of tree: 0.10085487365722656 MB
+Time for 'Build tree 17' 491 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_6
+#storage of tree: 0.09822463989257812 MB
+Time for 'Build tree 18' 591 ms.
+#storage of tree: 0.10058784484863281 MB
+Time for 'Build tree 19' 489 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_7
+#storage of tree: 0.10020065307617188 MB
+Time for 'Build tree 20' 556 ms.
 #storage of tree: 0.10097503662109375 MB
-Time for 'Build tree 138' 484 ms.
-#storage of tree: 0.10037422180175781 MB
-Time for 'Build tree 139' 484 ms.
-#storage of tree: 0.10236740112304688 MB
-Time for 'Build tree 140' 648 ms.
-#storage of tree: 0.10141181945800781 MB
-Time for 'Build tree 141' 472 ms.
-#storage of tree: 0.10173606872558594 MB
-Time for 'Build tree 142' 499 ms.
-#storage of tree: 0.10103607177734375 MB
-Time for 'Build tree 143' 498 ms.
-#storage of tree: 0.10142135620117188 MB
-Time for 'Build tree 144' 462 ms.
-#storage of tree: 0.10176849365234375 MB
-Time for 'Build tree 145' 485 ms.
-#storage of tree: 0.10172271728515625 MB
-Time for 'Build tree 146' 483 ms.
-#storage of tree: 0.1015167236328125 MB
-Time for 'Build tree 147' 486 ms.
-#storage of tree: 0.10087203979492188 MB
-Time for 'Build tree 148' 477 ms.
-#storage of tree: 0.10122108459472656 MB
-Time for 'Build tree 149' 652 ms.
-Time for 'Create trees' 156.633 secs.
-Total search time in secs.: 5.311
+Time for 'Build tree 21' 472 ms.
+#storage of tree: 0.09984397888183594 MB
+Time for 'Build tree 22' 486 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_8
+#storage of tree: 0.0999755859375 MB
+Time for 'Build tree 23' 537 ms.
+#storage of tree: 0.0994415283203125 MB
+Time for 'Build tree 24' 473 ms.
+#storage of tree: 0.10113525390625 MB
+Time for 'Build tree 25' 506 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_9
+#storage of tree: 0.09917831420898438 MB
+Time for 'Build tree 26' 509 ms.
+#storage of tree: 0.09959793090820312 MB
+Time for 'Build tree 27' 471 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_10
+#storage of tree: 0.10087776184082031 MB
+Time for 'Build tree 28' 526 ms.
+#storage of tree: 0.09991455078125 MB
+Time for 'Build tree 29' 524 ms.
+#storage of tree: 0.09920501708984375 MB
+Time for 'Build tree 30' 481 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_11
+#storage of tree: 0.10030364990234375 MB
+Time for 'Build tree 31' 571 ms.
+#storage of tree: 0.09900093078613281 MB
+Time for 'Build tree 32' 478 ms.
+#storage of tree: 0.100677490234375 MB
+Time for 'Build tree 33' 488 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_12
+#storage of tree: 0.10092353820800781 MB
+Time for 'Build tree 34' 531 ms.
+#storage of tree: 0.10036468505859375 MB
+Time for 'Build tree 35' 483 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_13
+#storage of tree: 0.09956550598144531 MB
+Time for 'Build tree 36' 538 ms.
+#storage of tree: 0.10000801086425781 MB
+Time for 'Build tree 37' 484 ms.
+#storage of tree: 0.10024452209472656 MB
+Time for 'Build tree 38' 484 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_14
+#storage of tree: 0.1002349853515625 MB
+Time for 'Build tree 39' 530 ms.
+#storage of tree: 0.09881401062011719 MB
+Time for 'Build tree 40' 481 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_15
+#storage of tree: 0.10002517700195312 MB
+Time for 'Build tree 41' 612 ms.
+#storage of tree: 0.09955024719238281 MB
+Time for 'Build tree 42' 493 ms.
+#storage of tree: 0.09970855712890625 MB
+Time for 'Build tree 43' 486 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_16
+#storage of tree: 0.10072135925292969 MB
+Time for 'Build tree 44' 568 ms.
+#storage of tree: 0.10079193115234375 MB
+Time for 'Build tree 45' 485 ms.
+#storage of tree: 0.10104560852050781 MB
+Time for 'Build tree 46' 479 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_17
+#storage of tree: 0.10087013244628906 MB
+Time for 'Build tree 47' 542 ms.
+#storage of tree: 0.10000991821289062 MB
+Time for 'Build tree 48' 488 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_18
+#storage of tree: 0.10050201416015625 MB
+Time for 'Build tree 49' 519 ms.
+#storage of tree: 0.10033035278320312 MB
+Time for 'Build tree 50' 483 ms.
+#storage of tree: 0.10025787353515625 MB
+Time for 'Build tree 51' 490 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_19
+#storage of tree: 0.10064888000488281 MB
+Time for 'Build tree 52' 616 ms.
+#storage of tree: 0.10020828247070312 MB
+Time for 'Build tree 53' 496 ms.
+#storage of tree: 0.09979248046875 MB
+Time for 'Build tree 54' 485 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_20
+#storage of tree: 0.10000038146972656 MB
+Time for 'Build tree 55' 533 ms.
+#storage of tree: 0.1001739501953125 MB
+Time for 'Build tree 56' 473 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_21
+#storage of tree: 0.10047340393066406 MB
+Time for 'Build tree 57' 522 ms.
+#storage of tree: 0.10035514831542969 MB
+Time for 'Build tree 58' 491 ms.
+#storage of tree: 0.10006523132324219 MB
+Time for 'Build tree 59' 492 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_22
+#storage of tree: 0.10012435913085938 MB
+Time for 'Build tree 60' 524 ms.
+#storage of tree: 0.09996414184570312 MB
+Time for 'Build tree 61' 489 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_23
+#storage of tree: 0.09910011291503906 MB
+Time for 'Build tree 62' 683 ms.
+#storage of tree: 0.10007095336914062 MB
+Time for 'Build tree 63' 485 ms.
+#storage of tree: 0.10165786743164062 MB
+Time for 'Build tree 64' 493 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_24
+#storage of tree: 0.10035514831542969 MB
+Time for 'Build tree 65' 509 ms.
+#storage of tree: 0.10012245178222656 MB
+Time for 'Build tree 66' 491 ms.
+#storage of tree: 0.0994720458984375 MB
+Time for 'Build tree 67' 476 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_25
+#storage of tree: 0.09966278076171875 MB
+Time for 'Build tree 68' 538 ms.
+#storage of tree: 0.09986495971679688 MB
+Time for 'Build tree 69' 498 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_26
+#storage of tree: 0.10017776489257812 MB
+Time for 'Build tree 70' 557 ms.
+#storage of tree: 0.10071182250976562 MB
+Time for 'Build tree 71' 489 ms.
+#storage of tree: 0.10035896301269531 MB
+Time for 'Build tree 72' 493 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_27
+#storage of tree: 0.10111427307128906 MB
+Time for 'Build tree 73' 602 ms.
+#storage of tree: 0.09998130798339844 MB
+Time for 'Build tree 74' 488 ms.
+#storage of tree: 0.10119056701660156 MB
+Time for 'Build tree 75' 495 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_28
+#storage of tree: 0.10053443908691406 MB
+Time for 'Build tree 76' 562 ms.
+#storage of tree: 0.09934043884277344 MB
+Time for 'Build tree 77' 499 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_29
+#storage of tree: 0.10054779052734375 MB
+Time for 'Build tree 78' 553 ms.
+#storage of tree: 0.10029220581054688 MB
+Time for 'Build tree 79' 495 ms.
+#storage of tree: 0.10020065307617188 MB
+Time for 'Build tree 80' 496 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_30
+#storage of tree: 0.09946060180664062 MB
+Time for 'Build tree 81' 543 ms.
+#storage of tree: 0.10040664672851562 MB
+Time for 'Build tree 82' 513 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_31
+#storage of tree: 0.09947967529296875 MB
+Time for 'Build tree 83' 577 ms.
+#storage of tree: 0.1013336181640625 MB
+Time for 'Build tree 84' 479 ms.
+#storage of tree: 0.09923934936523438 MB
+Time for 'Build tree 85' 488 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_32
+#storage of tree: 0.1010284423828125 MB
+Time for 'Build tree 86' 519 ms.
+#storage of tree: 0.10039520263671875 MB
+Time for 'Build tree 87' 493 ms.
+#storage of tree: 0.0994873046875 MB
+Time for 'Build tree 88' 492 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_33
+#storage of tree: 0.09990310668945312 MB
+Time for 'Build tree 89' 545 ms.
+#storage of tree: 0.10005950927734375 MB
+Time for 'Build tree 90' 491 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_34
+#storage of tree: 0.09988784790039062 MB
+Time for 'Build tree 91' 523 ms.
+#storage of tree: 0.10043525695800781 MB
+Time for 'Build tree 92' 485 ms.
+#storage of tree: 0.10070419311523438 MB
+Time for 'Build tree 93' 491 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_35
+#storage of tree: 0.09986495971679688 MB
+Time for 'Build tree 94' 667 ms.
+#storage of tree: 0.10079002380371094 MB
+Time for 'Build tree 95' 499 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_36
+#storage of tree: 0.100250244140625 MB
+Time for 'Build tree 96' 540 ms.
+#storage of tree: 0.1002349853515625 MB
+Time for 'Build tree 97' 487 ms.
+#storage of tree: 0.10101509094238281 MB
+Time for 'Build tree 98' 485 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_37
+#storage of tree: 0.10034561157226562 MB
+Time for 'Build tree 99' 538 ms.
+#storage of tree: 0.10028457641601562 MB
+Time for 'Build tree 100' 497 ms.
+#storage of tree: 0.09995841979980469 MB
+Time for 'Build tree 101' 524 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_38
+#storage of tree: 0.09899520874023438 MB
+Time for 'Build tree 102' 520 ms.
+#storage of tree: 0.10130882263183594 MB
+Time for 'Build tree 103' 486 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_39
+#storage of tree: 0.10033607482910156 MB
+Time for 'Build tree 104' 632 ms.
+#storage of tree: 0.10049247741699219 MB
+Time for 'Build tree 105' 496 ms.
+#storage of tree: 0.10077095031738281 MB
+Time for 'Build tree 106' 498 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_40
+#storage of tree: 0.09957122802734375 MB
+Time for 'Build tree 107' 543 ms.
+#storage of tree: 0.10025596618652344 MB
+Time for 'Build tree 108' 490 ms.
+#storage of tree: 0.10080718994140625 MB
+Time for 'Build tree 109' 488 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_41
+#storage of tree: 0.1007080078125 MB
+Time for 'Build tree 110' 543 ms.
+#storage of tree: 0.10056114196777344 MB
+Time for 'Build tree 111' 500 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_42
+#storage of tree: 0.09878349304199219 MB
+Time for 'Build tree 112' 512 ms.
+#storage of tree: 0.10092735290527344 MB
+Time for 'Build tree 113' 484 ms.
+#storage of tree: 0.10182380676269531 MB
+Time for 'Build tree 114' 479 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_43
+#storage of tree: 0.1000213623046875 MB
+Time for 'Build tree 115' 607 ms.
+#storage of tree: 0.10098457336425781 MB
+Time for 'Build tree 116' 524 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_44
+#storage of tree: 0.10074806213378906 MB
+Time for 'Build tree 117' 540 ms.
+#storage of tree: 0.0997467041015625 MB
+Time for 'Build tree 118' 471 ms.
+#storage of tree: 0.10069465637207031 MB
+Time for 'Build tree 119' 474 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_45
+#storage of tree: 0.09980010986328125 MB
+Time for 'Build tree 120' 538 ms.
+#storage of tree: 0.0989532470703125 MB
+Time for 'Build tree 121' 503 ms.
+#storage of tree: 0.10067176818847656 MB
+Time for 'Build tree 122' 494 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_46
+#storage of tree: 0.09912109375 MB
+Time for 'Build tree 123' 532 ms.
+#storage of tree: 0.10044097900390625 MB
+Time for 'Build tree 124' 482 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_47
+#storage of tree: 0.09976959228515625 MB
+Time for 'Build tree 125' 538 ms.
+#storage of tree: 0.1007843017578125 MB
+Time for 'Build tree 126' 484 ms.
+#storage of tree: 0.09979820251464844 MB
+Time for 'Build tree 127' 528 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_48
+#storage of tree: 0.10013961791992188 MB
+Time for 'Build tree 128' 526 ms.
+#storage of tree: 0.101104736328125 MB
+Time for 'Build tree 129' 489 ms.
+#storage of tree: 0.0994110107421875 MB
+Time for 'Build tree 130' 483 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_49
+#storage of tree: 0.099761962890625 MB
+Time for 'Build tree 131' 533 ms.
+#storage of tree: 0.10114097595214844 MB
+Time for 'Build tree 132' 490 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_50
+#storage of tree: 0.09971046447753906 MB
+Time for 'Build tree 133' 533 ms.
+#storage of tree: 0.10050582885742188 MB
+Time for 'Build tree 134' 485 ms.
+#storage of tree: 0.100921630859375 MB
+Time for 'Build tree 135' 484 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_51
+#storage of tree: 0.09824943542480469 MB
+Time for 'Build tree 136' 653 ms.
+#storage of tree: 0.0998382568359375 MB
+Time for 'Build tree 137' 485 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_52
+#storage of tree: 0.10142326354980469 MB
+Time for 'Build tree 138' 573 ms.
+#storage of tree: 0.0997314453125 MB
+Time for 'Build tree 139' 478 ms.
+#storage of tree: 0.10126495361328125 MB
+Time for 'Build tree 140' 478 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_53
+#storage of tree: 0.10149955749511719 MB
+Time for 'Build tree 141' 533 ms.
+#storage of tree: 0.09984970092773438 MB
+Time for 'Build tree 142' 481 ms.
+#storage of tree: 0.10088348388671875 MB
+Time for 'Build tree 143' 479 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_54
+#storage of tree: 0.09961509704589844 MB
+Time for 'Build tree 144' 518 ms.
+#storage of tree: 0.09951210021972656 MB
+Time for 'Build tree 145' 496 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_55
+#storage of tree: 0.09940719604492188 MB
+Time for 'Build tree 146' 507 ms.
+#storage of tree: 0.09970664978027344 MB
+Time for 'Build tree 147' 492 ms.
+#storage of tree: 0.10031509399414062 MB
+Time for 'Build tree 148' 494 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_56
+#storage of tree: 0.09922981262207031 MB
+Time for 'Build tree 149' 539 ms.
+Writing partial buckets to file :C:\tmp\output-index-glove\fuzzysearch_tree_partitions_8686116\_partition_57
+Time for 'Create trees' 99.509 secs.
+output.len: 2097152
+output.len: 2097152
+output.len: 2097152
+output.len: 108544
+com.stefansavev.randomprojections.implementation.RandomTrees
+ com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform
+  java.lang.Integer
+  java.lang.Integer memory: 4
+  java.lang.Integer
+  java.lang.Integer memory: 4
+  java.lang.Integer
+  java.lang.Integer memory: 4
+  java.lang.Integer
+  java.lang.Integer memory: 4
+  [D
+  [D memory: 25602 size: 3200
+ com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform memory: 25618
+ com.stefansavev.randomprojections.implementation.CosineOnOriginalDataDistanceEvaluator
+  java.lang.Integer
+  java.lang.Integer memory: 4
+ com.stefansavev.randomprojections.implementation.CosineOnOriginalDataDistanceEvaluator memory: 4
+ com.stefansavev.randomprojections.implementation.SignatureVectors
+  java.lang.Integer
+  java.lang.Integer memory: 4
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+   java.lang.Integer
+   java.lang.Integer memory: 4
+   [I
+   [I memory: 202 size: 100
+   [D
+   [D memory: 802 size: 100
+  com.stefansavev.randomprojections.datarepr.sparse.SparseVector memory: 1008
+ com.stefansavev.randomprojections.implementation.SignatureVectors memory: 16132
+ java.lang.Integer
+ java.lang.Integer memory: 4
+ java.lang.Integer
+ java.lang.Integer memory: 4
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420532
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420276
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423108
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417028
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420380
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418836
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417012
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419924
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421156
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424092
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418172
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419628
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 426852
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418268
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420468
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421508
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419724
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423420
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 412388
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422300
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420676
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423924
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419180
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419732
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417492
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424596
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 416388
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418148
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423516
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419476
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 416500
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421108
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 415644
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422676
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423708
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421364
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418012
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419868
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420860
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420820
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 414860
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419940
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417948
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418612
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422860
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423156
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424220
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423484
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419876
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421940
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421220
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420916
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422556
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420708
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418964
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419836
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420564
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421820
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421324
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420108
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420356
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419684
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 416060
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420132
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 426788
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421324
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420348
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417620
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418420
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419268
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420580
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422820
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421340
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424508
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419756
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424828
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422076
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417068
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422132
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421060
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420676
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417572
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421540
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417652
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 425428
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 416644
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424148
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421492
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417684
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419428
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420084
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419364
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421660
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422788
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419268
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423148
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420884
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420820
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424092
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421284
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421028
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419660
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 415620
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 425324
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421244
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421900
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423068
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418036
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420908
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423220
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422804
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422188
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 414732
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423724
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 427484
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419924
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423964
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422972
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418772
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422748
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418996
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 415444
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 422652
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 416148
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421684
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418868
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423124
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418988
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 420420
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424468
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417364
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418836
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 424620
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418620
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421956
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423700
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 412492
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419156
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 425804
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418708
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 425140
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 426124
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 419204
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 423540
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418220
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417788
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 417348
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 418604
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 421156
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot
+ com.stefansavev.randomprojections.implementation.RandomTreeNodeRoot memory: 416604
+com.stefansavev.randomprojections.implementation.RandomTrees memory: 63132356
+size of trees: 63132356
+numPointsInPartition 131072
+Loading file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_0
+Loading file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_1
+Loading file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_2
+Loading file: C:\tmp\output-index-glove\fuzzysearch_dataset_partitions_8686116\_dataset_partition_3
+Total search time in secs.: 4.715
 Num queries: 1000
-Time per query in ms.: 5.311
-Queries per sec.: 188.25301204819277
-Total search time in secs.: 55.161
+Time per query in ms.: 4.715
+Queries per sec.: 212.04410517387618
+Total search time in secs.: 4.104
 Num queries: 1000
-Time per query in ms.: 55.161
-Queries per sec.: 18.12842173960335
+Time per query in ms.: 4.104
+Queries per sec.: 243.605359317905
+Total search time in secs.: 4.054
+Num queries: 1000
+Time per query in ms.: 4.054
+Queries per sec.: 246.6091245376079
+Total search time in secs.: 55.375
+Num queries: 1000
+Time per query in ms.: 55.375
+Queries per sec.: 18.058364634498698
 ------------------------------
 Total queries: 1000
 Not-retrieved queries: 0
 Recalls from 1000 queries
-Recall@0: 96.09999999999991
-Recall@1: 95.04999999999997
-Recall@2: 93.7666666666666
-Recall@3: 93.22499999999987
-Recall@4: 92.74000000000001
-Recall@5: 92.29999999999993
-Recall@6: 91.92857142857137
-Recall@7: 91.57499999999996
-Recall@8: 91.25555555555562
-Recall@9: 90.9100000000001
-Recall@10: 90.63636363636365
+Recall@0: 95.59999999999997
+Recall@1: 94.55000000000004
+Recall@2: 93.93333333333344
+Recall@3: 93.44999999999995
+Recall@4: 92.6999999999999
+Recall@5: 92.25000000000009
+Recall@6: 91.91428571428588
+Recall@7: 91.53749999999997
+Recall@8: 91.33333333333331
+Recall@9: 90.9499999999999
+Recall@10: 90.69999999999996
 
 Process finished with exit code 0

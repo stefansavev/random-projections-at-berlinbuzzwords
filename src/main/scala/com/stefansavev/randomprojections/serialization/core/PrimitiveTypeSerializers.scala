@@ -15,8 +15,8 @@ object PrimitiveTypeSerializers {
       IntSerializer.read(inputStream)
     }
 
-    def sizeInBytes(input: Int): Long = {
-      4
+    def sizeInBytes(memoryTracker: MemoryTracker, input: Int): Long = {
+      MemoryTrackingUtils.withNestingInfo(memoryTracker, input, 4)
     }
   }
 
@@ -29,7 +29,7 @@ object PrimitiveTypeSerializers {
       StringSerializer.read(inputStream)
     }
 
-    def sizeInBytes(input: String): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: String): Long = {
       StringSerializer.sizeInBytes(input)
     }
   }
@@ -43,7 +43,7 @@ object PrimitiveTypeSerializers {
       DoubleSerializer.read(inputStream)
     }
 
-    def sizeInBytes(input: Double): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: Double): Long = {
       DoubleSerializer.sizeInBytes
     }
   }
@@ -57,8 +57,8 @@ object PrimitiveTypeSerializers {
       IntArraySerializer.read(inputStream)
     }
 
-    def sizeInBytes(input: SerializerType): Long = {
-      IntSerializer.sizeInBytes
+    def sizeInBytes(memoryTracker: MemoryTracker, input: SerializerType): Long = {
+      MemoryTrackingUtils.withNestingInfo(memoryTracker, input, IntArraySerializer.sizeInBytes(input))
     }
   }
 
@@ -71,8 +71,8 @@ object PrimitiveTypeSerializers {
       DoubleArraySerializer.read(inputStream)
     }
 
-    def sizeInBytes(input: SerializerType): Long = {
-      DoubleArraySerializer.sizeInBytes(input)
+    def sizeInBytes(memoryTracker: MemoryTracker, input: SerializerType): Long = {
+      MemoryTrackingUtils.withNestingInfo(memoryTracker, input, DoubleArraySerializer.sizeInBytes(input))
     }
   }
 
@@ -85,7 +85,7 @@ object PrimitiveTypeSerializers {
       ShortArraySerializer.read(inputStream)
     }
 
-    def sizeInBytes(input: SerializerType): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: SerializerType): Long = {
       ShortArraySerializer.sizeInBytes(input)
     }
   }
@@ -99,7 +99,7 @@ object PrimitiveTypeSerializers {
       FloatArraySerializer.read(inputStream)
     }
 
-    def sizeInBytes(input: SerializerType): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: SerializerType): Long = {
       FloatArraySerializer.sizeInBytes(input)
     }
   }
@@ -113,7 +113,7 @@ object PrimitiveTypeSerializers {
       ByteArraySerializer.read(inputStream)
     }
 
-    def sizeInBytes(input: SerializerType): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, input: SerializerType): Long = {
       ByteArraySerializer.sizeInBytes(input)
     }
   }

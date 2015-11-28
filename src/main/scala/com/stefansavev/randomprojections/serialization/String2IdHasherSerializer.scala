@@ -2,7 +2,7 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.randomprojections.serialization.core.TypedSerializer
+import com.stefansavev.randomprojections.serialization.core.{MemoryTracker, TypedSerializer}
 import com.stefansavev.randomprojections.utils.{StringIdHasherSettings, String2IdHasher}
 
 object String2IdHasherSerialization {
@@ -27,6 +27,21 @@ object String2IdHasherSerialization {
     }
 
     def fromBinary(inputStream: InputStream): String2IdHasher = {
+      /*just print memory usage
+      val maxValues = IntSerializer.read(inputStream)
+      val avgStringLen = IntSerializer.read(inputStream)
+      val numCollisions = IntSerializer.read(inputStream)
+      val numStrings = IntSerializer.read(inputStream)
+      var size = 0L
+      var i = 0
+      while(i < numStrings){
+        val str = StringSerializer.read(inputStream)
+        size += (1 + str.length*2)
+        i += 1
+      }
+      println("Strings size in MB: " + (size/(1024*1024)))
+      null
+      */
       val maxValues = IntSerializer.read(inputStream)
       val avgStringLen = IntSerializer.read(inputStream)
       val numCollisions = IntSerializer.read(inputStream)
@@ -46,7 +61,7 @@ object String2IdHasherSerialization {
       string2IdHasher
     }
 
-    def sizeInBytes(string2Id: String2IdHasher): Long = {
+    def sizeInBytes(memoryTracker: MemoryTracker, string2Id: String2IdHasher): Long = {
       //probably its stored more efficiently on disk than in memory
       if (string2Id == null){
         throw new IllegalStateException("string2IdHasher cannot be null")

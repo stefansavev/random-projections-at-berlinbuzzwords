@@ -4,7 +4,7 @@ import java.io.OutputStream
 
 import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeaderImpl, ColumnHeader}
 import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedIntSerializer
-import com.stefansavev.randomprojections.serialization.core.TypedSerializer
+import com.stefansavev.randomprojections.serialization.core.{MemoryTracker, TypedSerializer}
 
 object ColumnHeaderSerialization{
   implicit object ColumnHeaderSerializer extends TypedSerializer[ColumnHeader]{
@@ -18,8 +18,8 @@ object ColumnHeaderSerialization{
       new ColumnHeaderImpl(numCols, null, null, null, false)
     }
 
-    def sizeInBytes(input: ColumnHeader): Long = {
-      TypedIntSerializer.sizeInBytes(input.numCols)
+    def sizeInBytes(memoryTracker: MemoryTracker, input: ColumnHeader): Long = {
+      TypedIntSerializer.sizeInBytes(memoryTracker, input.numCols)
     }
   }
 }
