@@ -23,6 +23,7 @@ dependencies {
     compile 'org.scala-lang:scala-compiler:2.11.4'
     compile 'com.github.fommil.netlib:all:1.1.2'
     compile 'com.googlecode.matrix-toolkits-java:mtj:1.0.1'
+    compile 'com.typesafe.akka:akka-actor_2.11:2.3.14'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

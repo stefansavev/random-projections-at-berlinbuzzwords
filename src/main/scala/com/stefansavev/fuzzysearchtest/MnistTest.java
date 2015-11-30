@@ -24,7 +24,7 @@ public class MnistTest {
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 100;
-        int numTrees = 10;
+        int numTrees = 5;
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));

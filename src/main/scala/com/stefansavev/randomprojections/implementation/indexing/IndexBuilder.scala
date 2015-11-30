@@ -255,7 +255,7 @@ object IndexBuilder{
 
     //phase 2 place holder
     val newIndexes = PointIndexes(dataFrameView.indexes.indexes)
-    //!!!val rotatedDatasetPlaceHolder = new DataFrameView(newIndexes, datasetAfterSVD.rowStoredView)
+    val rotatedDatasetPlaceHolder = new DataFrameView(newIndexes, datasetAfterSVD.rowStoredView)
 
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
     //val (signatureVecs, signatures) = Signatures.computePointSignatures(settings.signatureSize, rnd, dataFrameView)
@@ -271,8 +271,8 @@ object IndexBuilder{
     for(i <- 0 until settings.numTrees){
       //phase 3: run fast trees
       val randomRotation = ProjectionStrategies.splitIntoKRandomProjection(k).build(settings, rnd, datasetAfterSVD)
-      //!!!val (rotationTransform, rotatedDataFrameView)= modifyDataFrame(rotatedDatasetPlaceHolder, randomRotation)
-      val (rotationTransform, rotatedDataFrameView) = modifyInPlace(datasetAfterSVD, randomRotation)
+      val (rotationTransform, rotatedDataFrameView)= modifyDataFrame(rotatedDatasetPlaceHolder, randomRotation)
+      //val (rotationTransform, rotatedDataFrameView) = modifyInPlace(datasetAfterSVD, randomRotation)
 
       val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, rotatedDataFrameView)
       val randomTree = Utils.timed(s"Build tree ${i}", {toEfficientlyStoredTree(buildTree(i, rnd, settings, rotatedDataFrameView, bucketCollector, splitStrategy, projStrategy, logger))}).result

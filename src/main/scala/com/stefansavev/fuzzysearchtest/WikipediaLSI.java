@@ -29,10 +29,13 @@ public class WikipediaLSI {
         int dataDimension = 128;
         int numTrees = 50;
         //create an indexer
+        /*
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees,
                                                 FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
-
+        */
+        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
+                FuzzySearchEngines.bruteForce (FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector
 
@@ -112,7 +115,7 @@ public class WikipediaLSI {
 
     public static void main(String[] args) throws Exception {
         String inputTextFile = "C:\\wikipedia-parsed\\lsi\\extracted\\wikipedia_lsi128.txt";
-        String indexFile = "C:/tmp/output-index-wikipedia-lsi/";
+        String indexFile = "C:/tmp/output-index-wikipedia-lsi-t1/";
 
         //buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);

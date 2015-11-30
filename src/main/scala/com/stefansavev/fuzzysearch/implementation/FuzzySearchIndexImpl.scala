@@ -28,13 +28,13 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
     val pq = new PriorityQueue[PointScore]()
     var j = 0
     val numRows = dataset.numRows
-    while(j < numRows) { //TODO: probably you want to process in a randomized order to make sure you don't insert too many itmes in pq
+    while(j < numRows){
       val score = dataset.cosineForNormalizedData(query, j)
       if (pq.size() < numNeighbors ){
         pq.add(new PointScore(j, score))
       }
       else{//it should be exactly k items in pq
-      val minAcceptedScore = pq.peek().score
+        val minAcceptedScore = pq.peek().score
         if (score > minAcceptedScore){
           pq.remove() //remove min
           pq.add(new PointScore(j, score))

@@ -135,8 +135,8 @@ class EfficientlyStoredTreeBucketSearchStrategy(datasetSplitStrategy: DatasetSpl
 
   def getBucketIndexes(randomTrees: RandomTrees, inputQuery: Array[Double], scratchBuffer: NearestNeigbhorQueryScratchBuffer): SearchBucketsResult = {
     val numberOfRequiredPointsPerTree = settings.numberOfRequiredPointsPerTree
-    //!!!val query = randomTrees.dimReductionTransform.transformQuery(inputQuery)
-    var query = randomTrees.dimReductionTransform.transformQuery(inputQuery)
+    val query = randomTrees.dimReductionTransform.transformQuery(inputQuery)
+    //var query = randomTrees.dimReductionTransform.transformQuery(inputQuery)
     val enableGreedy = settings.enableGreedy
     val datasetSplitStrategy = this.datasetSplitStrategy
     PerformanceCounters.numberOfRequiredPointsPerTree(numberOfRequiredPointsPerTree)
@@ -150,7 +150,7 @@ class EfficientlyStoredTreeBucketSearchStrategy(datasetSplitStrategy: DatasetSpl
       val (childTree, modifiedQuery) = tree match {
         case root: RandomTreeNodeRoot => {
           val rotatedQuery = root.modifyQuery(query__1)
-          query = rotatedQuery //!!! overwrite
+          //do not overwrite query = rotatedQuery //!!! overwrite
           (root.child, rotatedQuery)
         }
         case _ => (tree, query__1)

@@ -78,6 +78,32 @@ trait TypedSerializer[T]{
   def sizeInBytes(memoryTracker: MemoryTracker, input: T): Long
 }
 
+/*
+class TypedIntResult{
+  def asyncRead(input: Stream){
+    let! i = input.readAsync() //input.readAsync(fun (intValue, state) => {
+
+    })
+    input.onRead(4, (bytes, from, to) => {
+      //convert to int
+
+    })
+  }
+}
+
+class TypedTuple2{
+  cont :: ((a -> r) -> r) -> Cont r a
+  def asyncRead(state0: Stream)(cont: A => R]): R{
+    state0.asyncRead((value1, state1) => {
+      state1.asyncRead((value2, state3) => {
+        cont((value1, value2), state3)
+      }
+    })
+  }
+}
+
+
+ */
 object Core{
   /* moved to TupleSerializers via code autogen, left here as an example only
   class Tuple2Serializer[A, B](serA: TypedSerializer[A], serB: TypedSerializer[B]) extends TypedSerializer[(A, B)] {

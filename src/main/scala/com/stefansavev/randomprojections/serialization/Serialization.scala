@@ -2,6 +2,8 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io._
 import java.nio.ByteBuffer
+import com.stefansavev.randomprojections.actors
+import com.stefansavev.randomprojections.actors.AsyncReaderUtils
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReductionTransform}
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform
@@ -341,6 +343,49 @@ object ShortArraySerializer{
   }
 }
 
+class AsyncLongArraySerializer(output: Array[Long], offset: Int){
+  //output = request how much more
+  var state = 0
+  var remainingElements = 0
+  var outputPos: Int = offset
+
+  def readNextItems(buffer: ByteBuffer, n: Int): Unit = {
+    var i = 0
+    var j = outputPos
+    val output = this.output
+    while(i < n){
+      output(j) = buffer.getLong
+      i += 1
+      j += 1
+    }
+    outputPos = j
+    remainingElements -= n
+  }
+
+  def process(bytes: Array[Byte], fromPos: Int, toPos: Int): Int = {
+    val buffer = ByteBuffer.wrap(bytes)
+    buffer.position(fromPos)
+    if (state == 0){
+      remainingElements = buffer.getInt
+      if (remainingElements < 0){
+        Utils.internalError()
+      }
+      state = 1
+      val available = Math.min((toPos - fromPos - 4)/8 , remainingElements)
+      readNextItems(buffer, available)
+      8*(remainingElements - available)
+    }
+    else{
+      val available = Math.min((toPos - fromPos)/8, remainingElements)
+      readNextItems(buffer, available)
+      8*(remainingElements - available)
+    }
+  }
+
+  def getArray(): Array[Long] = output
+
+}
+
 object LongArraySerializer{
   def write(outputStream: OutputStream, values: Array[Long]): Unit = {
     IntSerializer.write(outputStream, values.length)
@@ -441,20 +486,45 @@ object PointSignaturesSerializer{
     if (caseId == 1){
       val backingDir = StringSerializer.read(inputStream)
       val numPartitions = IntSerializer.read(inputStream)
+
       val numPoints = IntSerializer.read(inputStream)
       val numSig = IntSerializer.read(inputStream)
       val data = Array.ofDim[Long](numPoints*numSig)
       var offset = 0
-      var i = 0
-      while(i < numPartitions){
-        val subStream = new BufferedInputStream(new FileInputStream(DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, i)))
-        val output = LongArraySerializer.read(subStream)
-        println("output.len: " + output.length)
-        subStream.close()
-        System.arraycopy(output, 0, data, offset, output.length)
-        offset += output.length
-        i += 1
-      }
+
+      /*
+      Utils.timed("asyncRead", {
+        val dataV2 = Array.ofDim[Long](numPoints*numSig)
+        val fileNames = Array.range(0, numPartitions).map(i => DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, i))
+        var serializers: Array[AsyncLongArraySerializer] = null
+        actors.AsyncReaderUtils.readMultipleFiles(fileNames, fileSizes => {
+          val fileSizesArray = fileSizes.fileSizes
+          val partialSums = Array.ofDim[Long](fileSizesArray.length)
+
+          var i = 1
+          while (i < fileSizesArray.length) {
+            partialSums(i) = partialSums(0) + (fileSizesArray(0) - 4) / 8
+            i += 1
+          }
+          serializers = Array.range(0, numPartitions).map(i => new AsyncLongArraySerializer(dataV2, partialSums(i).toInt)) //TODO: need to find the offset per file
+        },
+          results => {
+            serializers(results.readerIndex).process(results.bytes, 0, results.bytesRead)
+          })
+      })
+      */
+      Utils.timed("SeqRead", {
+        var i = 0
+        while (i < numPartitions) {
+          val subStream = new BufferedInputStream(new FileInputStream(DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, i)))
+          val output = LongArraySerializer.read(subStream)
+          println("output.len: " + output.length)
+          subStream.close()
+          System.arraycopy(output, 0, data, offset, output.length)
+          offset += output.length
+          i += 1
+        }
+      })
 
       if (offset != data.length){
         Utils.internalError()

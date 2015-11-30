@@ -27,10 +27,10 @@ public class WordVecTest {
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 200;
-        int numTrees = 50; //20;
+        int numTrees = 50;
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
-                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
+                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector

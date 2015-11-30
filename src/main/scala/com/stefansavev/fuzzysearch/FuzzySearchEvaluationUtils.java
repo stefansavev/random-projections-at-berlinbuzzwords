@@ -60,7 +60,7 @@ public class FuzzySearchEvaluationUtils {
     public static void compareWithBruteForce(String indexFile, Random rnd, int numQueries, int numResults) throws IOException {
         FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
         FuzzySearchResults testSet = generateRandomTestSet(rnd, numQueries, index);
-
+        System.out.println("loaded dataset");
         resultsOnTestSet(index, testSet, numResults, false); //with the system
         resultsOnTestSet(index, testSet, numResults, false); //with the system
 

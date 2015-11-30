@@ -23,7 +23,7 @@ public class GloveTest {
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 100;
-        int numTrees = 150;
+        int numTrees = 50; //150;
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
                 FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
@@ -99,7 +99,7 @@ public class GloveTest {
         String inputTextFile = "C:\\glove\\100d.txt";
         String indexFile = "C:/tmp/output-index-glove/";
 
-        buildIndex(inputTextFile, indexFile);
+        //buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);
         FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
     }
