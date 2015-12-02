@@ -1,6 +1,7 @@
 package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.fuzzysearch.*;
+import com.stefansavev.randomprojections.actors.Application;
 
 import java.io.*;
 import java.util.Iterator;
@@ -99,9 +100,10 @@ public class GloveTest {
         String inputTextFile = "C:\\glove\\100d.txt";
         String indexFile = "C:/tmp/output-index-glove/";
 
-        //buildIndex(inputTextFile, indexFile);
+        buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);
         FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
+        Application.shutdown();
     }
 
 

@@ -2,16 +2,33 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.randomprojections.datarepr.dense.{DataFrameView}
+import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeader, ValuesStore, DenseRowStoredMatrixView, DataFrameView}
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReductionTransform}
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform
 import com.stefansavev.randomprojections.implementation._
-import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.{TypedIntArraySerializer, TypedDoubleArraySerializer, TypedIntSerializer}
+import com.stefansavev.randomprojections.serialization.core.Core._
+import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers._
+import com.stefansavev.randomprojections.serialization.core.TupleSerializers._
 import com.stefansavev.randomprojections.serialization.core.{MemoryTrackingUtils, MemoryTracker, TypedSerializer}
+import com.stefansavev.randomprojections.utils.String2IdHasher
 import no.uib.cipr.matrix.DenseMatrix
 
 object RandomTreesSerializersV2 {
+
+  implicit def pointSignatureReferenceSerializer(): TypedSerializer[PointSignatureReference] = {
+
+    implicit object PointSignatureReferenceIso extends Iso[PointSignatureReference, PointSignatureReference.TupleType]{
+      def from(input: Input): Output = input.toTuple
+      def to(t: Output): Input = PointSignatureReference.fromTuple(t)
+    }
+
+    implicit def pointSignatureReferenceTupleTypeSerializer(): TypedSerializer[PointSignatureReference.TupleType] = {
+      tuple6Serializer[String, Int, Int, Int, Int, Array[Long]](TypedStringSerializer, TypedIntSerializer, TypedIntSerializer, TypedIntSerializer, TypedIntSerializer, TypedLongArraySerializer)
+    }
+
+    isoSerializer[PointSignatureReference, PointSignatureReference.TupleType](PointSignatureReferenceIso, pointSignatureReferenceTupleTypeSerializer())
+  }
 
   object SVDTransformSerializer extends TypedSerializer[SVDTransform]{
     def toBinary(outputStream: OutputStream, svdTransform: SVDTransform): Unit = {

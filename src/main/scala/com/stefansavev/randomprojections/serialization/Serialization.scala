@@ -465,10 +465,17 @@ object PointSignaturesSerializer{
 
   def toBinary(outputStream: OutputStream, pointSignatures: PointSignatures): Unit = {
     //TODO: this functionality should be split into 2 classes
-    if (pointSignatures.backingDir != null){
+    if (pointSignatures.backingDir != null && pointSignatures.pointSigReference == null){
       IntSerializer.write(outputStream, 1) //case 1
       StringSerializer.write(outputStream, pointSignatures.backingDir)
       IntSerializer.write(outputStream, pointSignatures.numPartitions)
+      IntSerializer.write(outputStream, pointSignatures.numPoints)
+      IntSerializer.write(outputStream, pointSignatures.numSignatures)
+    }
+    else if (pointSignatures.pointSigReference != null){
+      IntSerializer.write(outputStream, 3) //case 3
+      val pointSignatureSer = RandomTreesSerializersV2.pointSignatureReferenceSerializer()
+      pointSignatureSer.toBinary(outputStream, pointSignatures.pointSigReference)
       IntSerializer.write(outputStream, pointSignatures.numPoints)
       IntSerializer.write(outputStream, pointSignatures.numSignatures)
     }
@@ -539,13 +546,27 @@ object PointSignaturesSerializer{
       if (offset != data.length){
         Utils.internalError()
       }
-      new PointSignatures(null, -1, data, numPoints, numSig)
+      new PointSignatures(null, null, -1, data, numPoints, numSig)
     }
     else if (caseId == 2) {
       val signatures = LongArraySerializer.read(inputStream)
       val numPoints = IntSerializer.read(inputStream)
       val numSignatures = IntSerializer.read(inputStream)
-      new PointSignatures(null, -1, signatures, numPoints, numSignatures)
+      new PointSignatures(null, null, -1, signatures, numPoints, numSignatures)
+    }
+    else if (caseId == 3){
+      val pointSignatureSer = RandomTreesSerializersV2.pointSignatureReferenceSerializer()
+      val pointSigRef = pointSignatureSer.fromBinary(inputStream)
+      val pointSig = pointSigRef.toPointSignatures()
+      val numPoints = IntSerializer.read(inputStream)
+      val numSig = IntSerializer.read(inputStream)
+      if (pointSig.numSignatures != numSig){
+        Utils.internalError()
+      }
+      if (pointSig.numPoints != numPoints){
+        Utils.internalError()
+      }
+      pointSig
     }
     else{
       Utils.internalError()

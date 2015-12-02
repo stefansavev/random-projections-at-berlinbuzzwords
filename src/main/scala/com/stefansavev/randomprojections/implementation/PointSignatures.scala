@@ -1,6 +1,10 @@
 package com.stefansavev.randomprojections.implementation
 
+import java.io.{FileInputStream, BufferedInputStream}
+
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
+import com.stefansavev.randomprojections.serialization.core.Core
+import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 
 class SignatureVectors(val signatureVectors: Array[SparseVector]){
   def numSignatures: Int = signatureVectors.size
@@ -90,12 +94,53 @@ object PointSignatures{
       }
       pntId += 1
     }
-    new PointSignatures(null, -1, newData, numPoints, numSignatures)
+    new PointSignatures(null, null, -1, newData, numPoints, numSignatures)
   }
 }
 
+object PointSignatureReference{
+  type TupleType = (String, Int, Int, Int, Int, Array[Long])
 
-class PointSignatures(val backingDir: String, val numPartitions: Int, val pointSignatures: Array[Long], val numPoints: Int, val numSignatures: Int) {
+  def fromTuple(t: TupleType): PointSignatureReference = {
+    val (backingDir, numPartitions, numPoints, numSignatures, partitionSize, positions) = t
+    new PointSignatureReference(backingDir, numPartitions, numPoints, numSignatures, partitionSize, positions)
+  }
+}
+
+class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints: Int, numSignatures: Int, partitionSize: Int, positions: Array[Long]){
+  def toTuple(): PointSignatureReference.TupleType = {
+    //TODO: maybe just calling unapply on a case class would do the trick
+    (backingDir, numPartitions, numPoints, numSignatures, partitionSize, positions)
+  }
+
+  def toPointSignatures(): PointSignatures = {
+    val buffer = Array.ofDim[Long](numPoints*numSignatures)
+
+    def readPartition(partId: Int): Array[Long] = {
+      val fromByte = positions(partId)
+      val toByte = positions(partId + 1)
+      val fileName = AsyncSignatureVectorsUtils.fileName(backingDir)
+      val inputStream = new BufferedInputStream(new FileInputStream(fileName))
+      inputStream.skip(fromByte)
+      val size = (toByte - fromByte).toInt
+      val input: Array[Byte] = new Array[Byte](size)
+      inputStream.read(input)
+      inputStream.close()
+      val values = Core.fromBytes(TypedLongArraySerializer, input)
+      values
+    }
+
+    var offset = 0
+    for(i <- 0 until numPartitions){
+      val partitionValues = readPartition(i)
+      System.arraycopy(partitionValues, 0, buffer, offset, partitionValues.length)
+      offset += partitionValues.length
+    }
+    new PointSignatures(null, null, -1, buffer, numPoints, numSignatures)
+  }
+}
+
+class PointSignatures(val pointSigReference: PointSignatureReference, val backingDir: String, val numPartitions: Int, val pointSignatures: Array[Long], val numPoints: Int, val numSignatures: Int) {
   def overlap(querySig: Array[Long], pointId: Int): Int = {
     val pointSignatures = this.pointSignatures
     val len = querySig.size

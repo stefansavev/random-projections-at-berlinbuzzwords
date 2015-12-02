@@ -3,10 +3,13 @@ package com.stefansavev.randomprojections.implementation
 import java.io.{FileOutputStream, BufferedOutputStream, File}
 import java.util.Random
 
+import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.buffers.{LongArrayBuffer, IntArrayBuffer}
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.serialization.LongArraySerializer
+import com.stefansavev.randomprojections.serialization.core.Core
+import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.utils.RandomUtils
 
 object Counts{
@@ -224,7 +227,7 @@ class OnlineSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int){
   def buildPointSignatures(): (SignatureVectors, PointSignatures) = {
     val arr = buffer.toArray()
     buffer.clear()
-    val pointSig = new PointSignatures(null, -1, arr, numPoints, numSignatures)
+    val pointSig = new PointSignatures(null, null, -1, arr, numPoints, numSignatures)
     (sigVectors, pointSig)
   }
 }
@@ -267,9 +270,59 @@ class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSigna
       storePartition()
     }
     //need to save the backing directory
-    val pointSig = new PointSignatures(backingDir, currentPartition, null, numPoints, numSignatures)
+    val pointSig = new PointSignatures(null, backingDir, currentPartition, null, numPoints, numSignatures)
     (sigVectors, pointSig)
   }
 }
 
+
+object AsyncSignatureVectorsUtils{
+  val partitionFileNamePrefix = "_signature_partition_"
+  def fileName(dirName: String): String = {
+    (new File(dirName, partitionFileNamePrefix + "_async_")).getAbsolutePath
+  }
+}
+
+class AsyncSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int, numColumns: Int){
+  val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
+  var buffer = new LongArrayBuffer()
+  var numPoints = 0
+  val partitionSize = (1 << 17)
+  var currentPartition = 0
+  var nextBytesPos = 0L
+  val writer = Application.createAsyncFileWriter(AsyncSignatureVectorsUtils.fileName(backingDir), "AsyncSignatureVectors")
+  val supervisor = Application.createWriterSupervisor("SupervisorAsyncSignatureVectors", 10, Array(writer))
+  val positions = new LongArrayBuffer()
+
+  def storePartition(): Unit = {
+    val bytes = Core.toBytes(TypedLongArraySerializer, buffer.toArray())
+
+    positions += nextBytesPos
+    supervisor.write(0, bytes, nextBytesPos)
+    nextBytesPos += bytes.length
+    buffer = new LongArrayBuffer()
+    currentPartition += 1
+  }
+
+  def pass(vec: Array[Double]): Unit = {
+    val querySigs = sigVectors.computePointSignatures(vec, 0, numSignatures)
+    buffer ++= querySigs
+    numPoints += 1
+    if (numPoints % partitionSize == 0){
+      storePartition()
+    }
+  }
+
+  def buildPointSignatures(): (SignatureVectors, PointSignatures) = {
+    if (buffer.size > 0){
+      storePartition()
+    }
+    positions += nextBytesPos
+    supervisor.waitUntilDone()
+
+    val pointSigReference = new PointSignatureReference(backingDir, currentPartition, numPoints, numSignatures, partitionSize, positions.toArray)
+    val pointSig = new PointSignatures(pointSigReference, backingDir, currentPartition, null, numPoints, numSignatures)
+    (sigVectors, pointSig)
+  }
+}
 

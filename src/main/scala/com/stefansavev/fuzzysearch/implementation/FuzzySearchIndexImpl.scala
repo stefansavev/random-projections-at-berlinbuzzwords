@@ -221,7 +221,8 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
   val onlineSVDFitter = new OnlineSVDFitter(dim)
   val sigSize = 16
   val signatureBackedDir = new File(backingFile, FuzzySearchIndexWrapper.signaturePartitionsDir).getAbsolutePath
-  val onlineSigVecs = new DiskBackedOnlineSignatureVectors(signatureBackedDir, new Random(48186816), sigSize, dim)
+  //val onlineSigVecs = new DiskBackedOnlineSignatureVectors(signatureBackedDir, new Random(48186816), sigSize, dim)
+  val onlineSigVecs = new AsyncSignatureVectors(signatureBackedDir, new Random(48186816), sigSize, dim)
 
   def addItem(name: String, label: Int, dataPoint: Array[Double]): Unit = {
     onlineSVDFitter.pass(dataPoint)

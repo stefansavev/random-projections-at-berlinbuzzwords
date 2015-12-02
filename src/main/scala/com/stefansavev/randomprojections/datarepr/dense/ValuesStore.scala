@@ -287,7 +287,7 @@ class AsyncStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: Sto
   val writePositions = new LongArrayBuffer()
   val outputFileName = AsyncLoadValueStore.getFileName(backingDir)
   val writer = Application.createAsyncFileWriter(outputFileName, "AsyncStoreBuilder")
-  val supervisor = Application.createWriterSupervisor("Supervisor", 10, Array(writer))
+  val supervisor = Application.createWriterSupervisor("SupervisorAsyncStoreBuilder", 10, Array(writer))
   var currentPosition = 0
 
   def getCurrentRowIndex: Int = {

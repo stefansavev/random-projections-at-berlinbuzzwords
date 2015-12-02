@@ -2,6 +2,7 @@ package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.fuzzysearch.*;
 import com.stefansavev.fuzzysearch.FuzzySearchResultBuilder;
+import com.stefansavev.randomprojections.actors.Application;
 import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
 
 import java.io.BufferedReader;
@@ -107,6 +108,7 @@ public class WordVecTest {
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);
         FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
+        Application.shutdown();
     }
 
 

@@ -117,7 +117,7 @@ class FileWriterSupervisor(supervisorActor: ActorRef){
   import scala.concurrent.duration._
   import akka.pattern._
 
-  def write(writerId: Int, bytes: Array[Byte], pos: Int): Unit = {
+  def write(writerId: Int, bytes: Array[Byte], pos: Long): Unit = {
     implicit val timeout = Timeout(5000 seconds)
     val future = supervisorActor ? Write(writerId, bytes, pos)
     val result = Await.result(future, timeout.duration) //.asInstanceOf[String]
