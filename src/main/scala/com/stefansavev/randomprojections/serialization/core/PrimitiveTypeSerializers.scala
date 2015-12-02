@@ -62,6 +62,20 @@ object PrimitiveTypeSerializers {
     }
   }
 
+  implicit object TypedLongArraySerializer extends TypedSerializer[Array[Long]]{
+    def toBinary(outputStream: OutputStream, input: SerializerType): Unit = {
+      LongArraySerializer.write(outputStream, input)
+    }
+
+    def fromBinary(inputStream: InputStream): SerializerType = {
+      LongArraySerializer.read(inputStream)
+    }
+
+    def sizeInBytes(memoryTracker: MemoryTracker, input: SerializerType): Long = {
+      MemoryTrackingUtils.withNestingInfo(memoryTracker, input, LongArraySerializer.sizeInBytes(input))
+    }
+  }
+
   implicit object TypedDoubleArraySerializer extends TypedSerializer[Array[Double]]{
     def toBinary(outputStream: OutputStream, input: SerializerType): Unit = {
       DoubleArraySerializer.write(outputStream, input)

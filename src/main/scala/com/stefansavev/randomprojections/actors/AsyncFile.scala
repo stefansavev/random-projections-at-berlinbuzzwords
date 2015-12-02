@@ -102,6 +102,100 @@ class ActorFileWriter(file: AsyncWriteFile) extends Actor{
   }
 }
 
+object ActorFileWriterSupervisorMessages{
+  object WaitUntilDone
+  object WaitUntilSlotAvailable
+  object Done
+  object SlotAvailable
+}
+class FileWriterSupervisor(supervisorActor: ActorRef){
+  import ActorFileWriterSupervisorMessages._
+  import akka.actor.ActorDSL._
+  import akka.actor._
+  import akka.util.Timeout
+  import scala.concurrent.Await
+  import scala.concurrent.duration._
+  import akka.pattern._
+
+  def write(writerId: Int, bytes: Array[Byte], pos: Int): Unit = {
+    implicit val timeout = Timeout(5000 seconds)
+    val future = supervisorActor ? Write(writerId, bytes, pos)
+    val result = Await.result(future, timeout.duration) //.asInstanceOf[String]
+
+    /*
+    if (numWritesPending > maxNumberOfPendingWrites){
+      //need to block
+      println("need to block")
+      implicit val timeout = Timeout(500 seconds)
+      val future = self ? WaitUntilSlotAvailable
+      val result = Await.result(future, timeout.duration) //.asInstanceOf[String]
+    }
+
+    numWritesPending += 1
+    file.write(writerId, bytes)(self)
+    */
+  }
+
+  def waitUntilDone(): Unit = {
+    implicit val timeout = Timeout(5000 seconds)
+    val future = supervisorActor ? WaitUntilDone
+    val result = Await.result(future, timeout.duration) //.asInstanceOf[String]
+    ()
+  }
+
+}
+class ActorFileWriterSupervisor(maxNumberOfPendingWrites: Int, writers: Array[AsyncFileWriter]) extends Actor{
+  import ActorFileWriterSupervisorMessages._
+  import akka.pattern.ask
+
+  var numWritesPending = 0L
+  var waiter: Option[ActorRef] = None
+  var msgSender: Option[ActorRef] = None
+
+  def closeAll(): Unit = {
+    writers.foreach(writer => writer.close(context))
+    context.stop(self)
+  }
+
+  override def receive = {
+    case Write(writerId: Int, buffer: Array[Byte], position: Long) => {
+      println("writing at pos " + position + " with pending writes " + numWritesPending)
+      if (numWritesPending > maxNumberOfPendingWrites){
+        msgSender = Some(sender())
+      }
+      else {
+        numWritesPending += 1
+        writers(writerId).write(writerId, buffer)
+        sender() ! Done
+      }
+    }
+
+    case cmd@WriteResult(writerId: Int, bytesWritten: Int, position: Long) => {
+      numWritesPending -= 1
+      if (msgSender.isDefined){
+        println("releasing wait")
+        msgSender.get ! Done
+      }
+      if (numWritesPending == 0 && waiter.isDefined){
+        waiter.get ! Done
+        waiter = None
+        closeAll()
+      }
+    }
+    case WaitUntilDone => {
+      if (numWritesPending == 0){
+        sender() ! Done
+        closeAll()
+      }
+      else{
+        waiter = Some(sender())
+      }
+    }
+  }
+
+
+}
+
 class AsyncFileWriter(fileName: String, system: ActorSystem, pool: ExecutorService, actorNameSuffix: String){
   println("creating async file: " + fileName)
   //Files.delete(Paths.get(fileName))
@@ -117,8 +211,10 @@ class AsyncFileWriter(fileName: String, system: ActorSystem, pool: ExecutorServi
     prevPosition
   }
 
-  def write(writerId: Int, bytes: Array[Byte])(implicit sender: ActorRef): Unit = {
-    fileWriterActor ! Write(writerId, bytes, incWritePosition(bytes.length))
+  def write(writerId: Int, bytes: Array[Byte])(implicit sender: ActorRef): Long = {
+    val currentWritePos = incWritePosition(bytes.length)
+    fileWriterActor ! Write(writerId, bytes, currentWritePos)
+    currentWritePos
   }
 
   def close(context: ActorContext): Unit = {
@@ -160,6 +256,35 @@ class AsyncFileReader(fileName: String, system: ActorSystem, pool: ExecutorServi
   }
 }
 
+object Application{
+  implicit val system = akka.actor.ActorSystem("High-Dimensional-Search")
+
+  val pool = Executors.newFixedThreadPool(50) //TODO: replace with something else
+
+  def getActorSystem: ActorSystem = {
+    system
+  }
+
+  def getExecutorService: ExecutorService = {
+    pool
+  }
+
+  def createAsyncFileWriter(fileName: String, actorSuffix: String): AsyncFileWriter = {
+    new AsyncFileWriter(fileName, getActorSystem, getExecutorService, actorSuffix)
+  }
+
+  def createWriterSupervisor(suffix: String, maxNumberOfPendingWrites: Int, writers: Array[AsyncFileWriter]): FileWriterSupervisor = {
+    val props = Props(classOf[ActorFileWriterSupervisor], maxNumberOfPendingWrites, writers)
+    val actorRef = system.actorOf(props, "WriterSupervisor_" + suffix)
+    new FileWriterSupervisor(actorRef)
+  }
+
+  def shutdown(): Unit ={
+    pool.shutdown()
+    system.shutdown()
+  }
+
+}
 
 object AsyncReaderUtils{
   case class FileSizes(fileSizes: Array[Long])

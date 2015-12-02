@@ -213,8 +213,8 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
   }
 
   val datasetBackingDir = new File(backingFile, FuzzySearchIndexWrapper.datasetPartitionsDir).getAbsolutePath
-  val storageWithFile = new LazyLoadStoreBuilderType(datasetBackingDir, storageType)
-
+  val storageWithFile = new AsyncStoreBuilderType(datasetBackingDir, storageType) //
+  //val storageWithFile = new LazyLoadStoreBuilderType(datasetBackingDir, storageType)
   val columnIds = Array.range(0, dim)
   val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageWithFile)
   val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)

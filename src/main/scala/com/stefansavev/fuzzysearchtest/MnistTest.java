@@ -1,6 +1,7 @@
 package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.fuzzysearch.*;
+import com.stefansavev.randomprojections.actors.Application;
 import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
 
 import java.io.*;
@@ -24,10 +25,10 @@ public class MnistTest {
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 100;
-        int numTrees = 5;
+        int numTrees = 10;
         //create an indexer
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
-                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
+                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
 
         //FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
         //        FuzzySearchEngines.bruteForce(FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
@@ -143,7 +144,7 @@ public class MnistTest {
     public static void main(String[] args) throws Exception {
         String inputTextFile = "D:/RandomTreesData-144818512896186816/input/" + "mnist/svdpreprocessed/train.csv";
         String queriesFile = inputTextFile; //same as training in this example
-        String indexFile = "C:/tmp/output-index-mnist/";
+        String indexFile = "C:/tmp/output-index-mnist-1/";
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromFile(queriesFile, indexFile);
@@ -167,6 +168,7 @@ public class MnistTest {
         FuzzySearchResults retrieved =  FuzzySearchEvaluationUtils.resultsOnTestSet(index, expected, 1000, false); //with the system
         RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
 
+        Application.shutdown();
         //FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
     }
     /*

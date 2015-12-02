@@ -170,6 +170,7 @@ object StringSerializer{
 
 object DoubleSerializer{
   val bytes = Array.ofDim[Byte](8)
+
   def toByteArray(value: Double): Array[Byte] = {
     ByteBuffer.wrap(bytes).putDouble(value)
     bytes
@@ -220,6 +221,15 @@ object LongSerializer{
 }
 
 object DoubleArraySerializer{
+
+  def writeToBufferWithoutArrayLength(values: Array[Double], output: Array[Byte]): Unit = {
+    val buff = ByteBuffer.wrap(output)
+    var i = 0
+    while(i < values.length){
+      buff.putDouble(values(i))
+      i += 1
+    }
+  }
 
   def write(outputStream: OutputStream, values: Array[Double]): Unit = {
     IntSerializer.write(outputStream, values.length)

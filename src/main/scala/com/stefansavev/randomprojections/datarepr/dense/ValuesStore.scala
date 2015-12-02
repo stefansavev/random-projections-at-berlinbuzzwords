@@ -1,10 +1,14 @@
 package com.stefansavev.randomprojections.datarepr.dense
 
-import java.io.File
+import java.io.{FileInputStream, BufferedInputStream, File}
 
+import akka.actor.Actor
+import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.buffers._
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.implementation.HadamardUtils
+import com.stefansavev.randomprojections.serialization.DoubleArraySerializer
+import com.stefansavev.randomprojections.serialization.core.Core
 import com.stefansavev.randomprojections.utils.Utils
 
 import scala.reflect.ClassTag
@@ -26,7 +30,6 @@ object ValuesStore{
 
 object LazyLoadValueStore{
   val partitionFileNamePrefix = "_dataset_partition_"
-
   def getPartitionFileName(dirName: String, partitionId: Int): String = {
     val newFile = new File(dirName, partitionFileNamePrefix  + partitionId)
     newFile.getAbsolutePath
@@ -38,7 +41,6 @@ object LazyLoadValueStore{
     val (dirName, numPointsInPartition, numPartitions, numTotalRows, numColumns) = t
     new LazyLoadValueStore(dirName, numPointsInPartition, numPartitions, numTotalRows, numColumns)
   }
-
 }
 
 class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitions: Int, numTotalRows: Int, numColumns: Int) extends ValuesStore{
@@ -112,9 +114,108 @@ class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitio
 }
 
 
+object AsyncLoadValueStore{
+  val partitionFileNamePrefix = "_dataset_partition_"
+
+  def getFileName(dirName: String): String = {
+    val newFile = new File(dirName, partitionFileNamePrefix  + "_async")
+    newFile.getAbsolutePath
+  }
+
+  type TupleType = (String, Array[Long], Int, Int, Int, Int)
+
+  def fromTuple(t: TupleType): AsyncLoadValueStore = {
+    val (backingDir, chunkOffsets, numPartitions, numPointsInPartition, numTotalRows, numColumns) = t
+    new AsyncLoadValueStore(backingDir, chunkOffsets, numPartitions, numPointsInPartition, numTotalRows, numColumns)
+  }
+}
+
+class AsyncLoadValueStore(backingDir: String, chunkOffsets: Array[Long], numPartitions: Int, numPointsInPartition: Int, numTotalRows: Int, numColumns: Int) extends ValuesStore{
+
+  def toTuple(): AsyncLoadValueStore.TupleType = (backingDir, chunkOffsets, numPartitions, numPointsInPartition, numTotalRows, numColumns)
+
+  var underlyingStore: ValuesStore = null
+  var currentPartition = -1
+
+  def getBuilderType: StoreBuilderType = {
+    if (underlyingStore == null){
+      transformRowId(0) //call for sideeffect to load the data
+    }
+    underlyingStore.getBuilderType
+  }
+
+  def getPartition(rowId: Int): Int = {
+    rowId / numPointsInPartition //TODO: replace by bit shift
+  }
+
+  def loadStoreFromPartition(partitionId: Int): ValuesStore = {
+    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+
+    val fileName = AsyncLoadValueStore.getFileName(backingDir)
+    val inputStream = new BufferedInputStream(new FileInputStream(fileName))
+    val offset = chunkOffsets(partitionId)
+    inputStream.skip(offset)
+    val size = (chunkOffsets(partitionId + 1) - offset).toInt
+    val input: Array[Byte] = new Array[Byte](size)
+    inputStream.read(input)
+    val store  = ValuesStore.fromBytes(input)
+    inputStream.close()
+    store
+  }
+
+  def transformRowId(rowId: Int): Int = {
+
+    val partitionId = getPartition(rowId)
+    // println("rowid - partitionId " + rowId + " " + partitionId)
+    if (partitionId != currentPartition){
+      underlyingStore = loadStoreFromPartition(partitionId)
+
+      currentPartition = partitionId
+    }
+
+    rowId % numPointsInPartition //TODO: replace by bit shift
+  }
+
+  def fillRow(rowId: Int, output: Array[Double], isPos: Boolean): Unit = {
+    val tRowId = transformRowId(rowId)
+    underlyingStore.fillRow(tRowId, output, isPos)
+  }
+
+  def setRow(rowId: Int, input: Array[Double]): Unit = {
+    Utils.internalError() //this store is read only
+  }
+
+  def fillRow(rowId: Int, columnIds: Array[Int], output: Array[Double]): Unit = {
+    val tRowId = transformRowId(rowId)
+    underlyingStore.fillRow(tRowId, columnIds, output)
+  }
+
+  def multiplyRowComponentWiseBySparseVector(rowId: Int, sv: SparseVector, output: Array[Double]): Unit = {
+    val tRowId = transformRowId(rowId)
+    underlyingStore.multiplyRowComponentWiseBySparseVector(tRowId, sv, output)
+  }
+
+  def cosineForNormalizedData(query: Array[Double], rowId: Int): Double = {
+    val tRowId = transformRowId(rowId)
+    underlyingStore.cosineForNormalizedData(query, tRowId)
+  }
+
+  def loadAll(): ValuesStore = {
+    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    val head:ValuesStore = loadStoreFromPartition(0)
+    val rest = Iterator.range(1, numPartitions).map(partitionId => loadStoreFromPartition(partitionId))
+    val iter = Iterator(head) ++ rest
+    head.getBuilderType.getBuilder(numColumns).merge(numTotalRows, iter)
+  }
+}
+
 
 trait ValuesStoreBuilder{
   def getCurrentRowIndex: Int
+
+  def isFull: Boolean
+  def getContents(): Array[Byte]
+
   def addValues(values: Array[Double]): Unit
   def build(): ValuesStore
 
@@ -126,6 +227,7 @@ object ValuesStoreAsDoubleSerializationTags{
   val valuesStoreAsBytes = 2
   val valuesStoreAsSingleByte = 3
   val lazyLoadValuesStore = 4
+  val asyncLoadValuesStore = 5
 }
 
 class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: StoreBuilderType) extends ValuesStoreBuilder{
@@ -171,6 +273,64 @@ class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBui
   def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
     underlyingBuilder.getBuilder(numCols).merge(numTotalRows, valueStores)
   }
+
+  def isFull: Boolean = Utils.internalError()
+  def getContents(): Array[Byte] = Utils.internalError()
+}
+
+
+class AsyncStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: StoreBuilderType) extends ValuesStoreBuilder{
+  var currentRow = 0
+  val numPointsInPartition = 1 << 12 // 12 //1 << 17 //1 << 17 //= 131072
+  var currentPartition = 0
+  var currentBuilder = underlyingBuilder.getBuilder(numCols)
+  val writePositions = new LongArrayBuffer()
+  val outputFileName = AsyncLoadValueStore.getFileName(backingDir)
+  val writer = Application.createAsyncFileWriter(outputFileName, "AsyncStoreBuilder")
+  val supervisor = Application.createWriterSupervisor("Supervisor", 10, Array(writer))
+  var currentPosition = 0
+
+  def getCurrentRowIndex: Int = {
+    currentRow
+  }
+
+  def savePartition(): Unit = {
+    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    println("saving partition " + currentPartition)
+    val currentStore = currentBuilder.build() //serialize to bytes and send them to the async serializer
+    val bytes = currentStore.toBytes()
+    val writerId = 0
+    supervisor.write(writerId, bytes, currentPosition)
+    writePositions += currentPosition
+    currentPosition += bytes.length
+    currentBuilder = underlyingBuilder.getBuilder(numCols)
+    currentPartition += 1
+  }
+
+  def addValues(values: Array[Double]): Unit = {
+    if (currentBuilder.getCurrentRowIndex >= numPointsInPartition){
+      savePartition()
+    }
+    currentBuilder.addValues(values)
+    currentRow += 1
+  }
+
+  def build(): ValuesStore = {
+    if (currentBuilder.getCurrentRowIndex > 0) {
+      savePartition()
+      //finalize
+    }
+    supervisor.waitUntilDone()
+    writePositions += currentPosition
+    new AsyncLoadValueStore(backingDir, writePositions.toArray, currentPartition, numPointsInPartition: Int, currentRow, numCols)
+  }
+
+  def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
+    null //underlyingBuilder.getBuilder(numCols).merge(numTotalRows, valueStores)
+  }
+
+  def isFull: Boolean = Utils.internalError()
+  def getContents(): Array[Byte] = Utils.internalError()
 }
 
 object ValuesStoreAsDouble{
@@ -256,8 +416,8 @@ class ValuesStoreAsDouble(val _numCols: Int, val data: Array[Double]) extends Va
 }
 
 class ValuesStoreBuilderAsDouble(numCols: Int) extends ValuesStoreBuilder{
+  val numValuesInPage = 1024
   val valuesBuffer = new DoubleArrayBuffer()
-
   var currentRow = 0
 
   def addValues(values: Array[Double]): Unit = {
@@ -266,6 +426,14 @@ class ValuesStoreBuilderAsDouble(numCols: Int) extends ValuesStoreBuilder{
     }
     valuesBuffer ++= values
     currentRow += 1
+  }
+
+  def isFull: Boolean = (currentRow >= numValuesInPage)
+
+  def getContents: Array[Byte] = {
+    val output = Array.ofDim[Byte](8*currentRow)
+    DoubleArraySerializer.writeToBufferWithoutArrayLength(valuesBuffer.toArray(), output)
+    output
   }
 
   def getCurrentRowIndex = currentRow
@@ -451,6 +619,9 @@ class ValuesStoreBuilderAsBytes(numCols: Int) extends ValuesStoreBuilder{
     }
     new ValuesStoreAsBytes(numColumns, buffer.array)
   }
+
+  def isFull: Boolean = Utils.internalError()
+  def getContents(): Array[Byte] = Utils.internalError()
 }
 
 object FloatToSingleByteEncoder{
@@ -717,6 +888,9 @@ class ValuesStoreBuilderAsSingleByte(numCols: Int) extends ValuesStoreBuilder{
     }
     new ValuesStoreAsSingleByte(this.numCols, minValuePerRecord.array, maxValuePerRecord.array, valuesBuffer.array)
   }
+
+  def isFull: Boolean = Utils.internalError()
+  def getContents(): Array[Byte] = Utils.internalError()
 }
 
 class FixedLengthBuffer[T : ClassTag](val size: Int){
@@ -830,6 +1004,14 @@ case class LazyLoadStoreBuilderType(backingDir: String, underlyingBuilder: Store
   }
 
   def getBuilder(numCols: Int): ValuesStoreBuilder = new LazyLoadValuesStoreBuilder(backingDir, numCols, underlyingBuilder)
+}
+
+case class AsyncStoreBuilderType(backingDir: String, underlyingBuilder: StoreBuilderType) extends StoreBuilderType{
+  if (underlyingBuilder.isInstanceOf[LazyLoadStoreBuilderType]){
+    Utils.internalError()
+  }
+
+  def getBuilder(numCols: Int): ValuesStoreBuilder = new AsyncStoreBuilder(backingDir, numCols, underlyingBuilder)
 }
 
 /*

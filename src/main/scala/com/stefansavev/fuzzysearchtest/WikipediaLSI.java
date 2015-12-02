@@ -117,7 +117,7 @@ public class WikipediaLSI {
         String inputTextFile = "C:\\wikipedia-parsed\\lsi\\extracted\\wikipedia_lsi128.txt";
         String indexFile = "C:/tmp/output-index-wikipedia-lsi-t1/";
 
-        //buildIndex(inputTextFile, indexFile);
+        buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);
         System.out.println("Free memory: " + Runtime.getRuntime().freeMemory()/(1024));
         FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 100, 50);

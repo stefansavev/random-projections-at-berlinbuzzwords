@@ -30,6 +30,10 @@ object DataFrameViewSerializers {
       def tag: Int = ValuesStoreAsDoubleSerializationTags.lazyLoadValuesStore
     }
 
+    implicit object AsyncLoadStoreSerializationTag extends TypeTag[AsyncLoadValueStore]{
+      def tag: Int = ValuesStoreAsDoubleSerializationTags.asyncLoadValuesStore
+    }
+
     implicit def valuesStoreAsDoubleSerializer(): TypedSerializer[ValuesStoreAsDouble] = {
 
       implicit def valuesStoreTupleTypeSerializer(): TypedSerializer[ValuesStoreAsDouble.TupleType] = {
@@ -90,19 +94,38 @@ object DataFrameViewSerializers {
       isoSerializer[T, TT](ValuesStoreIso, valuesStoreTupleTypeSerializer())
     }
 
-    val valueStoreSerializer = subtype4Serializer[ValuesStore,
+    implicit def asyncLoadStoreSerializer(): TypedSerializer[AsyncLoadValueStore] = {
+      type T = AsyncLoadValueStore
+      type TT = AsyncLoadValueStore.TupleType
+
+      implicit def valuesStoreTupleTypeSerializer(): TypedSerializer[TT] = {
+        tuple6Serializer[String, Array[Long], Int, Int, Int, Int](TypedStringSerializer, TypedLongArraySerializer, TypedIntSerializer, TypedIntSerializer, TypedIntSerializer, TypedIntSerializer)
+      }
+
+      implicit object ValuesStoreIso extends Iso[T, TT]{
+        def from(input: Input): Output = input.toTuple
+        def to(t: Output): Input = AsyncLoadValueStore.fromTuple(t)
+      }
+
+      isoSerializer[T, TT](ValuesStoreIso, valuesStoreTupleTypeSerializer())
+    }
+
+    val valueStoreSerializer = subtype5Serializer[ValuesStore,
                         ValuesStoreAsDouble,
                         ValuesStoreAsBytes,
                         ValuesStoreAsSingleByte,
-                        LazyLoadValueStore](
+                        LazyLoadValueStore,
+                        AsyncLoadValueStore](
         ValuesStoreAsDoubleSerializationTag,
         ValuesStoreAsBytesSerializationTag,
         ValuesStoreAsSingleByteSerializationTag,
         LazyLoadStoreSerializationTag,
+        AsyncLoadStoreSerializationTag,
         valuesStoreAsDoubleSerializer(),
         valuesStoreAsBytesSerializer(),
         valuesStoreAsSingleByteSerializer(),
-        lazyLoadStoreSerializer())
+        lazyLoadStoreSerializer(),
+        asyncLoadStoreSerializer())
 
     object ValueStoreWithTransformedTypeSerializer extends TypedSerializer[ValuesStore] {
       def toBinary(outputStream: OutputStream, input: ValuesStore): Unit = {
@@ -114,6 +137,9 @@ object DataFrameViewSerializers {
         vs match {
           case lazyLoadStore: LazyLoadValueStore => {
             lazyLoadStore.loadAll()
+          }
+          case asyncLoadStore: AsyncLoadValueStore => {
+            asyncLoadStore.loadAll()
           }
           case _ => vs
         }
