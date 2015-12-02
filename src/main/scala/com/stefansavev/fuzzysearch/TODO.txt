@@ -1,0 +1,13 @@
+1. Add noise to queries and check the sensitivity of indexing structures to noise
+2. Introduce reverse rotation and remove the memory in IndexBuilder.buildWithSVDAndRandomRotation
+3. Check that the Hadamard transformation works for features whose size is not power of 2
+4. Check if introducing a permutation of the hadamard matrix makes a difference (it probably should)
+5. Introduce a single queue (see branch) for scoring the points
+6. Pre-slit the data into multiple subspaces and compute the SVD subspace dimension
+7. Compare with PCA tree at various levels of number of data points and so on
+8. Introduce dependent trees ("introduce information about "close points" from the previous (m - 1) trees
+into the m-th tree, remove the subspace of the "merged points" -- trees that take longer to build
+but a more accurate as a way to reduce the memory usage)
+9. Introduce a more generic SignatureFit where there are multiple ways to compute point signagures
+(for example, we can have a few subspaces and a single singnature per subspace)
+10. Add testing infrastructure
