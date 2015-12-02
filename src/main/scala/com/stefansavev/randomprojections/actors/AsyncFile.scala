@@ -103,11 +103,13 @@ class ActorFileWriter(file: AsyncWriteFile) extends Actor{
 }
 
 object ActorFileWriterSupervisorMessages{
-  object WaitUntilDone
-  object WaitUntilSlotAvailable
-  object Done
-  object SlotAvailable
+  trait ActorFileWriterSupervisorMessage
+  object WaitUntilDone extends ActorFileWriterSupervisorMessage
+  object WaitUntilSlotAvailable extends ActorFileWriterSupervisorMessage
+  case class Done(totalBytesWritten: Long) extends ActorFileWriterSupervisorMessage
+  case class WritePosition(pos: Long) extends ActorFileWriterSupervisorMessage
 }
+
 class FileWriterSupervisor(supervisorActor: ActorRef){
   import ActorFileWriterSupervisorMessages._
   import akka.actor.ActorDSL._
@@ -117,11 +119,11 @@ class FileWriterSupervisor(supervisorActor: ActorRef){
   import scala.concurrent.duration._
   import akka.pattern._
 
-  def write(writerId: Int, bytes: Array[Byte], pos: Long): Unit = {
+  def write(writerId: Int, bytes: Array[Byte], pos: Long): WritePosition = {
     implicit val timeout = Timeout(5000 seconds)
     val future = supervisorActor ? Write(writerId, bytes, pos)
-    val result = Await.result(future, timeout.duration) //.asInstanceOf[String]
-
+    val result = Await.result(future, timeout.duration).asInstanceOf[WritePosition]
+    result
     /*
     if (numWritesPending > maxNumberOfPendingWrites){
       //need to block
@@ -136,11 +138,11 @@ class FileWriterSupervisor(supervisorActor: ActorRef){
     */
   }
 
-  def waitUntilDone(): Unit = {
+  def waitUntilDone(): Done = {
     implicit val timeout = Timeout(5000 seconds)
     val future = supervisorActor ? WaitUntilDone
-    val result = Await.result(future, timeout.duration) //.asInstanceOf[String]
-    ()
+    val result = Await.result(future, timeout.duration).asInstanceOf[Done]
+    result
   }
 
 }
@@ -149,42 +151,59 @@ class ActorFileWriterSupervisor(maxNumberOfPendingWrites: Int, writers: Array[As
   import akka.pattern.ask
 
   var numWritesPending = 0L
+  var totalBytesWritten = 0L
+
+  case class ScheduledWrite(sender: ActorRef, writerId: Int, buffer: Array[Byte], position: Long)
+
   var waiter: Option[ActorRef] = None
-  var msgSender: Option[ActorRef] = None
+  var scheduledWrite: Option[ScheduledWrite] = None
 
   def closeAll(): Unit = {
     writers.foreach(writer => writer.close(context))
     context.stop(self)
   }
 
+  def scheduleWrite(scheduledWrite: ScheduledWrite): Unit = {
+    numWritesPending += 1
+    val writerId = scheduledWrite.writerId
+    val currentPos = writers(writerId).write(writerId, scheduledWrite.buffer)
+    scheduledWrite.sender ! WritePosition(currentPos)
+  }
+
   override def receive = {
     case Write(writerId: Int, buffer: Array[Byte], position: Long) => {
       println("writing at pos " + position + " with pending writes " + numWritesPending)
       if (numWritesPending > maxNumberOfPendingWrites){
-        msgSender = Some(sender())
+        if (scheduledWrite.isDefined){
+          throw new IllegalStateException("One one pending message is allowed")
+        }
+        scheduledWrite = Some(ScheduledWrite(sender(), writerId, buffer, position))
       }
       else {
-        numWritesPending += 1
-        writers(writerId).write(writerId, buffer)
-        sender() ! Done
+        scheduleWrite(ScheduledWrite(sender(), writerId, buffer, position))
       }
     }
 
     case cmd@WriteResult(writerId: Int, bytesWritten: Int, position: Long) => {
+      totalBytesWritten += bytesWritten
       numWritesPending -= 1
-      if (msgSender.isDefined){
-        println("releasing wait")
-        msgSender.get ! Done
+      if (scheduledWrite.isDefined){
+        scheduleWrite(scheduledWrite.get)
+        scheduledWrite = None
       }
       if (numWritesPending == 0 && waiter.isDefined){
-        waiter.get ! Done
+        if (scheduledWrite.isDefined){
+          throw new IllegalStateException("One one pending message is allowed")
+        }
+
+        waiter.get ! Done(totalBytesWritten)
         waiter = None
         closeAll()
       }
     }
     case WaitUntilDone => {
       if (numWritesPending == 0){
-        sender() ! Done
+        sender() ! Done(totalBytesWritten)
         closeAll()
       }
       else{
@@ -192,8 +211,6 @@ class ActorFileWriterSupervisor(maxNumberOfPendingWrites: Int, writers: Array[As
       }
     }
   }
-
-
 }
 
 class AsyncFileWriter(fileName: String, system: ActorSystem, pool: ExecutorService, actorNameSuffix: String){

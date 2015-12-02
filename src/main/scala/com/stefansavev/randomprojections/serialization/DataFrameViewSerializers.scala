@@ -144,10 +144,6 @@ object DataFrameViewSerializers {
           case _ => vs
         }
       }
-
-      def sizeInBytes(memoryTracker: MemoryTracker, input: ValuesStore): Long = {
-        valueStoreSerializer.sizeInBytes(memoryTracker, input)
-      }
     }
     ValueStoreWithTransformedTypeSerializer
   }
