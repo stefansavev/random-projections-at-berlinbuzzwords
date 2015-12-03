@@ -287,7 +287,7 @@ class AsyncSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int,
   val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
   var buffer = new LongArrayBuffer()
   var numPoints = 0
-  val partitionSize = (1 << 14)
+  val partitionSize = (1 << 10) //(1 << 14)
   var currentPartition = 0
   var nextBytesPos = 0L
   val writer = Application.createAsyncFileWriter(AsyncSignatureVectorsUtils.fileName(backingDir), "AsyncSignatureVectors")

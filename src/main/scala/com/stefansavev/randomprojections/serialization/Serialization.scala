@@ -3,7 +3,6 @@ package com.stefansavev.randomprojections.serialization
 import java.io._
 import java.nio.ByteBuffer
 import com.stefansavev.randomprojections.actors
-import com.stefansavev.randomprojections.actors.AsyncReaderUtils
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReductionTransform}
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform
@@ -509,27 +508,6 @@ object PointSignaturesSerializer{
       val data = Array.ofDim[Long](numPoints*numSig)
       var offset = 0
 
-      /*
-      Utils.timed("asyncRead", {
-        val dataV2 = Array.ofDim[Long](numPoints*numSig)
-        val fileNames = Array.range(0, numPartitions).map(i => DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, i))
-        var serializers: Array[AsyncLongArraySerializer] = null
-        actors.AsyncReaderUtils.readMultipleFiles(fileNames, fileSizes => {
-          val fileSizesArray = fileSizes.fileSizes
-          val partialSums = Array.ofDim[Long](fileSizesArray.length)
-
-          var i = 1
-          while (i < fileSizesArray.length) {
-            partialSums(i) = partialSums(0) + (fileSizesArray(0) - 4) / 8
-            i += 1
-          }
-          serializers = Array.range(0, numPartitions).map(i => new AsyncLongArraySerializer(dataV2, partialSums(i).toInt)) //TODO: need to find the offset per file
-        },
-          results => {
-            serializers(results.readerIndex).process(results.bytes, 0, results.bytesRead)
-          })
-      })
-      */
       Utils.timed("SeqRead", {
         var i = 0
         while (i < numPartitions) {

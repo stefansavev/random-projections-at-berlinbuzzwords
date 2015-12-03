@@ -148,20 +148,25 @@ class AsyncLoadValueStore(backingDir: String, chunkOffsets: Array[Long], numPart
     rowId / numPointsInPartition //TODO: replace by bit shift
   }
 
-  def loadStoreFromPartition(partitionId: Int): ValuesStore = {
+  def loadStoreFromPartition(inputStream: BufferedInputStream, partitionId: Int): ValuesStore = {
     import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
-
-    val fileName = AsyncLoadValueStore.getFileName(backingDir)
-    val inputStream = new BufferedInputStream(new FileInputStream(fileName))
     val offset = chunkOffsets(partitionId)
     inputStream.skip(offset)
     val size = (chunkOffsets(partitionId + 1) - offset).toInt
     val input: Array[Byte] = new Array[Byte](size)
     inputStream.read(input)
     val store  = ValuesStore.fromBytes(input)
+    store
+  }
+
+  def loadStoreFromPartition(partitionId: Int): ValuesStore = {
+    val fileName = AsyncLoadValueStore.getFileName(backingDir)
+    val inputStream = new BufferedInputStream(new FileInputStream(fileName))
+    val store = loadStoreFromPartition(inputStream, partitionId)
     inputStream.close()
     store
   }
+
 
   def transformRowId(rowId: Int): Int = {
 
@@ -205,7 +210,8 @@ class AsyncLoadValueStore(backingDir: String, chunkOffsets: Array[Long], numPart
     val head:ValuesStore = loadStoreFromPartition(0)
     val rest = Iterator.range(1, numPartitions).map(partitionId => loadStoreFromPartition(partitionId))
     val iter = Iterator(head) ++ rest
-    head.getBuilderType.getBuilder(numColumns).merge(numTotalRows, iter)
+    val mergedStores = head.getBuilderType.getBuilder(numColumns).merge(numTotalRows, iter)
+    mergedStores
   }
 }
 
@@ -872,13 +878,12 @@ class ValuesStoreBuilderAsSingleByte(numCols: Int) extends ValuesStoreBuilder{
   }
 
   def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
-    println("totalnumrows: " + numTotalRows)
+
     val minValuePerRecord = new FixedLengthBuffer[Float](numTotalRows)
     val maxValuePerRecord = new FixedLengthBuffer[Float](numTotalRows)
     val valuesBuffer = new FixedLengthBuffer[Byte](numTotalRows*numCols)
     for(store <- valueStores){
       val typedStore = store.asInstanceOf[ValuesStoreAsSingleByte]
-      println("minValuesLen: " + typedStore.minValues.length)
       minValuePerRecord ++= typedStore.minValues
       maxValuePerRecord ++= typedStore.maxValues
       valuesBuffer ++= typedStore._data

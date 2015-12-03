@@ -21,3 +21,10 @@ but a more accurate as a way to reduce the memory usage)
 17. apply a random permutation to the hadamard matrix
 18. Replace the StringStore
 19. Add specialied point ids stores (e.g. for longs/integers, consequtive etc.)
+20. add a parameter to the search: how many points to touch in all trees
+21. add a warm up method which will cause JIT of the relevant parts
+22. add a parameter how many trees to load
+23. add a parameter to create multipe trees simultaneously
+24. add test files for the special cases (e.g. dataset with one huge cluster, too many points are too close, etc.)
+    (cases which will make it hard to run without preprocessing)
+25. Move the async file read/write to futures or another more sane approach

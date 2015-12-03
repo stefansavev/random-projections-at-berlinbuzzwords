@@ -8,12 +8,10 @@ import java.nio.file.{Files, OpenOption, StandardOpenOption, Paths}
 import java.util.Random
 import java.util.concurrent.{Executors, ExecutorService, ThreadPoolExecutor}
 
-import akka.actor.ActorDSL._
 import akka.actor._
-import akka.util.Timeout
-import scala.concurrent.Await
-import scala.concurrent.duration._
-import akka.pattern.ask
+import com.stefansavev.randomprojections.utils.Utils
+import scala.collection.mutable
+
 
 class AsyncReadFile(val channel: AsynchronousFileChannel, val size: Long){
   def close(): Unit = {
@@ -50,13 +48,12 @@ object AsyncFile{
 trait AsyncFileCommand
 
 //case class Write(bytes: ByteString, position: Long) extends Command
-case class Read(readerId: Int, size: Int, position: Long) extends AsyncFileCommand
+case class Read(readerId: Int, fromPosition: Long, toPosition: Long, hook: Array[Byte] => Unit) extends AsyncFileCommand
 case class Write(writerId: Int, buffer: Array[Byte], position: Long) extends AsyncFileCommand
 
 trait AsyncFileEvent
 
-//case class Written(bytesWritten: Int) extends AsyncFileEvent
-case class ReadResult(readerId: Int, bytes: Array[Byte], bytesRead: Int, position: Long) extends AsyncFileEvent
+case class ReadResult(readRequest: Read, bytes: Array[Byte]) extends AsyncFileEvent
 case class WriteResult(writerId: Int, bytesWritten: Int, position: Long) extends AsyncFileEvent
 case class CommandFailed(cmd: AsyncFileCommand, cause: Throwable) extends AsyncFileEvent
 
@@ -64,15 +61,22 @@ trait BasicCompletionHandler[A, B] extends CompletionHandler[A, B] {
   def receiver: ActorRef
   def cmd: AsyncFileCommand
 
-  override def failed(exc: Throwable, attachment: B): Unit = receiver ! CommandFailed(cmd, exc)
+  override def failed(exc: Throwable, attachment: B): Unit = {
+    println("Failed " + exc)
+    receiver ! CommandFailed(cmd, exc)
+  }
 }
 
 class ReadCompletionHandler(val receiver: ActorRef, dst: ByteBuffer, val cmd: Read) extends BasicCompletionHandler[Integer, AnyRef] {
   override def completed(result: Integer, attachment: AnyRef): Unit = {
-    val bytes = Array.ofDim[Byte](result.intValue())
+    val numBytesRead = result.intValue()
+    if (numBytesRead != (cmd.toPosition - cmd.fromPosition).toInt){
+      Utils.internalError()
+    }
+    val bytes = Array.ofDim[Byte](numBytesRead)
     dst.rewind()
     dst.get(bytes)
-    receiver ! ReadResult(cmd.readerId, bytes, result.intValue(), cmd.position)
+    receiver ! ReadResult(cmd, bytes)
   }
 }
 
@@ -84,10 +88,12 @@ class WriteCompletionHandler(val receiver: ActorRef, val cmd: Write) extends Bas
 
 class ActorFileReader(file: AsyncReadFile) extends Actor{
   override def receive = {
-    case cmd@Read(_, size, position) => {
+    case cmd@Read(readerId, fromPosition, toPosition, hook) => {
+      val size = (toPosition - fromPosition).toInt
       val dst = ByteBuffer.allocate(size)
       //attachment is ignored
-      file.channel.read[AnyRef](dst, position, null, new ReadCompletionHandler(sender(), dst, cmd))
+      val handler = new ReadCompletionHandler(sender(), dst, cmd)
+      file.channel.read[AnyRef](dst, fromPosition, null, handler)
     }
   }
 }
@@ -124,18 +130,6 @@ class FileWriterSupervisor(supervisorActor: ActorRef){
     val future = supervisorActor ? Write(writerId, bytes, pos)
     val result = Await.result(future, timeout.duration).asInstanceOf[WritePosition]
     result
-    /*
-    if (numWritesPending > maxNumberOfPendingWrites){
-      //need to block
-      println("need to block")
-      implicit val timeout = Timeout(500 seconds)
-      val future = self ? WaitUntilSlotAvailable
-      val result = Await.result(future, timeout.duration) //.asInstanceOf[String]
-    }
-
-    numWritesPending += 1
-    file.write(writerId, bytes)(self)
-    */
   }
 
   def waitUntilDone(): Done = {
@@ -144,8 +138,31 @@ class FileWriterSupervisor(supervisorActor: ActorRef){
     val result = Await.result(future, timeout.duration).asInstanceOf[Done]
     result
   }
-
 }
+
+class FileReaderSupervisor(supervisorActor: ActorRef){
+  import ActorFileReaderSupervisorMessages._
+  import akka.util.Timeout
+  import scala.concurrent.Await
+  import scala.concurrent.duration._
+  import akka.pattern._
+
+  def read(fromPos: Long, toPos: Long, hook: Array[Byte] => Unit): Unit = {
+    implicit val timeout = Timeout(5000 seconds)
+    val future = supervisorActor ? Read(-1, fromPos, toPos, hook)
+    Await.result(future, timeout.duration).asInstanceOf[ScheduledReadMessage.type] //ignore result
+    println("finished waiting for read to get scheduled")
+  }
+
+  def waitUntilDone(): ReaderDone = {
+    implicit val timeout = Timeout(5000 seconds)
+    val future = supervisorActor ? ReaderWaitUntilDone
+    val result = Await.result(future, timeout.duration).asInstanceOf[ReaderDone]
+    println("reader done")
+    result
+  }
+}
+
 class ActorFileWriterSupervisor(maxNumberOfPendingWrites: Int, writers: Array[AsyncFileWriter]) extends Actor{
   import ActorFileWriterSupervisorMessages._
   import akka.pattern.ask
@@ -213,6 +230,110 @@ class ActorFileWriterSupervisor(maxNumberOfPendingWrites: Int, writers: Array[As
   }
 }
 
+object ActorFileReaderSupervisorMessages{
+  trait ActorFileReaderSupervisorMessage
+  object ReaderWaitUntilDone extends ActorFileReaderSupervisorMessage
+  object ScheduledReadMessage extends ActorFileReaderSupervisorMessage
+  object ReaderWaitUntilSlotAvailable extends ActorFileReaderSupervisorMessage
+  case class ReaderDone(totalBytesRead: Long) extends ActorFileReaderSupervisorMessage
+}
+
+
+class ActorFileReaderSupervisor(maxNumberOfPendingReads: Int, readers: Array[AsyncFileReader]) extends Actor{
+  import ActorFileReaderSupervisorMessages._
+
+  var numReadsPending = 0L
+  var totalBytesRead = 0L
+
+  case class ScheduledRead(sender: ActorRef, readMessage: Read)
+
+  var waiter: Option[ActorRef] = None
+  var scheduledRead: Option[ScheduledRead] = None
+  val availableReaders = {
+    val queue = new mutable.Queue[Int]()
+    (0 until maxNumberOfPendingReads).foreach(i => queue.enqueue(i))
+    queue
+  }
+
+  def closeAll(): Unit = {
+    readers.foreach(reader => reader.close(context))
+    context.stop(self)
+  }
+
+  def scheduleRead(scheduledRead: ScheduledRead): Unit = {
+    println("scheduling read with # pending " + numReadsPending)
+    numReadsPending += 1
+    val readerId = availableReaders.dequeue()
+    println("scheduling at reader: " + readerId)
+    readers(readerId).read(scheduledRead.readMessage.copy(readerId = readerId))
+    scheduledRead.sender ! ScheduledReadMessage
+  }
+
+  override def receive = {
+    case readMessage@Read(_, fromPosition, toPosition, internalMessage) => {
+      println("read message with #reads pending " + numReadsPending)
+      if (numReadsPending >= maxNumberOfPendingReads){
+        println("queuing read message with #pending " + numReadsPending)
+        if (scheduledRead.isDefined){
+          throw new IllegalStateException("One one pending message is allowed")
+        }
+        scheduledRead = Some(ScheduledRead(sender(), readMessage))
+      }
+      else {
+        scheduleRead(ScheduledRead(sender(), readMessage))
+      }
+    }
+
+    case cmd@ReadResult(readRequest: Read, bytes: Array[Byte]) => {
+      if (numReadsPending <= 0){
+        Utils.internalError()
+      }
+      readRequest.hook(bytes) //run the hook (it may block the actor for a while)
+      availableReaders.enqueue(readRequest.readerId)
+      totalBytesRead += bytes.length
+      numReadsPending -= 1
+
+      if (scheduledRead.isDefined){
+        println("releasing pending # " + numReadsPending)
+        scheduleRead(scheduledRead.get)
+        scheduledRead = None
+      }
+
+      if (numReadsPending == 0 && waiter.isDefined){
+        if (scheduledRead.isDefined){
+          throw new IllegalStateException("One one pending message is allowed")
+        }
+        if (readers(0).size != totalBytesRead){
+          Utils.internalError()
+        }
+        waiter.get ! ReaderDone(totalBytesRead)
+        waiter = None
+        closeAll()
+      }
+    }
+
+    case ReaderWaitUntilDone => {
+      println("reader wait until done")
+      if (waiter.isDefined){
+        Utils.internalError()
+      }
+      if (numReadsPending == 0){
+        if (scheduledRead.isDefined){
+          Utils.internalError()
+        }
+        if (readers(0).size != totalBytesRead){
+          Utils.internalError()
+        }
+        sender() ! ReaderDone(totalBytesRead)
+        closeAll()
+      }
+      else{
+        waiter = Some(sender())
+      }
+    }
+  }
+}
+
 class AsyncFileWriter(fileName: String, system: ActorSystem, pool: ExecutorService, actorNameSuffix: String){
   println("creating async file: " + fileName)
   //Files.delete(Paths.get(fileName))
@@ -240,31 +361,20 @@ class AsyncFileWriter(fileName: String, system: ActorSystem, pool: ExecutorServi
   }
 }
 
-class AsyncFileReader(fileName: String, system: ActorSystem, pool: ExecutorService, actorNameSuffix: String, startPos: Long = 0, endPos: Long = -1){
+class AsyncFileReader(fileName: String, system: ActorSystem, pool: ExecutorService, actorNameSuffix: String){
   val fileReader = AsyncFile.openRead(fileName, pool)
-
+  val size = fileReader.size
   val fileReaderActorProps = Props(classOf[ActorFileReader], fileReader)
   val fileReaderActor = system.actorOf(fileReaderActorProps, "FileReader_" + actorNameSuffix)
-  var readPosition = startPos
-  var adjustedEndPos = if (endPos < 0) fileReader.size else endPos
-  //val adjustedFileSize = if (endPos < 0) fileReader.size else Math.min(endPos, fileReader.size)
 
-  def read(readerId: Int, requestedSize: Int)(implicit sender: ActorRef): Boolean = {
-    if (readPosition < adjustedEndPos) {
-      val adjustedSize = if (readPosition + requestedSize > adjustedEndPos) {
-        (adjustedEndPos - readPosition).toInt
-      }
-      else {
-        requestedSize
-      }
-      val prevReadPosition = readPosition
-      readPosition += adjustedSize
-      fileReaderActor ! Read(readerId, adjustedSize, prevReadPosition)
-      true
+  def read(readMessage: Read)(implicit sender: ActorRef): Unit = {
+    if (readMessage.fromPosition >= readMessage.toPosition){
+      Utils.internalError()
     }
-    else{
-      false
+    if (readMessage.toPosition > size){
+      Utils.internalError()
     }
+    fileReaderActor ! readMessage
   }
 
   def close(context: ActorContext): Unit = {
@@ -290,10 +400,24 @@ object Application{
     new AsyncFileWriter(fileName, getActorSystem, getExecutorService, actorSuffix)
   }
 
+  def createAsyncFileReader(fileName: String, actorSuffix: String): AsyncFileReader = {
+    new AsyncFileReader(fileName, getActorSystem, getExecutorService, actorSuffix)
+  }
+
   def createWriterSupervisor(suffix: String, maxNumberOfPendingWrites: Int, writers: Array[AsyncFileWriter]): FileWriterSupervisor = {
     val props = Props(classOf[ActorFileWriterSupervisor], maxNumberOfPendingWrites, writers)
     val actorRef = system.actorOf(props, "WriterSupervisor_" + suffix)
     new FileWriterSupervisor(actorRef)
+  }
+
+  def createReaderSupervisor(suffix: String, maxNumberOfPendingReads: Int, fileName: String): FileReaderSupervisor = {
+    if (maxNumberOfPendingReads < 1){
+      Utils.internalError()
+    }
+    val readers = Array.range(0, maxNumberOfPendingReads).map(i => Application.createAsyncFileReader(fileName, suffix + "Reader_" + i))
+    val props = Props(classOf[ActorFileReaderSupervisor], maxNumberOfPendingReads, readers)
+    val actorRef = system.actorOf(props, "ReaderSupervisor_" + suffix)
+    new FileReaderSupervisor(actorRef)
   }
 
   def shutdown(): Unit ={
@@ -303,118 +427,5 @@ object Application{
 
 }
 
-object AsyncReaderUtils{
-  case class FileSizes(fileSizes: Array[Long])
-  case class AsyncReadMultipleResults(readerIndex: Int, bytes: Array[Byte], bytesRead: Int, position: Long)
-
-  def readMultipleFiles(fileNames: Array[String], onFileSizes: FileSizes => Unit, onRead: AsyncReadMultipleResults => Unit): Unit = {
-
-    implicit val system = akka.actor.ActorSystem("test-reader-writer")
-
-    val pool = Executors.newFixedThreadPool(50) //TODO: replace with something else
-
-    val maxNumBytes: Long = 1024*1024*64L //64 MB's
-    val readers = fileNames.zipWithIndex.map{case (fileName, index) => {
-        new AsyncFileReader(fileName, system, pool, index.toString)
-      }}
-
-    val fileSizes = readers.map(_.fileReader.size)
-    onFileSizes(FileSizes(fileSizes))
-
-    case object StartReading
-    case class ReadNextBytes(readerId: Int)
-    case object DoneReading
-    val readBufferSize = 1024*1024*1
-    var numRemaining = readers.length
-    var initialSender: Option[ActorRef] = None
-    val loop = actor(new Act {
-      become {
-        case StartReading => {
-          initialSender = Some(sender())
-          for(readerId <- 0 until readers.length){
-            self ! ReadNextBytes(readerId)
-          }
-        }
-        case ReadNextBytes(readerId) => {
-          if (!readers(readerId).read(readerId, readBufferSize)){
-            numRemaining -= 1
-          }
-          if (numRemaining == 0){
-            self ! DoneReading
-          }
-        }
-        case ReadResult(readerId, bytes: Array[Byte], bytesRead: Int, position: Long) => {
-          println("Read # bytes " + bytes.length + " at position " + position + " from reader: " + readerId)
-          onRead(AsyncReadMultipleResults(readerId, bytes, bytesRead, position))
-          self ! ReadNextBytes(readerId)
-        }
-        case DoneReading => {
-          readers.foreach(reader => reader.close(context))
-          context.stop(self)
-          println("done")
-          initialSender.get ! "done readering"
-          initialSender = None
-        }
-      }
-    })
-
-    implicit val timeout = Timeout(50 seconds)
-    val future = loop ? StartReading
-    val result = Await.result(future, timeout.duration).asInstanceOf[String]
-    println("Got result after waiting: " + result)
-    loop ! PoisonPill
-    pool.shutdown()
-    system.shutdown()
-  }
-}
-
-object MinTestReadWrite{
-  import akka.actor.ActorDSL._
-  import akka.actor.{PoisonPill, ActorSystem, ActorRef}
-
-  def main(args: Array[String]) {
-    implicit val system = akka.actor.ActorSystem("test-reader-writer")
-
-    val wikipediaFile = "C:/wikipedia-parsed/title_tokens.txt/title_tokens.txt"
-    val pool = Executors.newFixedThreadPool(50) //TODO: replace with something else
-
-    val maxNumBytes: Long = 1024*1024*64L //64 MB's
-    val reader = new AsyncFileReader(wikipediaFile, system, pool, "1",0, maxNumBytes)
-    val writers = Array.range(0, 10).map(i => new AsyncFileWriter("C:/wikipedia-parsed/trashdir/trash" + i + ".txt", system, pool, i.toString))
-
-    case object ReadNextBytes
-    case object DoneReading
-
-    val rnd = new Random(8484)
-    val loop = actor(new Act {
-      become {
-        case ReadNextBytes => {
-          if (!reader.read(0, 1024*1024*1)){
-            self ! DoneReading
-          }
-        }
-        case ReadResult(_, bytes: Array[Byte], bytesRead: Int, position: Long) => {
-          println("Read # bytes " + bytes.length + " at position " + position)
-          val randomWriterId = rnd.nextInt(writers.length)
-          val writer = writers(randomWriterId)
-          writer.write(randomWriterId, bytes)
-        }
-        case WriteResult(writerId, bytesWritten: Int, position: Long) => {
-          println("Wrote # bytes " + bytesWritten + " at pos " + position)
-          self ! ReadNextBytes
-        }
-        case DoneReading => {
-          reader.close(context)
-          writers.foreach(writer => writer.close(context))
-          context.stop(self)
-          pool.shutdown()
-          system.shutdown()
-          println("done")
-        }
-      }
-    })
-    loop ! ReadNextBytes
-  }
-}
 
 

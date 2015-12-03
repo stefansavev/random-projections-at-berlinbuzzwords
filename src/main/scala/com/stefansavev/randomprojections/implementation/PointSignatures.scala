@@ -2,9 +2,11 @@ package com.stefansavev.randomprojections.implementation
 
 import java.io.{FileInputStream, BufferedInputStream}
 
+import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.serialization.core.Core
 import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
+import com.stefansavev.randomprojections.utils.{Utils}
 
 class SignatureVectors(val signatureVectors: Array[SparseVector]){
   def numSignatures: Int = signatureVectors.size
@@ -114,13 +116,13 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
   }
 
   def toPointSignatures(): PointSignatures = {
-    val buffer = Array.ofDim[Long](numPoints*numSignatures)
+    val buffer1 = Array.ofDim[Long](numPoints*numSignatures)
 
     def readPartition(partId: Int): Array[Long] = {
-      val fromByte = positions(partId)
-      val toByte = positions(partId + 1)
       val fileName = AsyncSignatureVectorsUtils.fileName(backingDir)
       val inputStream = new BufferedInputStream(new FileInputStream(fileName))
+      val fromByte = positions(partId)
+      val toByte = positions(partId + 1)
       inputStream.skip(fromByte)
       val size = (toByte - fromByte).toInt
       val input: Array[Byte] = new Array[Byte](size)
@@ -130,13 +132,65 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
       values
     }
 
-    var offset = 0
-    for(i <- 0 until numPartitions){
-      val partitionValues = readPartition(i)
-      System.arraycopy(partitionValues, 0, buffer, offset, partitionValues.length)
-      offset += partitionValues.length
+    val readSynchronously = true
+    val readAsync = false
+    if (readSynchronously){
+      var offset = 0
+      for(i <- 0 until numPartitions){
+        val partitionValues = readPartition(i)
+        System.arraycopy(partitionValues, 0, buffer1, offset, partitionValues.length)
+        println("required offset for part " + i + " " + offset + " " + partitionValues.length)
+        offset += partitionValues.length
+
+      }
     }
-    new PointSignatures(null, null, -1, buffer, numPoints, numSignatures)
+
+    //code still in testing
+    if (readAsync) {
+      val buffer2 = Array.ofDim[Long](numPoints*numSignatures)
+      val fileName = AsyncSignatureVectorsUtils.fileName(backingDir)
+
+      //it looks like AsyncFileReader cannot be called multiple times until complete is finished
+      val supervisor = Application.createReaderSupervisor("SignatureReaderSupervisor", 10, fileName)
+      //val shuffledPartitions = RandomUtils.shuffleInts(new Random(48181), Array.range(0, numPartitions))
+      //val handledPartitions = new ArrayBuffer[Int]()
+      for (i <- 0 until numPartitions) {
+        //val i = j //shuffledPartitions(j)
+        println("reading partition " + i)
+        //synchronous code
+        //val partitionValues = readPartition(i)
+        //System.arraycopy(partitionValues, 0, buffer, offset, partitionValues.length)
+        val fromByte = positions(i)
+        val toByte = positions(i + 1)
+        //the read may block, but usually will not block
+        supervisor.read(fromByte, toByte, { bytesReceived => {
+            if (((toByte - fromByte).toInt) != bytesReceived.length) {
+              Utils.internalError()
+            }
+            //Thread.sleep(5000)
+            val partitionId = i //we remember i in the closure
+            val values = Core.fromBytes(TypedLongArraySerializer, bytesReceived)
+            val offset = partitionId * partitionSize * numSignatures
+            //println("computed offset for part " + partitionId + " " + offset + " len: " + values.length)
+            System.arraycopy(values, 0, buffer2, offset, values.length)
+            for(k <- offset until (offset + values.length)){
+              if (buffer1(k) != buffer2(k)){
+                println("Error at offset: " + (k - offset))
+                Utils.internalError()
+              }
+            }
+            //println("completed array copy at index " + partitionId)
+            //handledPartitions += partitionId
+          }
+        })
+        //println("finished read at index " + i)
+      }
+      supervisor.waitUntilDone()
+      //println("# handled partitions " + handledPartitions.toArray.distinct.length + " vs. " + numPartitions)
+
+    }
+
+    new PointSignatures(null, null, -1, buffer1, numPoints, numSignatures)
   }
 }
 
