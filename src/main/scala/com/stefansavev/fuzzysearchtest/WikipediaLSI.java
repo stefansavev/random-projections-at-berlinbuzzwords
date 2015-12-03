@@ -44,7 +44,7 @@ public class WikipediaLSI {
         String line = null;
         while ((line = reader.readLine()) != null) {
             FuzzySearchItem item = parseItem(lineNumber, line, dataDimension);
-            if (lineNumber <= 8000000) {
+            if (lineNumber <= 1000000) {
                 indexBuilder.addItem(item);
             }
             else{

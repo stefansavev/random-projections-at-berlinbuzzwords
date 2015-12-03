@@ -155,6 +155,40 @@ class PointSignatures(val pointSigReference: PointSignatureReference, val backin
     sum
   }
 
+  def overlapTwoPoints(pointId1: Int, pointId2: Int, k: Int): Int = {
+    val pointSignatures = this.pointSignatures
+    val len = Math.min(k, pointSignatures.length)
+
+    var offset1 = pointId1*numSignatures
+    var offset2 = pointId2*numSignatures
+
+    var sum = 0
+    var i = 0
+    while(i < len){
+      sum += Signatures.overlap(pointSignatures(offset1), pointSignatures(offset2))
+      offset1 += 1
+      offset2 += 1
+      i += 1
+    }
+    sum
+  }
+
+  def estimatedCosineTwoPoints(pointId1: Int, pointId2: Int, k: Int): Double = {
+    /*
+      p_agree = overlap/num_sig
+      #Source for the following formula:
+      # Similarity Estimation Techniques from Rounding Algorithms Moses S. Charikar
+      #p_agree = 1.0 - angle/pi
+      #solve for angle
+      angle = (1.0 - p_agree)*pi
+    */
+    val overlap = overlapTwoPoints(pointId1, pointId2, k)
+    val numSigBits = 64.0*k.toDouble //number of bits in signature
+    val p = overlap.toDouble / numSigBits
+    val angle = (1.0 - p)*Math.PI
+    Math.cos(angle)
+  }
+
   def pointSignature(pointId: Int): Array[Long] = {
     val output = Array.ofDim[Long](pointSignatures.length)
     var i = 0

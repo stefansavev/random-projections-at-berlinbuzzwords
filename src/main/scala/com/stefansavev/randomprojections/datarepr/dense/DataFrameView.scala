@@ -1,7 +1,9 @@
 package com.stefansavev.randomprojections.datarepr.dense
 
+import java.util.Random
+
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.randomprojections.implementation.PointSignatures
+import com.stefansavev.randomprojections.implementation.{Signatures, PointSignatures}
 
 class PointIndexes(val indexes: Array[Int]){
   def toTuple: PointIndexes.TupleType = (0, indexes)
@@ -29,6 +31,14 @@ class DataFrameView(val indexes: PointIndexes, val rowStoredView: RowStoredMatri
 
   def getRowIdByName(name: String): Int = {
     rowStoredView.getRowIdByName(name)
+  }
+
+  def buildSetSignatures(numSignatures: Int, rnd: Random): Unit = {
+    if (pointSignatures != null){
+      throw new IllegalStateException("Signatures cannot be overwritten")
+    }
+    val (signatureVecs, signatures) = Signatures.computePointSignatures(numSignatures, rnd, this)
+    this.setPointSignatures(signatures)
   }
 
   def getPointSignatures(): PointSignatures = {

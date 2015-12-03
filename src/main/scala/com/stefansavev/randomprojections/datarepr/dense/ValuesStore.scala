@@ -281,7 +281,7 @@ class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBui
 
 class AsyncStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: StoreBuilderType) extends ValuesStoreBuilder{
   var currentRow = 0
-  val numPointsInPartition = 1 << 12 // 12 //1 << 17 //1 << 17 //= 131072
+  val numPointsInPartition = 1 << 14
   var currentPartition = 0
   var currentBuilder = underlyingBuilder.getBuilder(numCols)
   val writePositions = new LongArrayBuffer()

@@ -1,3 +1,4 @@
+0. Restructure code and add testing
 1. Add noise to queries and check the sensitivity of indexing structures to noise
 2. Introduce reverse rotation and remove the memory in IndexBuilder.buildWithSVDAndRandomRotation
 3. Check that the Hadamard transformation works for features whose size is not power of 2
@@ -9,5 +10,14 @@
 into the m-th tree, remove the subspace of the "merged points" -- trees that take longer to build
 but a more accurate as a way to reduce the memory usage)
 9. Introduce a more generic SignatureFit where there are multiple ways to compute point signagures
-(for example, we can have a few subspaces and a single singnature per subspace)
+(for example, we can have a few subspaces and a single signature per subspace)
 10. Add testing infrastructure
+11. Factor out serialization core into a new project
+12. Move the Online SVD code into an actor
+13. Load data files asyncronously
+14. Speedup code when using storage as bytes not as doubles
+15. add versioning and checksums to the serialization
+16. remove big array used during querying
+17. apply a random permutation to the hadamard matrix
+18. Replace the StringStore
+19. Add specialied point ids stores (e.g. for longs/integers, consequtive etc.)

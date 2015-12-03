@@ -24,6 +24,8 @@ dependencies {
     compile 'com.github.fommil.netlib:all:1.1.2'
     compile 'com.googlecode.matrix-toolkits-java:mtj:1.0.1'
     compile 'com.typesafe.akka:akka-actor_2.11:2.3.14'
+
+    testCompile "org.scalatest:scalatest_2.11:2.2.4"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
