@@ -27,7 +27,7 @@ for all data points in datasets of sizes up to half a million data points.
 | MNIST                      | 42 000                |  100                  | 10                            | 1104             | 164                          | 91.5%    |
 | Google Word Vectors        | 70 000                |  200                  | 50                            | 528              | 49                           | 91.0%    |
 | Glove Word Vectors         | 400 000               |  100                  | 150                           | 165              | 18                           | 90.9%    |
-| Wikipedia Document Vectors | 40 000 000            |  128                  | 50                            | 268              | NA                           | 85.63    |
+| Wikipedia Document Vectors | 4 000 000             |  128                  | 50                            | 268              | NA                           | 85.63    |
 
 90% Recall@10 means that in top 10 results returned by the library we found 9. This is common for search using
 dense vectors. The remaining 1 result can be found by increasing the number of trees, essentially giving more computational time and memory to the library.
