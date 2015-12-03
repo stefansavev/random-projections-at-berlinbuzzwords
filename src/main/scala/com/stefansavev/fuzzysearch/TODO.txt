@@ -28,3 +28,7 @@ but a more accurate as a way to reduce the memory usage)
 24. add test files for the special cases (e.g. dataset with one huge cluster, too many points are too close, etc.)
     (cases which will make it hard to run without preprocessing)
 25. Move the async file read/write to futures or another more sane approach
+26. Add code to find "heavy" features (since they break the random proj. method) and also "heavy subspaces"
+    and apply RandomProj to the headvy subspaces (this is a small number of features that account
+        for large percentage of the mass of the point)
+27. Drop the requirement for cosine and switch to dot products
