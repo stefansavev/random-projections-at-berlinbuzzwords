@@ -143,6 +143,9 @@ object FuzzySearchIndexWrapper{
 }
 
 class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: Int, valueSize: FuzzyIndexValueSize){
+  if (dim < 8){
+    throw new IllegalStateException("The data dimension has to be greater or equal to 8")
+  }
   def checkDirectories(dirName: String): Unit = {
     val file = new File(dirName)
     if (!file.exists()) {
@@ -251,7 +254,8 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
     val signatures = onlineSigVecs.buildPointSignatures()
     val trees = Utils.timed("Create trees", {
       val treePartitionsDir = new File(backingFile, FuzzySearchIndexWrapper.randomTreesPartitionsDir).getAbsolutePath
-      IndexBuilder.buildWithSVDAndRandomRotation(treePartitionsDir, 32, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform), Some(signatures))
+      val svdDim = Math.min(32, HadamardUtils.roundDown(dim))
+      IndexBuilder.buildWithSVDAndRandomRotation(treePartitionsDir, svdDim, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform), Some(signatures))
     }).result
 
     def save(fileName: String): Unit = {
