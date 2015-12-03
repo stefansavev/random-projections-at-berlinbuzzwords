@@ -32,7 +32,11 @@ for all data points in datasets of sizes up to half a million data points.
 90% Recall@10 means that in top 10 results returned by the library we found 9. This is common for search using
 dense vectors. The remaining 1 result can be found by increasing the number of trees, essentially giving more computational time and memory to the library.
 
-##API
+#Usage
+
+There is a sample projection using this library at https://github.com/stefansavev/fuzzysearch-demo
+
+#API
 
 ###Indexing (in batch mode)
 
@@ -73,6 +77,3 @@ String topResultName = topResult.getName();
 double topResultSimilarity = topResult.getCosineSimilarity();
 ```
 
-#Usage
-
-There is a sample projection using this library at https://github.com/stefansavev/fuzzysearch-demo
