@@ -142,9 +142,14 @@ public class MnistTest {
     }
 
     public static void main(String[] args) throws Exception {
+        /*
         String inputTextFile = "D:/RandomTreesData-144818512896186816/input/" + "mnist/svdpreprocessed/train.csv";
         String queriesFile = inputTextFile; //same as training in this example
         String indexFile = "C:/tmp/output-index-mnist-1/";
+         */
+        String inputTextFile = "/tmp/fuzzysearch-demo/testdata/mnist/preprocessed-train.csv";
+        String queriesFile = inputTextFile; //same as training in this example
+        String indexFile = "/tmp/output-index-mnist-1/";
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromFile(queriesFile, indexFile);
@@ -164,12 +169,12 @@ public class MnistTest {
         //
         //FuzzySearchResults expected = FuzzySearchEvaluationUtils.resultsOnTestSet(index, testSet, 50, true); //brute force
         //expected.toTextFile("C:/tmp/mnist-testset.txt");
-        FuzzySearchResults expected = FuzzySearchResults.fromTextFile("C:/tmp/mnist-testset.txt");
-        FuzzySearchResults retrieved =  FuzzySearchEvaluationUtils.resultsOnTestSet(index, expected, 1000, false); //with the system
-        RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
-
+        //FuzzySearchResults expected = FuzzySearchResults.fromTextFile("C:/tmp/mnist-testset.txt");
+        //FuzzySearchResults retrieved =  FuzzySearchEvaluationUtils.resultsOnTestSet(index, expected, 1000, false); //with the system
+        //RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
+        FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
         Application.shutdown();
-        //FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
+        //
     }
     /*
     output:

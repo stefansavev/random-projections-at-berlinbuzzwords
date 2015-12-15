@@ -32,8 +32,18 @@ public class FuzzySearchEvaluationUtils {
             //System.out.println("Running query " + queryId + " " + numProcessedQueries + "/" + testSet.getNumberOfQueries());
             double[] queryVector = index.getItemByName(queryId).getVector();
             List<FuzzySearchResult> results;
-            if ( bruteForce) {
+            if (bruteForce) {
                 results = index.bruteForceSearch(numResults, queryVector);
+                /*
+                int i = 0;
+                for(FuzzySearchResult result: results){
+                    System.out.println(i + " " + result.getCosineSimilarity() + " " + result.getName());
+                    i += 1;
+                    if (i >= 10){
+                        break;
+                    }
+                }
+                */
             }
             else{
                 results = index.search(numResults, queryVector);
