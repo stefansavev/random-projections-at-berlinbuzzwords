@@ -2,12 +2,13 @@
 
 A library for approximate nearest neighbor search. This library can be used to:
 
-* search words represented as word vectors
-* search documents using a dense representation from Latent Dirichlet Allocation (LDA) and SVD
-* build an image search engine
-* build a music search engine
-* build a recommendation system
-* search representations of deep neural networks
+* efficiently search words represented as word vectors
+* efficiently search documents using a dense representation from Latent Dirichlet Allocation (LDA) and SVD
+* efficiently search representations of deep neural networks
+* as a component of a recommendation system
+* as a component of image search engine
+* as a component of a music search engine
+
 
 The library was presented at BerlinBuzzwords 2015 in the following talk:
 
@@ -27,14 +28,21 @@ for all data points in datasets of sizes up to half a million data points.
 | MNIST                      | 42 000                |  100                  | 10                            | 1104             | 164                          | 91.5%    |
 | Google Word Vectors        | 70 000                |  200                  | 50                            | 528              | 49                           | 91.0%    |
 | Glove Word Vectors         | 400 000               |  100                  | 150                           | 165              | 18                           | 90.9%    |
-| Wikipedia Document Vectors | 4 000 000             |  128                  | 50                            | 268              | NA                           | 85.63    |
+| Wikipedia Document Vectors | 4 000 000             |  128                  | 50                            | 268              | NA                           | 85.6%    |
 
-90% Recall@10 means that in top 10 results returned by the library we found 9. This is common for search using
+90% Recall@10 means that in top 10 results returned by the library we found 9 (we failed to find 1). This is common for approximate search using
 dense vectors. The remaining 1 result can be found by increasing the number of trees, essentially giving more computational time and memory to the library.
 
 #Usage
 
 There is a sample projection using this library at https://github.com/stefansavev/fuzzysearch-demo
+
+# Feature Roadmap
+
+* quantization: detect vectors which are very close (at similarity < 0.8) at indexing time. This also solves duplicate detection problem.
+* bag of features: allow one object to be represented by multiple vectors
+* query likelihood similarity: this makes sense when an object has multiple parts each represented by its own vector.
+* integration with ElasticSearch: index and search dense vectors in ElasticSearch together with other fields
 
 #API
 
