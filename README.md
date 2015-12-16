@@ -43,6 +43,17 @@ There is a sample projection using this library at https://github.com/stefansave
 * bag of features: allow one object to be represented by multiple vectors
 * query likelihood similarity: this makes sense when an object has multiple parts each represented by its own vector.
 * integration with ElasticSearch: index and search dense vectors in ElasticSearch together with other fields
+* reduced index size
+* integration with learning algorithms. If your data is labeled, you can levarage the labels to improved your search
+* integration with vizualization algorithms. Big high dimensional data can be successfully vizualized with the t-SNA algorithm
+* 20-questions. How do you search if you don't know where to start. We implement the 20-questions algorithm to
+help you search the data without knowing how to express your search.
+* integrate multiple filters such as time and location
+* integrate with sparse data
+* integrate with complex relational data
+* leverage external knowledge sources:
+** For image data we levarage the representation from neural networks on image net
+** For text data we levarage word vectors derived both on single words and phrases
 
 #API
 
