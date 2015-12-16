@@ -1,4 +1,7 @@
-# random-projections-at-berlinbuzzwords
+
+# Integrated Tools where Search meets Deep Neural Networks
+
+# Currently
 
 A library for approximate nearest neighbor search. This library can be used to:
 
@@ -46,14 +49,14 @@ There is a sample projection using this library at https://github.com/stefansave
 * reduced index size
 * integration with learning algorithms. If your data is labeled, you can levarage the labels to improved your search
 * integration with vizualization algorithms. Big high dimensional data can be successfully vizualized with the t-SNA algorithm
-* 20-questions. How do you search if you don't know where to start. We implement the 20-questions algorithm to
+* Let the system guide your search with 20 questions. How do you search if you don't know where to start. We implement the 20 questions algorithm to
 help you search the data without knowing how to express your search.
-* integrate multiple filters such as time and location
+* both exact keyword search and semantic search on the same platform. integrate multiple filters such as time, location and sparse signals such as keywords
 * integrate with sparse data
 * integrate with complex relational data
 * leverage external knowledge sources:
-** For image data we levarage the representation from neural networks on image net
-** For text data we levarage word vectors derived both on single words and phrases
+* For image data we levarage the representation from neural networks on image net
+* For text data we levarage word vectors derived both on single words and phrases
 
 #API
 
