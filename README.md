@@ -1,9 +1,9 @@
 
-# Integrated Tools where Search meets Deep Neural Networks
+# Approximate nearest neighbor search for dense and sparse vectors
 
 # Currently
 
-A library for approximate nearest neighbor search. This library can be used to:
+A library for approximate nearest neighbor search for dense vectors. This library can be used to:
 
 * efficiently search words represented as word vectors
 * efficiently search documents using a dense representation from Latent Dirichlet Allocation (LDA) and SVD
