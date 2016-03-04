@@ -3,8 +3,7 @@ package com.stefansavev.similaritysearch.implementation
 import java.io.{FileFilter, File}
 import java.util
 import java.util.Random
-
-import com.stefansavev.similaritysearch.SimilaritySearchEngines.StorageSize
+import com.stefansavev.similaritysearch.VectorType.StorageSize
 import com.stefansavev.similaritysearch.{SimilaritySearchItem, SimilaritySearchResult}
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.{SVDTransform, OnlineSVDFitter}

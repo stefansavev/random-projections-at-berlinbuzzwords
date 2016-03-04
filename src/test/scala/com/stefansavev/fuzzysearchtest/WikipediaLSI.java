@@ -1,6 +1,7 @@
 package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.similaritysearch.*;
+import com.stefansavev.similaritysearch.implementation.VectorTypes;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -29,9 +30,10 @@ public class WikipediaLSI {
         int numTrees = 50;
         //create an indexer
 
-        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
-                SimilaritySearchEngines.fastTrees(numTrees,
-                        SimilaritySearchEngines.StorageSize.SingleByte));
+        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile,
+                VectorTypes.uncorrelatedFeatures(dataDimension, VectorType.StorageSize.SingleByte),
+                SimilarityIndexingEngines.fastTrees(numTrees),
+                QueryTypes.cosineSimilarity());
 
         /*
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,

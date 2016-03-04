@@ -2,6 +2,7 @@ package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.similaritysearch.*;
 import com.stefansavev.randomprojections.actors.Application;
+import com.stefansavev.similaritysearch.implementation.VectorTypes;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -38,8 +39,10 @@ public class Cifar100Parts {
         int dataDimension = 64;
         int numTrees = 50; //150;
         //create an indexer
-        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
-                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.StorageSize.TwoBytes));
+        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile,
+                VectorTypes.uncorrelatedFeatures(dataDimension, VectorType.StorageSize.TwoBytes),
+                SimilarityIndexingEngines.fastTrees(numTrees),
+                QueryTypes.cosineSimilarity());
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector

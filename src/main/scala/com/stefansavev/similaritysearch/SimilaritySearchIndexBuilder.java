@@ -5,18 +5,23 @@ import com.stefansavev.similaritysearch.implementation.FuzzySearchIndexWrapper;
 
 public class SimilaritySearchIndexBuilder {
     FuzzySearchIndexBuilderWrapper wrapper;
+
     int dimension;
 
-    public SimilaritySearchIndexBuilder(String backingFile, int dimension, SimilaritySearchEngine engine){
-        this.dimension = dimension;
-        if (engine instanceof SimilaritySearchEngine.FastTrees){
-            SimilaritySearchEngine.FastTrees fastTrees = ((SimilaritySearchEngine.FastTrees)engine);
-            wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, fastTrees.getNumTrees(), fastTrees.getValueSize());
+    public SimilaritySearchIndexBuilder(String backingFile,
+                                        VectorType vectorType,
+                                        SimilarityIndexingEngine engine,
+                                        QueryType queryType){
+        dimension = vectorType.getDimension();
+        VectorType.StorageSize storageSize = vectorType.getStorageSize();
+        if (engine instanceof SimilarityIndexingEngine.FastTrees){
+            SimilarityIndexingEngine.FastTrees fastTrees = ((SimilarityIndexingEngine.FastTrees)engine);
+            wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, fastTrees.getNumTrees(), storageSize);
         }
         else{
-            //for the moment use numTrees == 0 as a brute force flag
-            SimilaritySearchEngine.BruteForce bruteForce = ((SimilaritySearchEngine.BruteForce)engine);
-            wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, 0, bruteForce.getValueSize());
+            //TODO: for the moment use numTrees == 0 as a brute force flag
+            SimilarityIndexingEngine.BruteForce bruteForce = ((SimilarityIndexingEngine.BruteForce)engine);
+            wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, 0, storageSize);
         }
     }
 

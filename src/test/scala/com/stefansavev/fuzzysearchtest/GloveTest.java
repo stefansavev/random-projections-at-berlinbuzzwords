@@ -2,6 +2,7 @@ package com.stefansavev.fuzzysearchtest;
 
 import com.stefansavev.similaritysearch.*;
 import com.stefansavev.randomprojections.actors.Application;
+import com.stefansavev.similaritysearch.implementation.VectorTypes;
 
 import java.io.*;
 import java.util.Iterator;
@@ -26,8 +27,10 @@ public class GloveTest {
         int dataDimension = 100;
         int numTrees = 50; //150;
         //create an indexer
-        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
-                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.StorageSize.Double));
+        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile,
+                VectorTypes.uncorrelatedFeatures(dataDimension, VectorType.StorageSize.Double),
+                SimilarityIndexingEngines.fastTrees(numTrees),
+                QueryTypes.cosineSimilarity());
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector
