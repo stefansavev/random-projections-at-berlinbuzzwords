@@ -3,10 +3,10 @@ package com.stefansavev.randomprojections.serialization
 import java.io._
 import java.nio.ByteBuffer
 
-import com.stefansavev.randomprojections.implementation.{BucketCollectorImpl, RandomTrees, IndexImpl, Leaf2Points}
+import RandomTreesSerializersV2.RandomTreesSerializer
+import com.stefansavev.core.serialization.core.{IntSerializer, StringSerializer, MemoryTrackerImpl}
+import com.stefansavev.randomprojections.implementation.{BucketCollectorImpl, IndexImpl, Leaf2Points, RandomTrees}
 import com.stefansavev.randomprojections.serialization.RandomTreesSerialization.BinaryFileDeserializer
-import com.stefansavev.randomprojections.serialization.RandomTreesSerializersV2.RandomTreesSerializer
-import com.stefansavev.randomprojections.serialization.core.MemoryTrackerImpl
 
 import scala.collection.mutable.ArrayBuffer
 

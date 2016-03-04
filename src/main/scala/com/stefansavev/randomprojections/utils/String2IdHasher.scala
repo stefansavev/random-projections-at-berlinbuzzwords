@@ -2,7 +2,6 @@ package com.stefansavev.randomprojections.utils
 
 import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.implementation.HadamardUtils
-import com.stefansavev.randomprojections.serialization.{StringSerializer, IntSerializer}
 
 object String2IdHasherHelper{
   def emptyIntArray(size: Int): Array[Int] = {

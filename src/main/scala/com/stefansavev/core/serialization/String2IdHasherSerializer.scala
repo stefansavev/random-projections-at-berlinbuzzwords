@@ -1,8 +1,8 @@
-package com.stefansavev.randomprojections.serialization
+package com.stefansavev.core.serialization
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.randomprojections.serialization.core.{MemoryTracker, TypedSerializer}
+import com.stefansavev.core.serialization.core.{StringSerializer, IntSerializer, MemoryTracker, TypedSerializer}
 import com.stefansavev.randomprojections.utils.{StringIdHasherSettings, String2IdHasher}
 
 object String2IdHasherSerialization {

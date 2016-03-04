@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.serialization.core
+package com.stefansavev.core.serialization.core
 
 object Demo {
   import Core._

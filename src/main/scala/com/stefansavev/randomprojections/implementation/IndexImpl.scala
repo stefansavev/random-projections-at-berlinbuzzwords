@@ -1,11 +1,12 @@
 package com.stefansavev.randomprojections.implementation
 
 import java.io.File
+import com.stefansavev.core.serialization.core.StringSerializer
 import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer
 import com.stefansavev.randomprojections.interface.Index
-import com.stefansavev.randomprojections.serialization.{StringSerializer, PointSignaturesSerializer, BinaryFileSerializer}
+import com.stefansavev.randomprojections.serialization.{PointSignaturesSerializer, BinaryFileSerializer}
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 
 class IndexImpl(val signatures: PointSignatures, val totalNumPoints: Int, val leaf2PointsDir: Option[(String, Int, Int, Int)], val leaf2Points: Leaf2Points, val id2Label: Array[Int]) extends Index{

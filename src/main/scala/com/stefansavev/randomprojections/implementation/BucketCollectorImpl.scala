@@ -2,10 +2,10 @@ package com.stefansavev.randomprojections.implementation
 
 import java.io._
 
+import com.stefansavev.core.serialization.core.IntArraySerializer
 import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.datarepr.dense.{FixedLengthBuffer, PointIndexes}
 import com.stefansavev.randomprojections.interface.{BucketCollector, Index}
-import com.stefansavev.randomprojections.serialization.{IntArraySerializer, LongArraySerializer}
 
 object BucketCollectorImplUtils{
   val partitionFileSuffix = "_partition_"

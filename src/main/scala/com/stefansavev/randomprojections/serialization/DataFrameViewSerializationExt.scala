@@ -1,9 +1,10 @@
 package com.stefansavev.randomprojections.serialization
 
 import java.io.File
+
+import DataFrameViewSerializers._
+import com.stefansavev.core.serialization.core.Core
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
-import com.stefansavev.randomprojections.serialization.core.Core
-import DataFrameViewSerializers.dataFrameSerializer
 
 object DataFrameViewSerializationExt {
 

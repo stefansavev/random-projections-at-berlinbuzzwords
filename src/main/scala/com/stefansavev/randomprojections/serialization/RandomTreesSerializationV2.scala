@@ -2,16 +2,16 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeader, ValuesStore, DenseRowStoredMatrixView, DataFrameView}
+import com.stefansavev.core.serialization._
+import com.stefansavev.core.serialization.core.Core._
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
+import com.stefansavev.core.serialization.core.TupleSerializers._
+import com.stefansavev.core.serialization.core._
+import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReductionTransform}
+import com.stefansavev.randomprojections.dimensionalityreduction.interface.{DimensionalityReductionTransform, NoDimensionalityReductionTransform}
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.SVDTransform
 import com.stefansavev.randomprojections.implementation._
-import com.stefansavev.randomprojections.serialization.core.Core._
-import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers._
-import com.stefansavev.randomprojections.serialization.core.TupleSerializers._
-import com.stefansavev.randomprojections.serialization.core.{MemoryTrackingUtils, MemoryTracker, TypedSerializer}
-import com.stefansavev.randomprojections.utils.String2IdHasher
 import no.uib.cipr.matrix.DenseMatrix
 
 object RandomTreesSerializersV2 {
@@ -319,8 +319,8 @@ object RandomTreesSerializersV2 {
   }
 
   object RandomTreesSerializer extends TypedSerializer[RandomTrees]{
-    import ImplicitSerializers._
     import ColumnHeaderSerialization._
+    import ImplicitSerializers._
 
     def toBinary(outputStream: OutputStream, randomTrees: RandomTrees): Unit = {
       DimensionalityReductionTransformSerializer.toBinary(outputStream, randomTrees.dimReductionTransform)

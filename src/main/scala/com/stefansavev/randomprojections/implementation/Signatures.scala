@@ -7,9 +7,8 @@ import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.buffers.{LongArrayBuffer, IntArrayBuffer}
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.randomprojections.serialization.LongArraySerializer
-import com.stefansavev.randomprojections.serialization.core.Core
-import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
+import com.stefansavev.core.serialization.core.{LongArraySerializer, Core}
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.utils.RandomUtils
 
 object Counts{

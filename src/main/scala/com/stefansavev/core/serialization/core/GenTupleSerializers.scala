@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.serialization.core
+package com.stefansavev.core.serialization.core
 
 object GenTupleSerializers{
   //use this code to generate all tuple serializers
@@ -48,7 +48,7 @@ object GenTupleSerializers{
   }
 
   def main (args: Array[String]): Unit = {
-    println("package com.stefansavev.randomprojections.serialization.core\n")
+    println("package com.stefansavev.core.serialization.core\n")
 
     println("import java.io._\n")
 

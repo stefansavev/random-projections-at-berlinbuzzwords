@@ -7,8 +7,8 @@ import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.buffers._
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.implementation.HadamardUtils
-import com.stefansavev.randomprojections.serialization.DoubleArraySerializer
-import com.stefansavev.randomprojections.serialization.core.Core
+import com.stefansavev.core.serialization.core.{DoubleArraySerializer, Core}
+import com.stefansavev.randomprojections.serialization.{ValueStoreSerializationExt}
 import com.stefansavev.randomprojections.utils.Utils
 
 import scala.reflect.ClassTag
@@ -66,7 +66,7 @@ class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitio
   }
 
   def transformRowId(rowId: Int): Int = {
-    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    import ValueStoreSerializationExt._
     val partitionId = getPartition(rowId)
    // println("rowid - partitionId " + rowId + " " + partitionId)
     if (partitionId != currentPartition){
@@ -102,7 +102,7 @@ class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitio
   }
 
   def loadAll(): ValuesStore = {
-    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    import ValueStoreSerializationExt._
     def loadFile(partitionId: Int): ValuesStore = {
       ValuesStore.fromFile(LazyLoadValueStore.getPartitionFileName(dirName, partitionId))
     }
@@ -149,7 +149,7 @@ class AsyncLoadValueStore(backingDir: String, chunkOffsets: Array[Long], numPart
   }
 
   def loadStoreFromPartition(inputStream: BufferedInputStream, partitionId: Int): ValuesStore = {
-    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    import ValueStoreSerializationExt._
     val offset = chunkOffsets(partitionId)
     inputStream.skip(offset)
     val size = (chunkOffsets(partitionId + 1) - offset).toInt
@@ -206,7 +206,7 @@ class AsyncLoadValueStore(backingDir: String, chunkOffsets: Array[Long], numPart
   }
 
   def loadAll(): ValuesStore = {
-    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    import ValueStoreSerializationExt._
     val head:ValuesStore = loadStoreFromPartition(0)
     val rest = Iterator.range(1, numPartitions).map(partitionId => loadStoreFromPartition(partitionId))
     val iter = Iterator(head) ++ rest
@@ -247,7 +247,7 @@ class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBui
   }
 
   def savePartition(): Unit = {
-    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    import ValueStoreSerializationExt._
     println("saving partition " + currentBuilder.getCurrentRowIndex)
 
     val currentStore = currentBuilder.build()
@@ -301,7 +301,7 @@ class AsyncStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: Sto
   }
 
   def savePartition(): Unit = {
-    import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt._
+    import ValueStoreSerializationExt._
     println("saving partition " + currentPartition)
     val currentStore = currentBuilder.build() //serialize to bytes and send them to the async serializer
     val bytes = currentStore.toBytes()

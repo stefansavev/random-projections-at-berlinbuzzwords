@@ -4,8 +4,8 @@ import java.io.{FileInputStream, BufferedInputStream}
 
 import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.randomprojections.serialization.core.Core
-import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
+import com.stefansavev.core.serialization.core.Core
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.utils.{Utils}
 
 class SignatureVectors(val signatureVectors: Array[SparseVector]){

@@ -2,13 +2,13 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.{InputStream, OutputStream}
 
+import com.stefansavev.core.serialization.String2IdHasherSerialization.String2IdHasherSerializer
+import com.stefansavev.core.serialization.core.Core._
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
+import com.stefansavev.core.serialization.core.TupleSerializers._
+import com.stefansavev.core.serialization.core.TypedSerializer
 import com.stefansavev.randomprojections.datarepr.dense._
-import com.stefansavev.randomprojections.serialization.String2IdHasherSerialization.String2IdHasherSerializer
-import com.stefansavev.randomprojections.serialization.core.Core._
-import com.stefansavev.randomprojections.serialization.core.TupleSerializers._
-import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers._
 import com.stefansavev.randomprojections.serialization.ColumnHeaderSerialization._
-import com.stefansavev.randomprojections.serialization.core.{MemoryTracker, TypedSerializer}
 import com.stefansavev.randomprojections.utils.String2IdHasher
 
 object DataFrameViewSerializers {

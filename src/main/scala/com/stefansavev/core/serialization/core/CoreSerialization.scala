@@ -1,9 +1,9 @@
-package com.stefansavev.randomprojections.serialization.core
+package com.stefansavev.core.serialization.core
 
 import java.io._
 import javax.imageio.stream.MemoryCacheImageOutputStream
 
-import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedIntSerializer
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedIntSerializer
 
 //approach is losely based on "Scala for generic programmers"
 

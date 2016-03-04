@@ -1,8 +1,6 @@
-package com.stefansavev.randomprojections.serialization.core
+package com.stefansavev.core.serialization.core
 
 import java.io.{InputStream, OutputStream}
-
-import com.stefansavev.randomprojections.serialization._
 
 object PrimitiveTypeSerializers {
 

@@ -22,7 +22,6 @@ import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
 import com.stefansavev.randomprojections.serialization.RandomTreesSerialization
-import com.stefansavev.randomprojections.serialization.RandomTreesSerialization
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.tuning.PerformanceCounters

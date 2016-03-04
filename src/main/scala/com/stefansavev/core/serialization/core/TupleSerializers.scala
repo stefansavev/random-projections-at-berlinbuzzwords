@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.serialization.core
+package com.stefansavev.core.serialization.core
 
 import java.io._
 

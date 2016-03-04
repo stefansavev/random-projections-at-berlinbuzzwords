@@ -2,9 +2,9 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.OutputStream
 
-import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeaderImpl, ColumnHeader}
-import com.stefansavev.randomprojections.serialization.core.PrimitiveTypeSerializers.TypedIntSerializer
-import com.stefansavev.randomprojections.serialization.core.{MemoryTracker, TypedSerializer}
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedIntSerializer
+import com.stefansavev.core.serialization.core.{ImplicitSerializers, MemoryTracker, TypedSerializer}
+import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeader, ColumnHeaderImpl}
 
 object ColumnHeaderSerialization{
   implicit object ColumnHeaderSerializer extends TypedSerializer[ColumnHeader]{
