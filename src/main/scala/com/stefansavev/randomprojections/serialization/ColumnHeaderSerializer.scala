@@ -3,7 +3,7 @@ package com.stefansavev.randomprojections.serialization
 import java.io.OutputStream
 
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedIntSerializer
-import com.stefansavev.core.serialization.core.{ImplicitSerializers, MemoryTracker, TypedSerializer}
+import com.stefansavev.core.serialization.core.{ImplicitSerializers, TypedSerializer}
 import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeader, ColumnHeaderImpl}
 
 object ColumnHeaderSerialization{
@@ -16,10 +16,6 @@ object ColumnHeaderSerialization{
     def fromBinary(stream: java.io.InputStream): ColumnHeader = {
       val numCols = stream.readInt()
       new ColumnHeaderImpl(numCols, null, null, null, false)
-    }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, input: ColumnHeader): Long = {
-      TypedIntSerializer.sizeInBytes(memoryTracker, input.numCols)
     }
   }
 }

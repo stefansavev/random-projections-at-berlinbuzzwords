@@ -5,106 +5,19 @@ import javax.imageio.stream.MemoryCacheImageOutputStream
 
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedIntSerializer
 
-//approach is losely based on "Scala for generic programmers"
-
-trait MemoryTracker{
-  def beginObject(inst: Any): Unit
-  def endObject(inst: Any, reportedMemory: Long): Unit
-  //def trackMemory(typeName: String, fieldName: String, memory: Long): Unit
-}
-
-class MemoryTrackerImpl extends MemoryTracker{
-  var depth = 0
-  def padToDepth(): String = Range(0, depth).map(_=> " ").mkString("")
-
-  def beginObject(inst: Any): Unit = {
-    val typeName = inst.getClass
-    println(padToDepth() + typeName.getName)
-    depth += 1
-  }
-
-  def endObject(inst: Any, reportedMemory: Long): Unit = {
-    val typeName = inst.getClass
-    depth -= 1
-    val formattedInfo = inst match {
-      case anyArray: Array[_] => {
-        "size: " + (anyArray.length)
-      }
-      case _ => ""
-    }
-    println(padToDepth() + typeName.getName + " memory: " + reportedMemory + " " + formattedInfo)
-  }
-
-  def trackMemory(typeName: String, fieldName: String, memory: Long): Unit = {
-    println(padToDepth() + typeName + ": " + fieldName + " " + memory)
-  }
-}
-
-object MemoryTrackingUtils{
-  /*
-  def withNestingInfo(memoryTracker: MemoryTracker, clazz: Class[_], block: => Long): Long = {
-    memoryTracker.beginObject(clazz)
-    val result = block
-    memoryTracker.endObject(clazz)
-    result
-  }
-  */
-
-  def withNestingInfo(memoryTracker: MemoryTracker, instance: Any, block: => Long): Long = {
-    memoryTracker.beginObject(instance)
-    val reportedMem = block
-    memoryTracker.endObject(instance, reportedMem)
-    reportedMem
-  }
-
-  def withGenericImplementation[T](memoryTracker: MemoryTracker, ser: TypedSerializer[T], inst: T): Long = {
-    withNestingInfo(memoryTracker, inst, {
-      var sum = 0L
-      val dummyOutputStream = new OutputStream {
-        override def write(b: Int): Unit = {
-          sum += 1
-        }
-      }
-      ser.toBinary(dummyOutputStream, inst)
-      sum
-    })
-  }
-
-}
-
+//approach is loosely based on "Scala for generic programmers"
 trait TypedSerializer[T]{
   type SerializerType = T
   def toBinary(outputStream: OutputStream, input: T): Unit
   def fromBinary(inputStream: InputStream): T
 }
 
-/*
-class TypedIntResult{
-  def asyncRead(input: Stream){
-    let! i = input.readAsync() //input.readAsync(fun (intValue, state) => {
-
-    })
-    input.onRead(4, (bytes, from, to) => {
-      //convert to int
-
-    })
-  }
-}
-
-class TypedTuple2{
-  cont :: ((a -> r) -> r) -> Cont r a
-  def asyncRead(state0: Stream)(cont: A => R]): R{
-    state0.asyncRead((value1, state1) => {
-      state1.asyncRead((value2, state3) => {
-        cont((value1, value2), state3)
-      }
-    })
-  }
-}
-
-
- */
 object Core{
+  abstract class TypeTag[A](implicit mf: Manifest[A]){
+    def tag: Int
+    def manifest: Manifest[A] = mf
+  }
+
   /* moved to TupleSerializers via code autogen, left here as an example only
   class Tuple2Serializer[A, B](serA: TypedSerializer[A], serB: TypedSerializer[B]) extends TypedSerializer[(A, B)] {
     def toBinary(outputStream: OutputStream, input: (A, B)): Unit = {
@@ -122,11 +35,6 @@ object Core{
     new Tuple2Serializer[A, B](serA, serB)
   }
   */
-
-  abstract class TypeTag[A](implicit mf: Manifest[A]){
-    def tag: Int
-    def manifest: Manifest[A] = mf
-  }
 
   class Subtype1Serializer[BaseType, SubType1 <: BaseType](tag1: TypeTag[SubType1], subTypeSer1 : TypedSerializer[SubType1]) extends TypedSerializer[BaseType] {
 

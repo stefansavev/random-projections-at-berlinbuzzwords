@@ -50,14 +50,6 @@ object RandomTreesSerializersV2 {
       System.arraycopy(inputData, 0, toOverwrite, 0, inputData.length)
       new SVDTransform(k, weightedVt)
     }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, svdTransform: SVDTransform): Long = {
-      val matrix = svdTransform.weightedVt
-      TypedIntSerializer.sizeInBytes(memoryTracker, svdTransform.k) + //k
-        TypedIntSerializer.sizeInBytes(memoryTracker, matrix.numRows()) +
-        TypedIntSerializer.sizeInBytes(memoryTracker, matrix.numColumns()) +
-        TypedDoubleArraySerializer.sizeInBytes(memoryTracker, matrix.getData)
-    }
   }
 
   implicit object DimensionalityReductionTransformSerializer extends TypedSerializer[DimensionalityReductionTransform]{
@@ -80,20 +72,6 @@ object RandomTreesSerializersV2 {
         case 1 => SVDTransformSerializer.fromBinary(inputStream)
       }
     }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, dimRedTransform: DimensionalityReductionTransform): Long = {
-      MemoryTrackingUtils.withNestingInfo(memoryTracker, dimRedTransform, {
-        dimRedTransform match {
-          case NoDimensionalityReductionTransform => {
-            TypedIntSerializer.sizeInBytes(memoryTracker, 0)
-          }
-          case svdTransform: SVDTransform => {
-            TypedIntSerializer.sizeInBytes(memoryTracker, 1) +
-              SVDTransformSerializer.sizeInBytes(memoryTracker, svdTransform)
-          }
-        }
-      })
-    }
   }
 
   object ReportingDistanceEvaluatorSerializer extends TypedSerializer[ReportingDistanceEvaluator]{
@@ -113,12 +91,6 @@ object RandomTreesSerializersV2 {
           new CosineOnOriginalDataDistanceEvaluator(origDataset)
         }
       }
-    }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, input: ReportingDistanceEvaluator): Long = {
-      MemoryTrackingUtils.withNestingInfo(memoryTracker, input, {
-        TypedIntSerializer.sizeInBytes(memoryTracker, 0)
-      })
     }
   }
 
@@ -145,21 +117,6 @@ object RandomTreesSerializersV2 {
         i += 1
       }
       new SignatureVectors(vectors)
-    }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, sigVectors: SignatureVectors): Long = {
-      MemoryTrackingUtils.withNestingInfo(memoryTracker, sigVectors, {
-        var sum = 0L
-        val vectors = sigVectors.signatureVectors
-        val len = vectors.length
-        sum += TypedIntSerializer.sizeInBytes(memoryTracker, len)
-        var i = 0
-        while (i < len) {
-          sum += SparseVectorSerializer.sizeInBytes(memoryTracker, vectors(i))
-          i += 1
-        }
-        sum
-      })
     }
   }
 
@@ -201,16 +158,6 @@ object RandomTreesSerializersV2 {
 
       new SparseVector(dim, ids, values)
     }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, vec: SparseVector): Long = {
-      MemoryTrackingUtils.withNestingInfo(memoryTracker, vec, {
-        var sum = 0L
-        sum += TypedIntSerializer.sizeInBytes(memoryTracker, vec.dim) //dim
-        sum += TypedIntArraySerializer.sizeInBytes(memoryTracker, vec.ids)
-        sum += TypedDoubleArraySerializer.sizeInBytes(memoryTracker, vec.values)
-        sum
-      })
-    }
   }
 
   implicit object SplitStrategySerializer extends TypedSerializer[DatasetSplitStrategy]{
@@ -232,10 +179,6 @@ object RandomTreesSerializersV2 {
         case 1 => new DataInformedSplitStrategy()
         case 2 => new NoSplitStrategy()
       }
-    }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, input: DatasetSplitStrategy): Long = {
-      IntSerializer.sizeInBytes
     }
   }
 
@@ -312,10 +255,6 @@ object RandomTreesSerializersV2 {
         }
       }
     }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, randomTree: RandomTree): Long = {
-      MemoryTrackingUtils.withGenericImplementation(memoryTracker, this, randomTree)
-    }
   }
 
   object RandomTreesSerializer extends TypedSerializer[RandomTrees]{
@@ -350,22 +289,6 @@ object RandomTreesSerializersV2 {
         i += 1
       }
       new RandomTrees(dimRedTransform, distanceEvaluator, sigVectors, splitStrategy, header, null/*must be set by the caller*/, trees)
-    }
-
-    def sizeInBytes(memoryTracker: MemoryTracker, randomTrees: RandomTrees): Long = {
-      MemoryTrackingUtils.withNestingInfo(memoryTracker, randomTrees, {
-        var sum = 0L
-        sum += DimensionalityReductionTransformSerializer.sizeInBytes(memoryTracker, randomTrees.dimReductionTransform)
-        sum += ReportingDistanceEvaluatorSerializer.sizeInBytes(memoryTracker, randomTrees.reportingDistanceEvaluator)
-        sum += SignatureVectorsSerializer.sizeInBytes(memoryTracker, randomTrees.signatureVecs)
-        sum += SplitStrategySerializer.sizeInBytes(memoryTracker, randomTrees.datasetSplitStrategy)
-        sum += ColumnHeaderSerializer.sizeInBytes(memoryTracker, randomTrees.header)
-        sum += TypedIntSerializer.sizeInBytes(memoryTracker, randomTrees.trees.length)
-        for (tree <- randomTrees.trees) {
-          sum += RandomTreeSerializer.sizeInBytes(memoryTracker, tree)
-        }
-        sum
-      })
     }
   }
 
