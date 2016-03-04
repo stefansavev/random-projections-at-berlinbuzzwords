@@ -3,8 +3,9 @@ package com.stefansavev.similaritysearch.implementation
 import java.io._
 import java.util
 
+import com.stefansavev.core.string2id.{String2UniqueIdTable, AddStringResult}
 import com.stefansavev.similaritysearch.{SimilaritySearchQueryResults, SimilaritySearchResult}
-import com.stefansavev.randomprojections.utils.{DirectIndexWithSimilarity, DirectIndexWithSimilarityBuilder, AddStringResult, String2UniqueIdTable}
+import com.stefansavev.randomprojections.utils.{DirectIndexWithSimilarity, DirectIndexWithSimilarityBuilder}
 
 import scala.io.Codec
 

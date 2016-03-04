@@ -1,7 +1,8 @@
-package com.stefansavev.randomprojections.utils
+package com.stefansavev.core.string2id
 
 import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.implementation.HadamardUtils
+import com.stefansavev.randomprojections.utils.HashUtils
 
 object String2IdHasherHelper{
   def emptyIntArray(size: Int): Array[Int] = {
