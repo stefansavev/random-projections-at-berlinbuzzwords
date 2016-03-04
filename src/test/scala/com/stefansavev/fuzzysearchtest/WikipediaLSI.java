@@ -31,11 +31,11 @@ public class WikipediaLSI {
 
         SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
                 SimilaritySearchEngines.fastTrees(numTrees,
-                        SimilaritySearchEngines.FuzzyIndexValueSize.AsSingleByte));
+                        SimilaritySearchEngines.StorageSize.SingleByte));
 
         /*
         FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
-                FuzzySearchEngines.bruteForce (FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
+                FuzzySearchEngines.bruteForce (FuzzySearchEngines.FuzzyIndexValueSize.SingleByte));
         */
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector

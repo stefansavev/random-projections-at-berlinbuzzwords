@@ -4,7 +4,7 @@ import java.io.{FileFilter, File}
 import java.util
 import java.util.Random
 
-import com.stefansavev.similaritysearch.SimilaritySearchEngines.FuzzyIndexValueSize
+import com.stefansavev.similaritysearch.SimilaritySearchEngines.StorageSize
 import com.stefansavev.similaritysearch.{SimilaritySearchItem, SimilaritySearchResult}
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.{SVDTransform, OnlineSVDFitter}
@@ -142,7 +142,7 @@ object FuzzySearchIndexWrapper{
   }
 }
 
-class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: Int, valueSize: FuzzyIndexValueSize){
+class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: Int, valueSize: StorageSize){
   if (dim < 8){
     throw new IllegalStateException("The data dimension has to be greater or equal to 8")
   }
@@ -204,13 +204,13 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
   checkDirectories(backingFile)
 
   val storageType = valueSize match  {
-    case FuzzyIndexValueSize.AsDouble => {
+    case StorageSize.Double => {
       StoreBuilderAsDoubleType
     }
-    case FuzzyIndexValueSize.As2Byte => {
+    case StorageSize.TwoBytes => {
       StoreBuilderAsBytesType
     }
-    case FuzzyIndexValueSize.AsSingleByte => {
+    case StorageSize.SingleByte => {
       StoreBuilderAsSingleByteType
     }
   }

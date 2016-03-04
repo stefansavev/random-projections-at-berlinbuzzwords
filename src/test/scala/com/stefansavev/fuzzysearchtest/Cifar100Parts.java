@@ -39,7 +39,7 @@ public class Cifar100Parts {
         int numTrees = 50; //150;
         //create an indexer
         SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
-                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.FuzzyIndexValueSize.As2Byte));
+                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.StorageSize.TwoBytes));
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector

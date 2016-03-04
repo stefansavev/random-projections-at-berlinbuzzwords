@@ -1,18 +1,18 @@
 package com.stefansavev.similaritysearch;
 
 public class SimilaritySearchEngines {
-    public static enum FuzzyIndexValueSize{
-        AsDouble,
-        AsFloat,
-        As2Byte,
-        AsSingleByte
+    public enum StorageSize {
+        Double,
+        Float,
+        TwoBytes,
+        SingleByte
     }
 
-    public static SimilaritySearchEngine fastTrees(int numTrees, FuzzyIndexValueSize valueSize){
+    public static SimilaritySearchEngine fastTrees(int numTrees, StorageSize valueSize){
         return new SimilaritySearchEngine.FastTrees(numTrees, valueSize);
     }
 
-    public static SimilaritySearchEngine bruteForce(FuzzyIndexValueSize valueSize){
+    public static SimilaritySearchEngine bruteForce(StorageSize valueSize){
         return new SimilaritySearchEngine.BruteForce(valueSize);
     }
 }

@@ -30,7 +30,7 @@ public class WordVecTest {
         int numTrees = 50;
         //create an indexer
         SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
-                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.FuzzyIndexValueSize.AsDouble));
+                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.StorageSize.Double));
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector

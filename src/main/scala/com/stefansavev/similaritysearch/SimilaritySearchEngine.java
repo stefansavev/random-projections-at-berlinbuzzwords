@@ -3,9 +3,9 @@ package com.stefansavev.similaritysearch;
 public interface SimilaritySearchEngine {
     public static class FastTrees implements SimilaritySearchEngine {
         private int numTrees;
-        private SimilaritySearchEngines.FuzzyIndexValueSize valueSize;
+        private SimilaritySearchEngines.StorageSize valueSize;
 
-        public FastTrees(int numTrees, SimilaritySearchEngines.FuzzyIndexValueSize valueSize){
+        public FastTrees(int numTrees, SimilaritySearchEngines.StorageSize valueSize){
             this.numTrees = numTrees;
             this.valueSize = valueSize;
         }
@@ -14,19 +14,19 @@ public interface SimilaritySearchEngine {
             return numTrees;
         }
 
-        public SimilaritySearchEngines.FuzzyIndexValueSize getValueSize(){
+        public SimilaritySearchEngines.StorageSize getValueSize(){
             return valueSize;
         }
     }
 
     public static class BruteForce implements SimilaritySearchEngine {
-        private SimilaritySearchEngines.FuzzyIndexValueSize valueSize;
+        private SimilaritySearchEngines.StorageSize valueSize;
 
-        public BruteForce(SimilaritySearchEngines.FuzzyIndexValueSize valueSize) {
+        public BruteForce(SimilaritySearchEngines.StorageSize valueSize) {
             this.valueSize = valueSize;
         }
 
-        public SimilaritySearchEngines.FuzzyIndexValueSize getValueSize(){
+        public SimilaritySearchEngines.StorageSize getValueSize(){
             return valueSize;
         }
     }

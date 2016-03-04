@@ -27,10 +27,10 @@ public class MnistTest {
         int numTrees = 10;
         //create an indexer
         SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
-                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.FuzzyIndexValueSize.AsDouble));
+                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.StorageSize.Double));
 
         //FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
-        //        FuzzySearchEngines.bruteForce(FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
+        //        FuzzySearchEngines.bruteForce(FuzzySearchEngines.FuzzyIndexValueSize.SingleByte));
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector
@@ -61,7 +61,6 @@ public class MnistTest {
         while ((line = reader.readLine()) != null) {
             SimilaritySearchItem item = parseItem(lineNumber, line, dataDimension);
             List<SimilaritySearchResult> results = index.search(10, item.getVector());
-
         }
         reader.close();
     }
@@ -141,15 +140,15 @@ public class MnistTest {
     }
 
     public static void main(String[] args) throws Exception {
-        /*
         String inputTextFile = "D:/RandomTreesData-144818512896186816/input/" + "mnist/svdpreprocessed/train.csv";
         String queriesFile = inputTextFile; //same as training in this example
-        String indexFile = "C:/tmp/output-index-mnist-1/";
-         */
-        String inputTextFile = "/tmp/fuzzysearch-demo/testdata/mnist/preprocessed-train.csv";
-        String queriesFile = inputTextFile; //same as training in this example
-        String indexFile = "/tmp/output-index-mnist-1/";
+        String indexFile = "C:/tmp/output-index-mnist-2/";
 
+        /*
+        String inputTextFile = "C:/tmp/fuzzysearch-demo/testdata/mnist/preprocessed-train.csv";
+        String queriesFile = inputTextFile; //same as training in this example
+        String indexFile = "C:/tmp/output-index-mnist-1/";
+        */
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromFile(queriesFile, indexFile);
         //runQueriesFromIndex(indexFile);
