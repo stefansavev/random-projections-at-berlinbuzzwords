@@ -1,11 +1,11 @@
-package com.stefansavev.fuzzysearch;
+package com.stefansavev.similaritysearch;
 
-public class FuzzySearchResult {
+public class SimilaritySearchResult {
     String name;
     int label;
     double cosineSimilarity;
 
-    public FuzzySearchResult(String name, int label, double cosineSimilarity){
+    public SimilaritySearchResult(String name, int label, double cosineSimilarity){
         this.name = name;
         this.label = label;
         this.cosineSimilarity = cosineSimilarity;

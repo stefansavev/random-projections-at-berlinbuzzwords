@@ -1,9 +1,9 @@
-package com.stefansavev.fuzzysearch.implementation
+package com.stefansavev.similaritysearch.implementation
 
 import java.io._
 import java.util
 
-import com.stefansavev.fuzzysearch.{FuzzySearchQueryResults, FuzzySearchResult}
+import com.stefansavev.similaritysearch.{SimilaritySearchQueryResults, SimilaritySearchResult}
 import com.stefansavev.randomprojections.utils.{DirectIndexWithSimilarity, DirectIndexWithSimilarityBuilder, AddStringResult, String2UniqueIdTable}
 
 import scala.io.Codec
@@ -28,7 +28,7 @@ object FuzzySearchResultsWrapper{
       }
       val queryName = queryParts(2)
       var hasMoreResults = true
-      val resultsArray = new java.util.ArrayList[FuzzySearchResult]()
+      val resultsArray = new java.util.ArrayList[SimilaritySearchResult]()
       while(iter.hasNext && hasMoreResults){
         val result = iter.next()
         line += 1
@@ -44,7 +44,7 @@ object FuzzySearchResultsWrapper{
           val index = parts(1) //is the index, should be consequtive
           val resultName = parts(2)
           val cosine = parts(3).toDouble //this is the cosine
-          resultsArray.add(new FuzzySearchResult(resultName, -1, cosine))
+          resultsArray.add(new SimilaritySearchResult(resultName, -1, cosine))
         }
       }
       builder.addResult(queryName, resultsArray)
@@ -56,7 +56,7 @@ object FuzzySearchResultsWrapper{
 
 class FuzzySearchResultsWrapper(queryString2Id: String2UniqueIdTable, resultsString2Id: String2UniqueIdTable, directIndex: DirectIndexWithSimilarity){
 
-  def getIterator: java.util.Iterator[FuzzySearchQueryResults] = {
+  def getIterator: java.util.Iterator[SimilaritySearchQueryResults] = {
     import scala.collection.JavaConversions._
     val numQueries = getNumberOfQueries
     Iterator.range(0, numQueries).map(i => getQueryAtPos(i))
@@ -70,7 +70,7 @@ class FuzzySearchResultsWrapper(queryString2Id: String2UniqueIdTable, resultsStr
     (queryString2Id.getStringId(name) >= 0)
   }
 
-  def getQueryByName(name: String): FuzzySearchQueryResults = {
+  def getQueryByName(name: String): SimilaritySearchQueryResults = {
     val pos = queryString2Id.getStringId(name)
     if (pos < 0){
       throw new IllegalStateException("Query does not exist in results set " + name)
@@ -78,18 +78,18 @@ class FuzzySearchResultsWrapper(queryString2Id: String2UniqueIdTable, resultsStr
     getQueryAtPos(pos)
   }
 
-  def getQueryAtPos(pos: Int): FuzzySearchQueryResults = {
+  def getQueryAtPos(pos: Int): SimilaritySearchQueryResults = {
     val queryName = queryString2Id.getStringById(pos)
     val (neighborIds, similarities) = directIndex.getContextIdsAndSimilarities(pos)
-    val results = new util.ArrayList[FuzzySearchResult]()
+    val results = new util.ArrayList[SimilaritySearchResult]()
     var i = 0
     while(i < neighborIds.length){
       val resultName = resultsString2Id.getStringById(neighborIds(i))
-      val result = new FuzzySearchResult(resultName, -1, similarities(i))
+      val result = new SimilaritySearchResult(resultName, -1, similarities(i))
       results.add(result)
       i += 1
     }
-    return new FuzzySearchQueryResults(queryName, results)
+    return new SimilaritySearchQueryResults(queryName, results)
   }
 
 
@@ -120,7 +120,7 @@ class FuzzySearchResultsBuilderWrapper {
   val resultsString2Id = new String2UniqueIdTable()
   val directIndexBuilder = new DirectIndexWithSimilarityBuilder()
 
-  def addResult(queryId: String, resultList: java.util.List[FuzzySearchResult]): Unit = {
+  def addResult(queryId: String, resultList: java.util.List[SimilaritySearchResult]): Unit = {
     queryString2Id.addString(queryId, addStringResult)
     if (addStringResult.existedPreviously){
       throw new IllegalStateException(s"Result for query ${queryId} has already been added and cannot be added again")

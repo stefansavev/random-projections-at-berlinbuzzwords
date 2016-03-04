@@ -1,6 +1,6 @@
 package com.stefansavev.randomprojections.evaluation
 
-import com.stefansavev.fuzzysearch.{FuzzySearchQueryResults, FuzzySearchResults}
+import com.stefansavev.similaritysearch.{SimilaritySearchQueryResults, SimilaritySearchResults}
 import com.stefansavev.randomprojections.implementation.{OnlineVariance, KNNS}
 import com.stefansavev.randomprojections.utils.Utils
 
@@ -19,7 +19,7 @@ object RecallEvaluator{
     }
   }
 
-  def evaluateRecall(maxCutoff: Int, retrieved: FuzzySearchResults, expected: FuzzySearchResults): Recall = {
+  def evaluateRecall(maxCutoff: Int, retrieved: SimilaritySearchResults, expected: SimilaritySearchResults): Recall = {
     import scala.collection.JavaConversions._
 
     if (maxCutoff > 100){
@@ -28,7 +28,7 @@ object RecallEvaluator{
 
     val onlineRecalls = new OnlineVariance(maxCutoff)
 
-    def evaluateQuery(name: String, retrievedQuery: FuzzySearchQueryResults, expectedQuery: FuzzySearchQueryResults): Unit = {
+    def evaluateQuery(name: String, retrievedQuery: SimilaritySearchQueryResults, expectedQuery: SimilaritySearchQueryResults): Unit = {
       if (expectedQuery.getQueryResults.size() < maxCutoff){
         Utils.failWith("The query is expected to have at least maxCutoff answers")
       }

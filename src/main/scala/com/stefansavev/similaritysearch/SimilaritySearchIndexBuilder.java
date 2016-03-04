@@ -1,26 +1,26 @@
-package com.stefansavev.fuzzysearch;
+package com.stefansavev.similaritysearch;
 
-import com.stefansavev.fuzzysearch.implementation.FuzzySearchIndexBuilderWrapper;
-import com.stefansavev.fuzzysearch.implementation.FuzzySearchIndexWrapper;
+import com.stefansavev.similaritysearch.implementation.FuzzySearchIndexBuilderWrapper;
+import com.stefansavev.similaritysearch.implementation.FuzzySearchIndexWrapper;
 
-public class FuzzySearchIndexBuilder {
+public class SimilaritySearchIndexBuilder {
     FuzzySearchIndexBuilderWrapper wrapper;
     int dimension;
 
-    public FuzzySearchIndexBuilder(String backingFile, int dimension, FuzzySearchEngine engine){
+    public SimilaritySearchIndexBuilder(String backingFile, int dimension, SimilaritySearchEngine engine){
         this.dimension = dimension;
-        if (engine instanceof FuzzySearchEngine.FastTrees){
-            FuzzySearchEngine.FastTrees fastTrees = ((FuzzySearchEngine.FastTrees)engine);
+        if (engine instanceof SimilaritySearchEngine.FastTrees){
+            SimilaritySearchEngine.FastTrees fastTrees = ((SimilaritySearchEngine.FastTrees)engine);
             wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, fastTrees.getNumTrees(), fastTrees.getValueSize());
         }
         else{
             //for the moment use numTrees == 0 as a brute force flag
-            FuzzySearchEngine.BruteForce bruteForce = ((FuzzySearchEngine.BruteForce)engine);
+            SimilaritySearchEngine.BruteForce bruteForce = ((SimilaritySearchEngine.BruteForce)engine);
             wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, 0, bruteForce.getValueSize());
         }
     }
 
-    public void addItem(FuzzySearchItem item){
+    public void addItem(SimilaritySearchItem item){
         if (item == null){
             throw new IllegalStateException("FuzzySearchItem cannot be null");
         }

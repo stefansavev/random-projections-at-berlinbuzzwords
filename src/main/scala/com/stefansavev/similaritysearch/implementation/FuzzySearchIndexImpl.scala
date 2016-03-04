@@ -1,11 +1,11 @@
-package com.stefansavev.fuzzysearch.implementation
+package com.stefansavev.similaritysearch.implementation
 
 import java.io.{FileFilter, File}
 import java.util
 import java.util.Random
 
-import com.stefansavev.fuzzysearch.FuzzySearchEngines.FuzzyIndexValueSize
-import com.stefansavev.fuzzysearch.{FuzzySearchItem, FuzzySearchResult}
+import com.stefansavev.similaritysearch.SimilaritySearchEngines.FuzzyIndexValueSize
+import com.stefansavev.similaritysearch.{SimilaritySearchItem, SimilaritySearchResult}
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.dimensionalityreduction.svd.{SVDTransform, OnlineSVDFitter}
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
@@ -23,7 +23,7 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
 
   val searcher = new NonThreadSafeSearcher(searcherSettings)
 
-  def bruteForceSearch(numNeighbors: Int, query: Array[Double]): java.util.List[FuzzySearchResult] = {
+  def bruteForceSearch(numNeighbors: Int, query: Array[Double]): java.util.List[SimilaritySearchResult] = {
     import java.util.PriorityQueue
     val pq = new PriorityQueue[PointScore]()
     var j = 0
@@ -50,55 +50,55 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
       j += 1
     }
     val sortedPoints = sorted //sorted.sortBy(ps => - ps.score)
-    val result = new java.util.ArrayList[FuzzySearchResult]()
+    val result = new java.util.ArrayList[SimilaritySearchResult]()
     var i = 0
     while(i < sortedPoints.length){
       val idAndScore = sortedPoints(i)
       val id = idAndScore.pointId
       val name = dataset.getName(id)
       val label = dataset.getLabel(id)
-      result.add(new FuzzySearchResult(name, label, idAndScore.score))
+      result.add(new SimilaritySearchResult(name, label, idAndScore.score))
       i += 1
     }
     result
   }
 
-  def getNearestNeighborsByQuery(numNeighbors: Int, query: Array[Double]): java.util.List[FuzzySearchResult] = {
+  def getNearestNeighborsByQuery(numNeighbors: Int, query: Array[Double]): java.util.List[SimilaritySearchResult] = {
     val knns = searcher.getNearestNeighborsByVector(query, numNeighbors)
     val neighbors = knns.neighbors
     val dataset = this.dataset
-    val result = new java.util.ArrayList[FuzzySearchResult]()
+    val result = new java.util.ArrayList[SimilaritySearchResult]()
     var i = 0
     while(i < neighbors.length){
       val nn = neighbors(i)
       val id = nn.neighborId
       val name = dataset.getName(id)
       val label = nn.label
-      result.add(new FuzzySearchResult(name, label, nn.dist))
+      result.add(new SimilaritySearchResult(name, label, nn.dist))
       i += 1
     }
     result
   }
 
-  def getItemByName(name: String): FuzzySearchItem = {
+  def getItemByName(name: String): SimilaritySearchItem = {
     val i = dataset.getRowIdByName(name)
     getItemById(i)
   }
 
-  def getItemById(i: Int): FuzzySearchItem = {
-    new FuzzySearchItem(dataset.getName(i), dataset.getLabel(i), dataset.getPointAsDenseVector(i))
+  def getItemById(i: Int): SimilaritySearchItem = {
+    new SimilaritySearchItem(dataset.getName(i), dataset.getLabel(i), dataset.getPointAsDenseVector(i))
   }
 
   def getDimension(): Int = {
     dataset.numCols
   }
 
-  def getItems(): java.util.Iterator[FuzzySearchItem] = {
-    new util.Iterator[FuzzySearchItem] {
+  def getItems(): java.util.Iterator[SimilaritySearchItem] = {
+    new util.Iterator[SimilaritySearchItem] {
       val numRows = dataset.numRows
       var i = 0
 
-      override def next(): FuzzySearchItem = {
+      override def next(): SimilaritySearchItem = {
         val item = getItemById(i)
         i += 1
         item

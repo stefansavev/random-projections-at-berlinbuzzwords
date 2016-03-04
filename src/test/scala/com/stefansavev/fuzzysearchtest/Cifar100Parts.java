@@ -1,43 +1,46 @@
 package com.stefansavev.fuzzysearchtest;
 
-import com.stefansavev.fuzzysearch.*;
+import com.stefansavev.similaritysearch.*;
+import com.stefansavev.randomprojections.actors.Application;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class WikipediaLSI {
-    static FuzzySearchItem parseItem(int lineNumber, String line, int numDimensions){
+public class Cifar100Parts {
+    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions){
         String[] parts = line.split("\\s+");
-        //if (parts.length != (numDimensions)){
-        //    throw new IllegalStateException("Invalid data format. Expecting data of dimension " + numDimensions  + " such as: 'the 0.020341 0.011216 0.099383 0.102027 0.041391 -0.010218 ");
-        //}
-        double[] vec = new double[numDimensions];
-        for(int i = 0; i < numDimensions; i ++){
-            vec[i] =  Double.parseDouble(parts[i]);
+        //System.out.println("Parts len: " + parts.length);
+        if (parts.length != 67){
+            return null;
         }
 
-        return new FuzzySearchItem(Integer.toString(lineNumber), -1, vec); //ignore the label
+        if (parts.length != (3 + numDimensions)){
+            throw new IllegalStateException("Invalid data format. Expecting data of dimension " + numDimensions  + line);
+        }
+        String fileIndex = parts[0];
+        String partId = parts[1];
+        int labelId = Integer.parseInt(parts[2]);
+
+        double[] vec = new double[numDimensions];
+        for(int i = 0; i < numDimensions; i ++){
+            vec[i] =  Double.parseDouble(parts[i + 1]);
+        }
+        return new SimilaritySearchItem(fileIndex + "_" + partId, labelId, vec);
+
     }
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
-        int dataDimension = 128;
-        int numTrees = 50;
+        int dataDimension = 64;
+        int numTrees = 50; //150;
         //create an indexer
+        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
+                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.FuzzyIndexValueSize.As2Byte));
 
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
-                FuzzySearchEngines.fastTrees(numTrees,
-                                                FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
-
-        /*
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
-                FuzzySearchEngines.bruteForce (FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
-        */
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector
 
@@ -45,36 +48,28 @@ public class WikipediaLSI {
         int lineNumber = 1;
         String line = null;
         while ((line = reader.readLine()) != null) {
-            FuzzySearchItem item = parseItem(lineNumber, line, dataDimension);
-            if (lineNumber <= 1000000) {
+            SimilaritySearchItem item = parseItem(lineNumber, line, dataDimension);
+            if (item != null) {
                 indexBuilder.addItem(item);
-            }
-            else{
-                break;
-            }
-            if (lineNumber % 1000 == 0){
-                System.out.println(" " + lineNumber + " docs. read");
             }
             lineNumber ++;
         }
-        System.out.println("#docs: " + lineNumber);
         reader.close();
-
         //build the index
         indexBuilder.build();
     }
 
     static void runQueriesFromIndex(String indexFile) throws IOException {
-        FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
-        FuzzySearchResultBuilder resultBuilder = new FuzzySearchResultBuilder();
-        Iterator<FuzzySearchItem> itemsIterator = index.getItems();
+        SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
+        SimilaritySearchResultBuilder resultBuilder = new SimilaritySearchResultBuilder();
+        Iterator<SimilaritySearchItem> itemsIterator = index.getItems();
         long start = System.currentTimeMillis();
 
         int numQueries = 0;
 
         while (itemsIterator.hasNext()) {
-            FuzzySearchItem item = itemsIterator.next();
-            List<FuzzySearchResult> results = index.search(10, item.getVector());
+            SimilaritySearchItem item = itemsIterator.next();
+            List<SimilaritySearchResult> results = index.search(10, item.getVector());
             resultBuilder.addResult(item.getName(), results);
             if (!results.get(0).getName().equals(item.getName())){
                 throw new IllegalStateException("The top result should be the query itself");
@@ -97,7 +92,7 @@ public class WikipediaLSI {
         }
         */
         //resultBuilder.build()
-        FuzzySearchResults retrieved = resultBuilder.build();
+        SimilaritySearchResults retrieved = resultBuilder.build();
         /*
         retrieved.toTextFile("C:/tmp/output-word-vec-results.txt");
         FuzzySearchResults groundTruth = FuzzySearchResults.fromTextFile("C:/tmp/word-vec-truth.txt");
@@ -116,14 +111,13 @@ public class WikipediaLSI {
     }
 
     public static void main(String[] args) throws Exception {
-        String inputTextFile = "C:\\wikipedia-parsed\\lsi\\extracted\\wikipedia_lsi128.txt";
-        String indexFile = "C:/tmp/output-index-wikipedia-lsi-t1/";
+        String inputTextFile = "/home/stefan2/data/cifar/cifar_parts.csv";
+        String indexFile = "/tmp/index-cifar";
 
-        buildIndex(inputTextFile, indexFile);
+        //buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);
-        System.out.println("Free memory: " + Runtime.getRuntime().freeMemory()/(1024));
-        FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 100, 50);
+        SimilaritySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 100, 50);
+
+        Application.shutdown();
     }
-
-
 }

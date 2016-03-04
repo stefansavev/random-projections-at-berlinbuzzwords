@@ -1,6 +1,6 @@
-package com.stefansavev.fuzzysearch;
+package com.stefansavev.similaritysearch;
 
-import com.stefansavev.fuzzysearch.implementation.FuzzySearchEvaluationUtilsWrapper;
+import com.stefansavev.similaritysearch.implementation.FuzzySearchEvaluationUtilsWrapper;
 import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
 
 import java.io.IOException;
@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class FuzzySearchEvaluationUtils {
-    public static FuzzySearchResults generateRandomTestSet(Random rnd, int numQueries, FuzzySearchIndex index){
+public class SimilaritySearchEvaluationUtils {
+    public static SimilaritySearchResults generateRandomTestSet(Random rnd, int numQueries, SimilaritySearchIndex index){
         return FuzzySearchEvaluationUtilsWrapper.generateRandomTestSet(rnd, numQueries, index);
     }
 
@@ -17,21 +17,21 @@ public class FuzzySearchEvaluationUtils {
 
     }
 
-    public static FuzzySearchResults resultsOnTestSet(FuzzySearchIndex index, FuzzySearchResults testSet, int numResults, boolean bruteForce) throws IOException {
+    public static SimilaritySearchResults resultsOnTestSet(SimilaritySearchIndex index, SimilaritySearchResults testSet, int numResults, boolean bruteForce) throws IOException {
 
         //FuzzySearchResults testSet = FuzzySearchEvaluationUtils.generateRandomTestSet(rnd, numQueries, numResults, index);
 
-        Iterator<FuzzySearchQueryResults> queryIterator = testSet.getIterator();
+        Iterator<SimilaritySearchQueryResults> queryIterator = testSet.getIterator();
 
         long start = System.currentTimeMillis();
 
-        FuzzySearchResultBuilder resultsBuilder = new FuzzySearchResultBuilder();
+        SimilaritySearchResultBuilder resultsBuilder = new SimilaritySearchResultBuilder();
         int numProcessedQueries = 0;
         while (queryIterator.hasNext()) {
             String queryId = queryIterator.next().getName();
             //System.out.println("Running query " + queryId + " " + numProcessedQueries + "/" + testSet.getNumberOfQueries());
             double[] queryVector = index.getItemByName(queryId).getVector();
-            List<FuzzySearchResult> results;
+            List<SimilaritySearchResult> results;
             if (bruteForce) {
                 results = index.bruteForceSearch(numResults, queryVector);
                 /*
@@ -68,18 +68,18 @@ public class FuzzySearchEvaluationUtils {
     }
 
     public static void compareWithBruteForce(String indexFile, Random rnd, int numQueries, int numResults) throws IOException {
-        FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
-        FuzzySearchResults testSet = generateRandomTestSet(rnd, numQueries, index);
-        FuzzySearchResults testSet1 = generateRandomTestSet(rnd, numQueries, index);
+        SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
+        SimilaritySearchResults testSet = generateRandomTestSet(rnd, numQueries, index);
+        SimilaritySearchResults testSet1 = generateRandomTestSet(rnd, numQueries, index);
         System.out.println("loaded dataset");
         resultsOnTestSet(index, testSet, numResults, false); //with the system
         resultsOnTestSet(index, testSet1, numResults, false); //with the system
         resultsOnTestSet(index, testSet, numResults, false); //with the system
         resultsOnTestSet(index, testSet1, numResults, false); //with the system
 
-        FuzzySearchResults retrieved = resultsOnTestSet(index, testSet, numResults, false); //with the system
+        SimilaritySearchResults retrieved = resultsOnTestSet(index, testSet, numResults, false); //with the system
 
-        FuzzySearchResults expected = resultsOnTestSet(index, testSet, numResults, true); //brute force
+        SimilaritySearchResults expected = resultsOnTestSet(index, testSet, numResults, true); //brute force
         RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
     }
 }

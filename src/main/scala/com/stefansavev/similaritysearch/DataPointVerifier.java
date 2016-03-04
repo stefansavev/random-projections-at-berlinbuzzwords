@@ -1,4 +1,4 @@
-package com.stefansavev.fuzzysearch;
+package com.stefansavev.similaritysearch;
 
 public class DataPointVerifier {
     public static double[] normalizeDataPointOrFail(double[] dataPoint){

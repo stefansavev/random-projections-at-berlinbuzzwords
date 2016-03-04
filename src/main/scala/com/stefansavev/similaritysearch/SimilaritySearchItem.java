@@ -1,11 +1,11 @@
-package com.stefansavev.fuzzysearch;
+package com.stefansavev.similaritysearch;
 
-public class FuzzySearchItem {
+public class SimilaritySearchItem {
     private double[] vec;
     private String name;
     private int label;
 
-    public FuzzySearchItem(String name, int label, double[] vec){
+    public SimilaritySearchItem(String name, int label, double[] vec){
         this.name = name;
         this.label = label;
         this.vec = vec;

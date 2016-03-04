@@ -1,8 +1,7 @@
 package com.stefansavev.fuzzysearchtest;
 
-import com.stefansavev.fuzzysearch.*;
+import com.stefansavev.similaritysearch.*;
 import com.stefansavev.randomprojections.actors.Application;
-import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
 
 import java.io.*;
 import java.util.Iterator;
@@ -11,7 +10,7 @@ import java.util.Random;
 
 public class MnistTest {
 
-    static FuzzySearchItem parseItem(int lineNumber, String line, int numDimensions){
+    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions){
         String[] tokens = line.split(",");
         int label = Integer.parseInt(tokens[0]);
         double[] values = new double[numDimensions];
@@ -20,15 +19,15 @@ public class MnistTest {
         }
         String lineNumberStr = Integer.toString(lineNumber);
         String name = lineNumberStr + "#" + lineNumberStr;
-        return new FuzzySearchItem(name, label, values);
+        return new SimilaritySearchItem(name, label, values);
     }
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 100;
         int numTrees = 10;
         //create an indexer
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
-                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
+        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
+                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.FuzzyIndexValueSize.AsDouble));
 
         //FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(dataDimension,
         //        FuzzySearchEngines.bruteForce(FuzzySearchEngines.FuzzyIndexValueSize.AsSingleByte));
@@ -40,7 +39,7 @@ public class MnistTest {
         int lineNumber = 1;
         String line = null;
         while ((line = reader.readLine()) != null) {
-            FuzzySearchItem item = parseItem(lineNumber, line, dataDimension);
+            SimilaritySearchItem item = parseItem(lineNumber, line, dataDimension);
             indexBuilder.addItem(item);
             lineNumber ++;
         }
@@ -51,7 +50,7 @@ public class MnistTest {
     }
 
     static void runQueriesFromFile(String queriesFile, String indexFile) throws IOException {
-        FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
+        SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
         int dataDimension = index.getDimension();
 
         String line = null;
@@ -60,8 +59,8 @@ public class MnistTest {
         int lineNumber = 1;
 
         while ((line = reader.readLine()) != null) {
-            FuzzySearchItem item = parseItem(lineNumber, line, dataDimension);
-            List<FuzzySearchResult> results = index.search(10, item.getVector());
+            SimilaritySearchItem item = parseItem(lineNumber, line, dataDimension);
+            List<SimilaritySearchResult> results = index.search(10, item.getVector());
 
         }
         reader.close();
@@ -108,16 +107,16 @@ public class MnistTest {
     }
     */
     static void runQueriesFromIndex(String indexFile) throws IOException {
-        FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
+        SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
 
-        Iterator<FuzzySearchItem> itemsIterator = index.getItems();
+        Iterator<SimilaritySearchItem> itemsIterator = index.getItems();
         double agree = 0.0;
         double disagree = 0.0;
         long start = System.currentTimeMillis();
 
         while (itemsIterator.hasNext()) {
-            FuzzySearchItem item = itemsIterator.next();
-            List<FuzzySearchResult> results = index.search(10, item.getVector());
+            SimilaritySearchItem item = itemsIterator.next();
+            List<SimilaritySearchResult> results = index.search(10, item.getVector());
             if (!results.get(0).getName().equals(item.getName())){
                 throw new IllegalStateException("The top result should be the query itself");
             }
@@ -160,7 +159,7 @@ public class MnistTest {
         System.out.println("Before index load: Used Memory [in MB]:"
                 + (runtime.totalMemory() - runtime.freeMemory()) / mb);
 
-        FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
+        SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
         System.out.println("After index load: Used Memory [in MB]:"
                 + (runtime.totalMemory() - runtime.freeMemory()) / mb);
 
@@ -172,7 +171,7 @@ public class MnistTest {
         //FuzzySearchResults expected = FuzzySearchResults.fromTextFile("C:/tmp/mnist-testset.txt");
         //FuzzySearchResults retrieved =  FuzzySearchEvaluationUtils.resultsOnTestSet(index, expected, 1000, false); //with the system
         //RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
-        FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
+        SimilaritySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
         Application.shutdown();
         //
     }

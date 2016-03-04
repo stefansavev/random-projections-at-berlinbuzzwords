@@ -1,7 +1,7 @@
 package com.stefansavev.randomprojections.examples.wordvec
 
-import com.stefansavev.fuzzysearch.implementation.FuzzySearchResultsWrapper
-import com.stefansavev.fuzzysearch.{FuzzySearchResults, FuzzySearchResult, FuzzySearchResultBuilder}
+import com.stefansavev.similaritysearch.implementation.FuzzySearchResultsWrapper
+import com.stefansavev.similaritysearch.{SimilaritySearchResults, SimilaritySearchResult, SimilaritySearchResultBuilder}
 import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.file.{CSVFile, CSVFileOptions}
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
@@ -91,16 +91,16 @@ object WordVecs {
     val dataFrameOptions = new DataFrameOptions("label", false, null)
     val dataset = WordVecs.fromFile(inputFile, opt, dataFrameOptions, DenseRowStoredMatrixViewBuilderFactory, 100000)
 
-    val c = new FuzzySearchResults(FuzzySearchResultsWrapper.fromTextFile("C:/tmp/word-vec-truth.txt"))
+    val c = new SimilaritySearchResults(FuzzySearchResultsWrapper.fromTextFile("C:/tmp/word-vec-truth.txt"))
 
     val truth1 = WordVecGroundTruth.readGroundTruthInObject().mapping
-    val builderNeighbors = new FuzzySearchResultBuilder()
+    val builderNeighbors = new SimilaritySearchResultBuilder()
     val rowNames = dataset.getAllRowNames()
     for(name <- rowNames){
       val neighbors = truth1(name).sortBy(-_._2)
-      val list = new java.util.ArrayList[FuzzySearchResult]()
+      val list = new java.util.ArrayList[SimilaritySearchResult]()
       for(kv <- neighbors){
-        list.add(new FuzzySearchResult(kv._1, -1, kv._2))
+        list.add(new SimilaritySearchResult(kv._1, -1, kv._2))
       }
       builderNeighbors.addResult(name, list)
     }

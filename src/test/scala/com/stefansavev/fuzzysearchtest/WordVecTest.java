@@ -1,6 +1,6 @@
 package com.stefansavev.fuzzysearchtest;
 
-import com.stefansavev.fuzzysearch.*;
+import com.stefansavev.similaritysearch.*;
 import com.stefansavev.randomprojections.actors.Application;
 import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
 
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 public class WordVecTest {
-    static FuzzySearchItem parseItem(int lineNumber, String line, int numDimensions) {
+    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions) {
         String[] parts = line.split("\\s+");
         if (parts.length != (1 + numDimensions)) {
             throw new IllegalStateException("Invalid data format. Expecting data of dimension " + numDimensions + " such as: 'the 0.020341 0.011216 0.099383 0.102027 0.041391 -0.010218 ");
@@ -22,15 +22,15 @@ public class WordVecTest {
         for (int i = 0; i < numDimensions; i++) {
             vec[i] = Double.parseDouble(parts[i + 1]);
         }
-        return new FuzzySearchItem(word, -1, vec); //ignore the label
+        return new SimilaritySearchItem(word, -1, vec); //ignore the label
     }
 
     static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
         int dataDimension = 200;
         int numTrees = 50;
         //create an indexer
-        FuzzySearchIndexBuilder indexBuilder = new FuzzySearchIndexBuilder(outputIndexFile, dataDimension,
-                FuzzySearchEngines.fastTrees(numTrees, FuzzySearchEngines.FuzzyIndexValueSize.AsDouble));
+        SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile, dataDimension,
+                SimilaritySearchEngines.fastTrees(numTrees, SimilaritySearchEngines.FuzzyIndexValueSize.AsDouble));
 
         //read the data points from a file and add them to the indexer one by one
         //each point has a name(string), label(int), and a vector
@@ -38,7 +38,7 @@ public class WordVecTest {
         int lineNumber = 1;
         String line = null;
         while ((line = reader.readLine()) != null) {
-            FuzzySearchItem item = parseItem(lineNumber, line, dataDimension);
+            SimilaritySearchItem item = parseItem(lineNumber, line, dataDimension);
             indexBuilder.addItem(item);
             lineNumber++;
         }
@@ -51,16 +51,16 @@ public class WordVecTest {
     }
 
     static void runQueriesFromIndex(String indexFile) throws IOException {
-        FuzzySearchIndex index = FuzzySearchIndex.open(indexFile);
-        FuzzySearchResultBuilder resultBuilder = new FuzzySearchResultBuilder();
-        Iterator<FuzzySearchItem> itemsIterator = index.getItems();
+        SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
+        SimilaritySearchResultBuilder resultBuilder = new SimilaritySearchResultBuilder();
+        Iterator<SimilaritySearchItem> itemsIterator = index.getItems();
         long start = System.currentTimeMillis();
 
         int numQueries = 0;
 
         while (itemsIterator.hasNext()) {
-            FuzzySearchItem item = itemsIterator.next();
-            List<FuzzySearchResult> results = index.search(10, item.getVector());
+            SimilaritySearchItem item = itemsIterator.next();
+            List<SimilaritySearchResult> results = index.search(10, item.getVector());
             resultBuilder.addResult(item.getName(), results);
             if (!results.get(0).getName().equals(item.getName())) {
                 throw new IllegalStateException("The top result should be the query itself");
@@ -83,9 +83,9 @@ public class WordVecTest {
         }
         */
         //resultBuilder.build()
-        FuzzySearchResults retrieved = resultBuilder.build();
+        SimilaritySearchResults retrieved = resultBuilder.build();
         retrieved.toTextFile("C:/tmp/output-word-vec-results.txt");
-        FuzzySearchResults groundTruth = FuzzySearchResults.fromTextFile("C:/tmp/word-vec-truth.txt");
+        SimilaritySearchResults groundTruth = SimilaritySearchResults.fromTextFile("C:/tmp/word-vec-truth.txt");
         RecallEvaluator.evaluateRecall(11, retrieved, groundTruth).printRecalls();
 
 
@@ -106,7 +106,7 @@ public class WordVecTest {
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);
-        FuzzySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
+        SimilaritySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 1000, 50);
         Application.shutdown();
     }
 

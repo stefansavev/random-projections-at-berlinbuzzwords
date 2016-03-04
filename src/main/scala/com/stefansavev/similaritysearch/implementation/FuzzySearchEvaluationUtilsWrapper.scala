@@ -1,23 +1,23 @@
-package com.stefansavev.fuzzysearch.implementation
+package com.stefansavev.similaritysearch.implementation
 
 import java.util
 import java.util.Random
 
-import com.stefansavev.fuzzysearch.{FuzzySearchResult, FuzzySearchResultBuilder, FuzzySearchIndex, FuzzySearchResults}
+import com.stefansavev.similaritysearch.{SimilaritySearchResult, SimilaritySearchResultBuilder, SimilaritySearchIndex, SimilaritySearchResults}
 import com.stefansavev.randomprojections.utils.RandomUtils
 
 object FuzzySearchEvaluationUtilsWrapper {
 
-  def generateRandomTestSet(rnd: Random, numQueries: Int, index: FuzzySearchIndex): FuzzySearchResults = {
+  def generateRandomTestSet(rnd: Random, numQueries: Int, index: SimilaritySearchIndex): SimilaritySearchResults = {
     import scala.collection.JavaConversions._
     val itemNames = index.getItems.toIterator.map(_.getName).toArray
 
     val sampleIds = RandomUtils.sample(rnd, numQueries, Array.range(0, itemNames.length))
-    val builder = new FuzzySearchResultBuilder()
+    val builder = new SimilaritySearchResultBuilder()
     for(id <- sampleIds){
       val queryId = itemNames(id)
       val queryVector = index.getItemByName(queryId).getVector
-      val queryResults = new util.ArrayList[FuzzySearchResult]()
+      val queryResults = new util.ArrayList[SimilaritySearchResult]()
       builder.addResult(queryId, queryResults)
     }
     return builder.build()
