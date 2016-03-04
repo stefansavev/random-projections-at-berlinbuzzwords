@@ -1,9 +1,11 @@
-package com.stefansavev.core.serialization.core
+package com.stefansavev.core.serialization
 
-object Demo {
-  import Core._
-  import PrimitiveTypeSerializers._
-  import TupleSerializers._
+import com.stefansavev.core.serialization.core.TypedSerializer
+import com.stefansavev.core.serialization.core.Core._
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
+import com.stefansavev.core.serialization.core.TupleSerializers._
+
+object TestSerializers {
 
   def roundTripInputOutput[A](ser: TypedSerializer[A], input: A, fileName: String): A = {
     toFile(ser, fileName, input)
@@ -86,3 +88,4 @@ object Demo {
     roundTripInputOutput[BasePoint](ser5, superPoint, tmpFile)
   }
 }
+
