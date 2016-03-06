@@ -400,7 +400,7 @@ class String2IdHasher(settings: StringIdHasherSettings){
     pointersToValues(index)
   }
 
-  def getOrAddId(arr: Array[Char], fromPos: Int, toPos: Int, add: Boolean): Int = {
+  def getOrAddId(arr: Array[Char], fromPos: Int, toPos: Int, addMode: Boolean): Int = {
     val index = findOrGetNewEntryIndex(arr, fromPos, toPos)
     if (index == -1){
       -2 //table size is exceeded, with a max collisions >= 4 this is unlikely to happen
@@ -411,7 +411,7 @@ class String2IdHasher(settings: StringIdHasherSettings){
         index
       }
       else {
-        if (add) {
+        if (addMode) {
           if (nextAvailablePointer < maxAllowedValues) {
             addAtIndex(index, arr, fromPos, toPos)
             index
@@ -421,7 +421,7 @@ class String2IdHasher(settings: StringIdHasherSettings){
           }
         }
         else {
-          -1
+          -1 //did not find existing entry
         }
       }
     }
