@@ -13,10 +13,12 @@ A library for approximate nearest neighbor search for dense vectors. This librar
 * as a component of image search engine
 * as a component of a music search engine
 
-
 The library was presented at BerlinBuzzwords 2015 in the following talk:
 
 https://www.youtube.com/watch?v=V9zl09w1SGM&list=PLq-odUc2x7i-_qWWixXHZ6w-MxyLxEC7s&index=22
+
+The original algorithm is based on https://github.com/spotify/annoy. Now there are a number of differences
+from Annoy's algorithm.
 
 Technical information is available at:
 
@@ -35,6 +37,7 @@ for all data points in datasets of sizes up to half a million data points.
 
 90% Recall@10 means that in top 10 results returned by the library we found 9 (we failed to find 1 nearest neighbor). This is common for approximate search using
 dense vectors. The remaining 1 result can be found by increasing the number of trees, essentially giving more computational time and memory to the library.
+
 
 #Usage
 
