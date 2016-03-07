@@ -1,4 +1,7 @@
 package com.stefansavev.randomprojections.datarepr.dense
+
+import com.stefansavev.randomprojections.datarepr.dense.store.{StoreBuilderAsDoubleType, StoreBuilderType}
+
 import scala.collection.mutable
 
 trait ColumnHeader{

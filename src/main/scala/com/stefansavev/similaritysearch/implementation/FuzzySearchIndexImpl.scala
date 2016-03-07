@@ -3,6 +3,7 @@ package com.stefansavev.similaritysearch.implementation
 import java.io.{FileFilter, File}
 import java.util
 import java.util.Random
+import com.stefansavev.randomprojections.datarepr.dense.store._
 import com.stefansavev.randomprojections.serialization.{RandomTreesSerialization, DataFrameViewSerializationExt}
 import com.stefansavev.similaritysearch.VectorType.StorageSize
 import com.stefansavev.similaritysearch.{SimilaritySearchItem, SimilaritySearchResult}

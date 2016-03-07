@@ -3,7 +3,7 @@ package com.stefansavev.randomprojections.serialization
 import java.io.File
 
 import com.stefansavev.core.serialization.core.Core
-import com.stefansavev.randomprojections.datarepr.dense.ValuesStore
+import com.stefansavev.randomprojections.datarepr.dense.store.ValuesStore
 import com.stefansavev.randomprojections.serialization.DataFrameViewSerializers._
 
 object ValueStoreSerializationExt {

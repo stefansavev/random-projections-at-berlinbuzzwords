@@ -1,5 +1,6 @@
 package com.stefansavev.randomprojections.datarepr.dense
 
+import com.stefansavev.randomprojections.datarepr.dense.store.StoreBuilderType
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.file.{CSVFile, CSVFileOptions}
 

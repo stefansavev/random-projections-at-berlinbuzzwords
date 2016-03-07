@@ -4,7 +4,8 @@ import java.io._
 
 import com.stefansavev.core.serialization.core.IntArraySerializer
 import com.stefansavev.randomprojections.buffers.IntArrayBuffer
-import com.stefansavev.randomprojections.datarepr.dense.{FixedLengthBuffer, PointIndexes}
+import com.stefansavev.randomprojections.datarepr.dense.PointIndexes
+import com.stefansavev.randomprojections.datarepr.dense.store.FixedLengthBuffer
 import com.stefansavev.randomprojections.interface.{BucketCollector, Index}
 
 object BucketCollectorImplUtils{
@@ -62,7 +63,6 @@ class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketColl
     val index = new IndexImpl(pointSignatures, labels.length, Some((backingDir, leafId + 1, globalIndex, numPartitions)), null, labels)
     index
   }
-
 }
 
 object BucketCollectorImpl{

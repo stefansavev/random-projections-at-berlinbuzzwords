@@ -1,43 +1,41 @@
 package com.stefansavev.core.string2id
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.{FlatSpec, Matchers}
 
-object TestDynamicString2IdHasher{
-  def main (args: Array[String]): Unit = {
-    val table = new String2UniqueIdTable()
-    def makeName(i: Int): String = i + "#" + i
-    for(i <- 0 until 10000000){
-      val result = table.addString(makeName(i)).stringId
-      //println("added " + i + " at " + result)
-    }
-    for(i <- 0 until 10000000){
+
+@RunWith(classOf[JUnitRunner])
+class TestDynamicString2IdHasher extends FlatSpec with Matchers {
+  val table = new String2UniqueIdTable()
+  def makeName(i: Int): String = i + "#" + i
+  for(i <- 0 until 100000){
+    table.addString(makeName(i))
+  }
+
+  "strings " should "be from 0 to 100000" in {
+    for (i <- 0 until 100000) {
       val str = table.getStringById(i)
-      if (str != makeName(i).toString){
-        throw new IllegalStateException("problem")
-      }
-      //println("got " + str + " " + i)
-
+      val expectedStr = makeName(i).toString
+      str should be(expectedStr)
     }
   }
 }
 
-object String2IdHasherTester{
-  def main (args: Array[String]): Unit = {
-    val settings = StringIdHasherSettings(2/*8*/, 50, 4)
+@RunWith(classOf[JUnitRunner])
+class String2IdHasherTester extends FlatSpec with Matchers {
+  "some strings" should "not be added because of lack of space" in {
+    val settings = StringIdHasherSettings(2, 50, 4)
     val h = new String2IdHasher(settings)
     val input = Array("a", "a", "b", "cd", "p", "q")
-    for(word <- input){
-      println("adding " + word)
+    for (word <- input) {
       val arr = word.toCharArray
       val index = h.getOrAddId(arr, 0, arr.length, true)
-      if (index >= 0) {
-        println("added: " + h.getStringAtIndex(index) + " at index " + index)
-      }
-      else{
-        println("cannot add " + word)
+      if (word == "cd" || word == "p" || word == "q") {
+        //cannot add
+        index should be (-2)
       }
     }
-    println("dump contents")
-    h.dumpContents()
   }
 }
 

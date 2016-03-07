@@ -158,8 +158,7 @@ class SignaturesSpec extends FlatSpec with Matchers {
 
   "Error between truth and estimation" should "be small" in {
     val (err, errFromScratch) = estimateAvgError()
-    println(s"error between cosine and signature estimation (also error from scratch implementation): ${err} ${errFromScratch}")
-    (err < 0.04) should be(true)
-    (errFromScratch < 0.04) should be(true)
+    (err < 0.04) should be (true)
+    (errFromScratch < 0.04) should be (true)
   }
 }

@@ -2,6 +2,7 @@ package com.stefansavev.randomprojections.datarepr.dense
 
 import com.stefansavev.core.string2id.{StringIdHasherSettings, String2IdHasher}
 import com.stefansavev.randomprojections.buffers.{DoubleArrayBuffer, IntArrayBuffer}
+import com.stefansavev.randomprojections.datarepr.dense.store.{StoreBuilderType, ValuesStore}
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.file.CSVFileOptions
 
