@@ -17,7 +17,7 @@ The library was presented at BerlinBuzzwords 2015 in the following talk:
 
 https://www.youtube.com/watch?v=V9zl09w1SGM&list=PLq-odUc2x7i-_qWWixXHZ6w-MxyLxEC7s&index=22
 
-The original algorithm is based on https://github.com/spotify/annoy. Now there are a number of [differences from Annoy's algorithm.!](docs/DifferencesFromAnnoy.md)
+The original algorithm is based on [Spotify Annoy](https://github.com/spotify/annoy). Now there are a number of [differences from Annoy's algorithm](docs/DifferencesFromAnnoy.md)
 
 Technical information is available at:
 
