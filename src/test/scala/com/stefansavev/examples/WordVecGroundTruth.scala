@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples
+package com.stefansavev.examples
 
 import java.io.PrintWriter
 

@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples.randomdata
+package com.stefansavev.examples.randomdata
 
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
 import com.stefansavev.randomprojections.implementation._

@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples.mnist
+package com.stefansavev.examples.mnist
 
 import java.text.DecimalFormat
 

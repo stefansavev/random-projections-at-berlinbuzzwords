@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples.mnist
+package com.stefansavev.examples.mnist
 
 import java.io.PrintWriter
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameOptions
@@ -28,7 +28,7 @@ import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.utils.AllNearestNeighborsForDataset
 import com.stefansavev.randomprojections.utils.Utils
 import com.stefansavev.randomprojections.utils.{AllNearestNeighborsForDataset, Utils}
-import com.stefansavev.randomprojections.examples.ExamplesSettings
+import com.stefansavev.examples.ExamplesSettings
 
 object MnistAfterSVD_BruteForceWithSignatures {
   import RandomTreesSerialization.Implicits._

@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples.randomdata
+package com.stefansavev.examples.randomdata
 
 import java.util.Random
 

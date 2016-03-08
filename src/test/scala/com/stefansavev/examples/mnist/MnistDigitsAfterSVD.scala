@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples.mnist
+package com.stefansavev.examples.mnist
 
 import java.io.PrintWriter
 import com.stefansavev.randomprojections.datarepr.dense.{DataFrameOptions, DataFrameView, DenseRowStoredMatrixViewBuilderFactory, RowStoredMatrixView}
@@ -10,10 +10,16 @@ import com.stefansavev.randomprojections.serialization.RandomTreesSerialization
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{AllNearestNeighborsForDataset, Utils}
-import com.stefansavev.randomprojections.examples.ExamplesSettings
+import com.stefansavev.examples.ExamplesSettings
 
-object MnistDigitsAfterSVD_DataInformedProjections {
+object MnistDigitsAfterSVD {
   import RandomTreesSerialization.Implicits._
+
+  def loadData(fileName: String): DataFrameView ={
+    val opt = CSVFileOptions(onlyTopRecords = None)
+    val dataFrameOptions = new DataFrameOptions(labelColumnName = "label", builderFactory = DenseRowStoredMatrixViewBuilderFactory, normalizeVectors = true)
+    RowStoredMatrixView.fromFile(fileName, opt, dataFrameOptions)
+  }
 
   def main (args: Array[String]): Unit = {
     val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")
@@ -23,7 +29,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
 
     val doTrain = true
     val doSearch = true
-    val doTest = true
+    val doTest = false
 
     val dataset = MnistUtils.loadData(trainFile)
 
@@ -31,7 +37,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
       maxPntsPerBucket=50,
       numTrees=10,
       maxDepth = None,
-      projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(),
+      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(4),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
@@ -49,7 +55,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
 
       val searcherSettings = SearcherSettings (
         bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 100),
-        pointScoreSettings = PointScoreSettings(topKCandidates = 50, rescoreExactlyTopK = 50),
+        pointScoreSettings = PointScoreSettings(topKCandidates = 100, rescoreExactlyTopK = 100),
         randomTrees = treesFromFile,
         trainingSet = dataset)
 
@@ -67,7 +73,7 @@ object MnistDigitsAfterSVD_DataInformedProjections {
     }
 
     if (doTest){
-      val testDataset = MnistUtils.loadData(testFile)
+      val testDataset = loadData(testFile)
       println(testDataset)
       val treesFromFile = RandomTrees.fromFile(indexFile)
 
@@ -84,7 +90,8 @@ object MnistDigitsAfterSVD_DataInformedProjections {
         AllNearestNeighborsForDataset.getTopNearestNeighborsForAllPointsTestDataset(100, searcher, testDataset)
       }).result
       MnistUtils.writePredictionsInKaggleFormat(predictionsOnTestFile, allNN)
-      //expected score on kaggle: ?
     }
   }
+
+
 }

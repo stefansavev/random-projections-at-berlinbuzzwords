@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples
+package com.stefansavev.examples
 
 import com.stefansavev.randomprojections.implementation.KNNS
 import java.io.PrintWriter

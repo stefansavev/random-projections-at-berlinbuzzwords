@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.examples.mnist
+package com.stefansavev.examples.mnist
 
 import java.io.PrintWriter
 import com.stefansavev.randomprojections.datarepr.dense.{DataFrameOptions, DataFrameView, DenseRowStoredMatrixViewBuilderFactory, RowStoredMatrixView}
@@ -10,16 +10,10 @@ import com.stefansavev.randomprojections.serialization.RandomTreesSerialization
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{AllNearestNeighborsForDataset, Utils}
-import com.stefansavev.randomprojections.examples.ExamplesSettings
+import com.stefansavev.examples.ExamplesSettings
 
-object MnistDigitsAfterSVD {
+object MnistDigitsAfterSVD_DataInformedProjections {
   import RandomTreesSerialization.Implicits._
-
-  def loadData(fileName: String): DataFrameView ={
-    val opt = CSVFileOptions(onlyTopRecords = None)
-    val dataFrameOptions = new DataFrameOptions(labelColumnName = "label", builderFactory = DenseRowStoredMatrixViewBuilderFactory, normalizeVectors = true)
-    RowStoredMatrixView.fromFile(fileName, opt, dataFrameOptions)
-  }
 
   def main (args: Array[String]): Unit = {
     val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")
@@ -29,7 +23,7 @@ object MnistDigitsAfterSVD {
 
     val doTrain = true
     val doSearch = true
-    val doTest = false
+    val doTest = true
 
     val dataset = MnistUtils.loadData(trainFile)
 
@@ -37,7 +31,7 @@ object MnistDigitsAfterSVD {
       maxPntsPerBucket=50,
       numTrees=10,
       maxDepth = None,
-      projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(4),
+      projectionStrategyBuilder = ProjectionStrategies.dataInformedProjectionStrategy(),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393
     )
@@ -55,7 +49,7 @@ object MnistDigitsAfterSVD {
 
       val searcherSettings = SearcherSettings (
         bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 100),
-        pointScoreSettings = PointScoreSettings(topKCandidates = 100, rescoreExactlyTopK = 100),
+        pointScoreSettings = PointScoreSettings(topKCandidates = 50, rescoreExactlyTopK = 50),
         randomTrees = treesFromFile,
         trainingSet = dataset)
 
@@ -73,7 +67,7 @@ object MnistDigitsAfterSVD {
     }
 
     if (doTest){
-      val testDataset = loadData(testFile)
+      val testDataset = MnistUtils.loadData(testFile)
       println(testDataset)
       val treesFromFile = RandomTrees.fromFile(indexFile)
 
@@ -90,8 +84,7 @@ object MnistDigitsAfterSVD {
         AllNearestNeighborsForDataset.getTopNearestNeighborsForAllPointsTestDataset(100, searcher, testDataset)
       }).result
       MnistUtils.writePredictionsInKaggleFormat(predictionsOnTestFile, allNN)
+      //expected score on kaggle: ?
     }
   }
-
-
 }
