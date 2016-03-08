@@ -1,22 +1,23 @@
 package com.stefansavev.similaritysearch.implementation
 
-import java.io.{FileFilter, File}
+import java.io.{File, FileFilter}
 import java.util
 import java.util.Random
-import com.stefansavev.randomprojections.datarepr.dense.store._
-import com.stefansavev.randomprojections.serialization.{RandomTreesSerialization, DataFrameViewSerializationExt}
-import com.stefansavev.similaritysearch.VectorType.StorageSize
-import com.stefansavev.similaritysearch.{SimilaritySearchItem, SimilaritySearchResult}
+
 import com.stefansavev.randomprojections.datarepr.dense._
-import com.stefansavev.randomprojections.dimensionalityreduction.svd.{SVDTransform, OnlineSVDFitter}
+import com.stefansavev.randomprojections.datarepr.dense.store._
+import com.stefansavev.randomprojections.dimensionalityreduction.svd.{OnlineSVDFitter, SVDTransform}
+import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
-import com.stefansavev.randomprojections.implementation._
+import com.stefansavev.randomprojections.serialization.{DataFrameViewSerializationExt, RandomTreesSerialization}
 import com.stefansavev.randomprojections.utils.Utils
+import com.stefansavev.similaritysearch.VectorType.StorageSize
+import com.stefansavev.similaritysearch.{SimilaritySearchItem, SimilaritySearchResult}
 import com.typesafe.scalalogging.StrictLogging
 
 class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
-  val searcherSettings = SearcherSettings (
+  val searcherSettings = SearcherSettings(
     bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 100),
     pointScoreSettings = PointScoreSettings(topKCandidates = 100, rescoreExactlyTopK = 100),
     randomTrees = trees,
@@ -29,14 +30,15 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
     val pq = new PriorityQueue[PointScore]()
     var j = 0
     val numRows = dataset.numRows
-    while(j < numRows){
+    while (j < numRows) {
       val score = dataset.cosineForNormalizedData(query, j)
-      if (pq.size() < numNeighbors ){
+      if (pq.size() < numNeighbors) {
         pq.add(new PointScore(j, score))
       }
-      else{//it should be exactly k items in pq
+      else {
+        //there should be exactly k items in pq
         val minAcceptedScore = pq.peek().score
-        if (score > minAcceptedScore){
+        if (score > minAcceptedScore) {
           pq.remove() //remove min
           pq.add(new PointScore(j, score))
         }
@@ -44,16 +46,16 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
       j += 1
     }
     val n = pq.size()
-    val sorted = Array.ofDim[PointScore](n)
+    val sortedPoints = Array.ofDim[PointScore](n)
     j = 0
-    while(pq.size() > 0){
-      sorted(n - j - 1) = pq.remove()
+    while (pq.size() > 0) {
+      sortedPoints(n - j - 1) = pq.remove()
       j += 1
     }
-    val sortedPoints = sorted //sorted.sortBy(ps => - ps.score)
+
     val result = new java.util.ArrayList[SimilaritySearchResult]()
     var i = 0
-    while(i < sortedPoints.length){
+    while (i < sortedPoints.length) {
       val idAndScore = sortedPoints(i)
       val id = idAndScore.pointId
       val name = dataset.getName(id)
@@ -70,7 +72,7 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
     val dataset = this.dataset
     val result = new java.util.ArrayList[SimilaritySearchResult]()
     var i = 0
-    while(i < neighbors.length){
+    while (i < neighbors.length) {
       val nn = neighbors(i)
       val id = nn.neighborId
       val name = dataset.getName(id)
@@ -113,26 +115,25 @@ class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
         i < numRows
       }
     }
-
   }
-
 }
 
-object FuzzySearchIndexWrapper{
-  val treesSubDir = "fuzzysearch_trees_dir_8686116"
-  val datasetFile = "fuzzysearch_dataset_file_8686116"
-  val datasetPartitionsDir = "fuzzysearch_dataset_partitions_8686116"
+object FuzzySearchIndexWrapper {
+  val fileVersion = "0_1"
+  val treesSubDir = s"fuzzysearch_trees_dir_${fileVersion}"
+  val datasetFile = s"fuzzysearch_dataset_file_${fileVersion}"
+  val datasetPartitionsDir = "fuzzysearch_dataset_partitions_${fileVersion}"
   val datasetPartitionFile = LazyLoadValueStore.partitionFileNamePrefix
-  val signaturePartitionsDir = "fuzzysearch_signature_partitions_8686116"
+  val signaturePartitionsDir = "fuzzysearch_signature_partitions_${fileVersion}"
   val signaturePartitionFile = DiskBackedOnlineSignatureVectorsUtils.partitionFileNamePrefix
   val randomTreesModelFile = RandomTreesSerialization.Implicits.modelFileName
   val randomTreesIndexFile = RandomTreesSerialization.Implicits.indexFileName
-  val randomTreesPartitionsDir =  "fuzzysearch_tree_partitions_8686116"
+  val randomTreesPartitionsDir = "fuzzysearch_tree_partitions_${fileVersion}"
   val randomTreesPartitionFile = BucketCollectorImplUtils.partitionFileSuffix
 
   def open(fileName: String): FuzzySearchIndexWrapper = {
-    import RandomTreesSerialization.Implicits._
     import DataFrameViewSerializationExt._
+    import RandomTreesSerialization.Implicits._
 
     val treesFullDir = new File(fileName, treesSubDir)
     val datasetFullFile = new File(fileName, datasetFile)
@@ -143,23 +144,24 @@ object FuzzySearchIndexWrapper{
   }
 }
 
-class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: Int, valueSize: StorageSize) extends StrictLogging{
-  if (dim < 8){
+class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: Int, valueSize: StorageSize) extends StrictLogging {
+  if (dim < 8) {
     throw new IllegalStateException("The data dimension has to be greater or equal to 8")
   }
+
   def checkDirectories(dirName: String): Unit = {
     val file = new File(dirName)
     if (!file.exists()) {
       throw new IllegalStateException(s"Directory should exist: ${dirName}")
     }
 
-    if (!file.isDirectory()){
+    if (!file.isDirectory()) {
       throw new IllegalStateException(s"File is not a directory ${dirName}")
     }
 
     def cleanDir(subDir: String, acceptsFile: File => Boolean): Unit = {
       val fullDir = new File(dirName, subDir)
-      if (!fullDir.exists()){
+      if (!fullDir.exists()) {
         fullDir.mkdir()
       }
       val unrecognizedFiles = fullDir.listFiles(new FileFilter {
@@ -167,7 +169,7 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
           !acceptsFile(pathName)
         }
       })
-      if (unrecognizedFiles.length > 0){
+      if (unrecognizedFiles.length > 0) {
         val unrecognizedFile = unrecognizedFiles(0)
         Utils.failWith(s"Directory ${fullDir} contains an unrecognized file: " + unrecognizedFile.getName)
       }
@@ -180,17 +182,10 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
         logger.info(s"FILE TO BE DELETED $f")
         f.delete()
       })
-      if (fullDir.listFiles().length > 0){
+      if (fullDir.listFiles().length > 0) {
         Utils.failWith(s"Directory contains files that could not be deleted")
       }
     }
-
-    /*
-    val treesFullDir = new File(fileName, FuzzySearchIndexWrapper.treesSubDir)
-    if (!treesFullDir.exists()){
-      treesFullDir.mkdir()
-    }
-    */
 
     cleanDir(FuzzySearchIndexWrapper.treesSubDir, file => {
       file.getName.startsWith(FuzzySearchIndexWrapper.randomTreesModelFile) ||
@@ -204,7 +199,7 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
 
   checkDirectories(backingFile)
 
-  val storageType = valueSize match  {
+  val storageType = valueSize match {
     case StorageSize.Double => {
       StoreBuilderAsDoubleType
     }
@@ -217,16 +212,19 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
   }
 
   val datasetBackingDir = new File(backingFile, FuzzySearchIndexWrapper.datasetPartitionsDir).getAbsolutePath
-  val storageWithFile = new AsyncStoreBuilderType(datasetBackingDir, storageType) //
+  val storageWithFile = new AsyncStoreBuilderType(datasetBackingDir, storageType)
   //val storageWithFile = new LazyLoadStoreBuilderType(datasetBackingDir, storageType)
+
   val columnIds = Array.range(0, dim)
   val header = ColumnHeaderBuilder.build("label", columnIds.map(i => ("f" + i, i)), true, storageWithFile)
   val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
   val onlineSVDFitter = new OnlineSVDFitter(dim)
   val sigSize = 16
   val signatureBackedDir = new File(backingFile, FuzzySearchIndexWrapper.signaturePartitionsDir).getAbsolutePath
-  //val onlineSigVecs = new DiskBackedOnlineSignatureVectors(signatureBackedDir, new Random(48186816), sigSize, dim)
+
+
   val onlineSigVecs = new AsyncSignatureVectors(signatureBackedDir, new Random(48186816), sigSize, dim)
+  //val onlineSigVecs = new DiskBackedOnlineSignatureVectors(signatureBackedDir, new Random(48186816), sigSize, dim)
 
   def addItem(name: String, label: Int, dataPoint: Array[Double]): Unit = {
     onlineSVDFitter.pass(dataPoint)
@@ -242,15 +240,14 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
     val svdTransform = onlineSVDFitter.finalizeFit().asInstanceOf[SVDTransform]
 
     val randomTreeSettings = IndexSettings(
-      maxPntsPerBucket=50,
-      numTrees=numTrees,
+      maxPntsPerBucket = 50,
+      numTrees = numTrees,
       maxDepth = None,
       projectionStrategyBuilder = ProjectionStrategies.splitIntoKRandomProjection(8),
       reportingDistanceEvaluator = ReportingDistanceEvaluators.cosineOnOriginalData(),
       randomSeed = 39393,
       signatureSize = sigSize
     )
-    println(dataset)
 
     val signatures = onlineSigVecs.buildPointSignatures()
     val trees = (Utils.timed("Create trees", {
@@ -260,18 +257,18 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
     })(logger)).result
 
     def save(fileName: String): Unit = {
-      import RandomTreesSerialization.Implicits._
       import DataFrameViewSerializationExt._
+      import RandomTreesSerialization.Implicits._
       val file = new File(fileName)
       if (!file.exists()) {
         throw new IllegalStateException(s"Directory should exist: ${fileName}")
       }
 
-      if (!file.isDirectory()){
+      if (!file.isDirectory()) {
         throw new IllegalStateException(s"File is not a directory ${fileName}")
       }
       val treesFullDir = new File(fileName, FuzzySearchIndexWrapper.treesSubDir)
-      if (!treesFullDir.exists()){
+      if (!treesFullDir.exists()) {
         treesFullDir.mkdir()
       }
 
