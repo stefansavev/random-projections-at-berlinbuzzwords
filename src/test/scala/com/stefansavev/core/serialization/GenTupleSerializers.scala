@@ -1,4 +1,4 @@
-package com.stefansavev.core.serialization.core
+package com.stefansavev.core.serialization
 
 object GenTupleSerializers{
   //use this code to generate all tuple serializers
