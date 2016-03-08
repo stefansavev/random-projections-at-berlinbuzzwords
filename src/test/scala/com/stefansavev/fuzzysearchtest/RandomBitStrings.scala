@@ -1,4 +1,4 @@
-package com.stefansavev.examples.randomdata
+package com.stefansavev.fuzzysearchtest
 
 import java.util.Random
 

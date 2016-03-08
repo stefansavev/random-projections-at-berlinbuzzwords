@@ -1,12 +1,13 @@
-package com.stefansavev.examples.randomdata
+package com.stefansavev.fuzzysearchtest
 
-import com.stefansavev.examples.mnist.MnistDigitsAfterSVD._
-import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
+import java.util.Random
+
+import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.implementation._
-import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
-import com.stefansavev.randomprojections.tuning.PerformanceCounters
-import com.stefansavev.randomprojections.evaluation.Evaluation
-import com.stefansavev.randomprojections.utils.{Utils, AllNearestNeighborsForDataset}
+import com.stefansavev.randomprojections.utils.Utils
+import com.stefansavev.similaritysearch.SimilaritySearchEvaluationUtils
+import com.stefansavev.similaritysearch.VectorType.StorageSize
+import com.stefansavev.similaritysearch.implementation.FuzzySearchIndexBuilderWrapper
 import com.typesafe.scalalogging.StrictLogging
 
 
@@ -15,11 +16,12 @@ object TestOnRandomData extends StrictLogging{
 
   def main (args: Array[String]): Unit = {
     val dataGenSettings = RandomBitStrings.RandomBitSettings(
-      numGroups = 10000,
+      numGroups = 100000,
       numRowsPerGroup = 2,
       numCols=256,
       per1sInPrototype = 0.5,
       perNoise = 0.2)
+
 
       val debug = false
       val randomBitStringsDataset = RandomBitStrings.genRandomData(58585, dataGenSettings, debug, true)
@@ -34,11 +36,22 @@ object TestOnRandomData extends StrictLogging{
       )
 
       println("Number of Rows: " + randomBitStringsDataset.numRows)
-
+      val diskLocation = "D:/tmp/randomfile"
       val trees = Utils.timed("Build Index", {
-        IndexBuilder.buildWithSVDAndRandomRotation(null, 32, settings = randomTreeSettings,dataFrameView = randomBitStringsDataset)
+        val wrapper = new FuzzySearchIndexBuilderWrapper(diskLocation, randomBitStringsDataset.numCols, 50, StorageSize.Double)
+        var i = 0
+        while(i < randomBitStringsDataset.numRows){
+          wrapper.addItem(i.toString, 0, randomBitStringsDataset.getPointAsDenseVector(i))
+          i += 1
+        }
+        wrapper.build()
+        //SimilaritySearchIndex.open(diskLocation)
+        ()
       }).result
 
+      SimilaritySearchEvaluationUtils.compareWithBruteForce(diskLocation, new Random(481868), 1000, 50)
+
+    /*
       val searcherSettings = SearcherSettings (
         bucketSearchSettings = PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree = 1000),
         pointScoreSettings = PointScoreSettings(topKCandidates = 100, rescoreExactlyTopK = 100),
@@ -55,6 +68,9 @@ object TestOnRandomData extends StrictLogging{
       PerformanceCounters.report()
 
       Evaluation.evaluate(randomBitStringsDataset.getAllLabels(), allNN, -1, 1)
+      */
+
+    Application.shutdown()
   }
 }
 
