@@ -35,7 +35,7 @@ public class Cifar100Parts {
 
     }
 
-    static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
+    static void buildIndex(String inputFile, String outputIndexFile) throws IOException, InvalidDataPointException {
         int dataDimension = 64;
         int numTrees = 50; //150;
         //create an indexer
@@ -62,7 +62,7 @@ public class Cifar100Parts {
         indexBuilder.build();
     }
 
-    static void runQueriesFromIndex(String indexFile) throws IOException {
+    static void runQueriesFromIndex(String indexFile) throws IOException, InvalidDataPointException {
         SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
         SimilaritySearchResultBuilder resultBuilder = new SimilaritySearchResultBuilder();
         Iterator<SimilaritySearchItem> itemsIterator = index.getItems();

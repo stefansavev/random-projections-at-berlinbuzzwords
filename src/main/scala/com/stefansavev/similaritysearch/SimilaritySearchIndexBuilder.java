@@ -11,40 +11,39 @@ public class SimilaritySearchIndexBuilder {
     public SimilaritySearchIndexBuilder(String backingFile,
                                         VectorType vectorType,
                                         SimilarityIndexingEngine engine,
-                                        QueryType queryType){
+                                        QueryType queryType) {
         dimension = vectorType.getDimension();
         VectorType.StorageSize storageSize = vectorType.getStorageSize();
-        if (engine instanceof SimilarityIndexingEngine.FastTrees){
-            SimilarityIndexingEngine.FastTrees fastTrees = ((SimilarityIndexingEngine.FastTrees)engine);
+        if (engine instanceof SimilarityIndexingEngine.FastTrees) {
+            SimilarityIndexingEngine.FastTrees fastTrees = ((SimilarityIndexingEngine.FastTrees) engine);
             wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, fastTrees.getNumTrees(), storageSize);
-        }
-        else{
+        } else {
             //TODO: for the moment use numTrees == 0 as a brute force flag
-            SimilarityIndexingEngine.BruteForce bruteForce = ((SimilarityIndexingEngine.BruteForce)engine);
+            SimilarityIndexingEngine.BruteForce bruteForce = ((SimilarityIndexingEngine.BruteForce) engine);
             wrapper = new FuzzySearchIndexBuilderWrapper(backingFile, dimension, 0, storageSize);
         }
     }
 
-    public void addItem(SimilaritySearchItem item){
-        if (item == null){
+    public void addItem(SimilaritySearchItem item) throws InvalidDataPointException {
+        if (item == null) {
             throw new IllegalStateException("FuzzySearchItem cannot be null");
         }
         addItem(item.getName(), item.getLabel(), item.getVector());
     }
 
-    public void addItem(String name, int label, double[] dataPoint) throws InvalidDataPointException{
-        if (dataPoint.length != dimension){
+    public void addItem(String name, int label, double[] dataPoint) throws InvalidDataPointException {
+        if (dataPoint.length != dimension) {
             throw new InvalidDataPointException("The dimension of the data point is incorrect");
         }
-        if (name == null){
+        if (name == null) {
             throw new IllegalStateException("FuzzySearchItem.name cannot be null");
         }
         double[] normalizedPoint = DataPointVerifier.normalizeDataPointOrFail(dataPoint);
         wrapper.addItem(name, label, normalizedPoint);
     }
 
-    public void build(){
-        FuzzySearchIndexWrapper wrappedIndex =  wrapper.build();
+    public void build() {
+        FuzzySearchIndexWrapper wrappedIndex = wrapper.build();
         //use FuzzySearchIndex.open to open the index
     }
 }

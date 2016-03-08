@@ -25,7 +25,7 @@ public class MnistTest{
         return new SimilaritySearchItem(name, label, values);
     }
 
-    static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
+    static void buildIndex(String inputFile, String outputIndexFile) throws IOException, InvalidDataPointException {
         int dataDimension = 100;
         int numTrees = 10;
         //create an indexer
@@ -54,7 +54,7 @@ public class MnistTest{
         indexBuilder.build();
     }
 
-    static void runQueriesFromFile(String queriesFile, String indexFile) throws IOException {
+    static void runQueriesFromFile(String queriesFile, String indexFile) throws IOException, InvalidDataPointException {
         SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
         int dataDimension = index.getDimension();
 
@@ -110,7 +110,7 @@ public class MnistTest{
         RecallEvaluator.evaluateRecall(11, retrieved, testSet).printRecalls();
     }
     */
-    static void runQueriesFromIndex(String indexFile) throws IOException {
+    static void runQueriesFromIndex(String indexFile) throws IOException, InvalidDataPointException {
         SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
 
         Iterator<SimilaritySearchItem> itemsIterator = index.getItems();

@@ -1,12 +1,12 @@
 package com.stefansavev.similaritysearch;
 
 public interface QueryType {
-    class CosineSimilarity implements QueryType{
+    class CosineSimilarity implements QueryType {
 
     }
 
-    class QueryLikelihood implements QueryType{
-        public QueryLikelihood(){
+    class QueryLikelihood implements QueryType {
+        public QueryLikelihood() {
             throw new UnsupportedOperationException();
         }
     }

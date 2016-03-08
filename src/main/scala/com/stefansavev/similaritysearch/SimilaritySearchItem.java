@@ -6,26 +6,26 @@ public class SimilaritySearchItem {
     private int label;
     private byte[] payload; //TODO
 
-    public SimilaritySearchItem(String name, int label, double[] vec, byte[] payload){
+    public SimilaritySearchItem(String name, int label, double[] vec, byte[] payload) {
         this.name = name;
         this.label = label;
         this.vec = vec;
         this.payload = payload;
     }
 
-    public SimilaritySearchItem(String name, int label, double[] vec){
+    public SimilaritySearchItem(String name, int label, double[] vec) {
         this(name, label, vec, null);
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public double[] getVector(){
+    public double[] getVector() {
         return vec;
     }
 
-    public int getLabel(){
+    public int getLabel() {
         return label;
     }
 }

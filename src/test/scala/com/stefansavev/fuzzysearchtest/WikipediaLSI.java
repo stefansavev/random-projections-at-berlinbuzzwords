@@ -25,7 +25,7 @@ public class WikipediaLSI {
         return new SimilaritySearchItem(Integer.toString(lineNumber), -1, vec); //ignore the label
     }
 
-    static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
+    static void buildIndex(String inputFile, String outputIndexFile) throws IOException, InvalidDataPointException {
         int dataDimension = 128;
         int numTrees = 50;
         //create an indexer
@@ -65,7 +65,7 @@ public class WikipediaLSI {
         indexBuilder.build();
     }
 
-    static void runQueriesFromIndex(String indexFile) throws IOException {
+    static void runQueriesFromIndex(String indexFile) throws IOException, InvalidDataPointException {
         SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
         SimilaritySearchResultBuilder resultBuilder = new SimilaritySearchResultBuilder();
         Iterator<SimilaritySearchItem> itemsIterator = index.getItems();

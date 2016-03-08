@@ -2,6 +2,7 @@ package com.stefansavev.similaritysearch;
 
 public interface VectorType {
     int getDimension();
+
     StorageSize getStorageSize();
 
     enum StorageSize {

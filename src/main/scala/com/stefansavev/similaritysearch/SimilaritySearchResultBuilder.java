@@ -9,15 +9,15 @@ public class SimilaritySearchResultBuilder {
     boolean inInsertMode = true;
     FuzzySearchResultsBuilderWrapper wrapper = new FuzzySearchResultsBuilderWrapper();
 
-    public void addResult(String queryId, List<SimilaritySearchResult> resultList){
-        if (!inInsertMode){
+    public void addResult(String queryId, List<SimilaritySearchResult> resultList) {
+        if (!inInsertMode) {
             throw new IllegalStateException("Method build() has already been called.");
         }
         wrapper.addResult(queryId, resultList);
     }
 
-    public SimilaritySearchResults build(){
-        if (!inInsertMode){
+    public SimilaritySearchResults build() {
+        if (!inInsertMode) {
             throw new IllegalStateException("Method build() has already been called.");
         }
         inInsertMode = false;

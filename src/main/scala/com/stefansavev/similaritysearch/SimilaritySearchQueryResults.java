@@ -6,20 +6,20 @@ public class SimilaritySearchQueryResults {
     private String queryId;
     List<SimilaritySearchResult> results;
 
-    public String getName(){
+    public String getName() {
         return queryId;
     }
 
-    public List<SimilaritySearchResult> getQueryResults(){
+    public List<SimilaritySearchResult> getQueryResults() {
         return results;
     }
 
-    public SimilaritySearchQueryResults(String queryId, List<SimilaritySearchResult> results){
+    public SimilaritySearchQueryResults(String queryId, List<SimilaritySearchResult> results) {
         this.queryId = queryId;
         this.results = results;
     }
 
-    private List<SimilaritySearchResult> getResults(){
+    private List<SimilaritySearchResult> getResults() {
         return results;
     }
 }

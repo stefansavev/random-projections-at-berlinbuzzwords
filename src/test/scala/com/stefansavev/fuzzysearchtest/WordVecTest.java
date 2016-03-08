@@ -26,7 +26,7 @@ public class WordVecTest {
         return new SimilaritySearchItem(word, -1, vec); //ignore the label
     }
 
-    static void buildIndex(String inputFile, String outputIndexFile) throws IOException {
+    static void buildIndex(String inputFile, String outputIndexFile) throws IOException, InvalidDataPointException {
         int dataDimension = 200;
         int numTrees = 50;
         //create an indexer
@@ -55,7 +55,7 @@ public class WordVecTest {
         //save the index to file
     }
 
-    static void runQueriesFromIndex(String indexFile) throws IOException {
+    static void runQueriesFromIndex(String indexFile) throws IOException, InvalidDataPointException {
         SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
         SimilaritySearchResultBuilder resultBuilder = new SimilaritySearchResultBuilder();
         Iterator<SimilaritySearchItem> itemsIterator = index.getItems();
