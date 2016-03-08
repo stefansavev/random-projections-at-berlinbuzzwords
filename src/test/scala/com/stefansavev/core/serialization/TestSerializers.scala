@@ -5,8 +5,9 @@ import java.io.File
 import com.stefansavev.TemporaryFolderFixture
 import com.stefansavev.core.serialization.core.Core._
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
+import com.stefansavev.core.serialization.core.SubtypeSerializers._
 import com.stefansavev.core.serialization.core.TupleSerializers._
-import com.stefansavev.core.serialization.core.{Core, TypedSerializer}
+import com.stefansavev.core.serialization.core.{Iso, TypedSerializer}
 import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner
@@ -38,7 +39,7 @@ object SerializersTestUtils {
     def tag: Int = 3
   }
 
-  implicit object PointXYIso extends Core.Iso[PointXY, (Int, Double)] {
+  implicit object PointXYIso extends Iso[PointXY, (Int, Double)] {
     def from(input: PointXY): Output = (input.x, input.y)
 
     def to(input: Output): PointXY = {
