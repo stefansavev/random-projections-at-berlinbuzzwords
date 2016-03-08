@@ -87,12 +87,8 @@ class ValuesStoreAsSingleByte(val _numCols: Int, val minValues: Array[Float], va
 }
 
 class ValuesStoreBuilderAsSingleByte(numCols: Int) extends ValuesStoreBuilder {
-  //val minExponentPerRecord = new IntArrayBuffer()
-  //val maxExponentPerRecord = new IntArrayBuffer()
-
   val minValuePerRecord = new FloatArrayBuffer()
   val maxValuePerRecord = new FloatArrayBuffer()
-  //val rangeSizeInBits = new ByteArrayBuffer()
 
   val valuesBuffer = new ByteArrayBuffer()
   var currentRow = 0
@@ -103,54 +99,22 @@ class ValuesStoreBuilderAsSingleByte(numCols: Int) extends ValuesStoreBuilder {
     Array.range(0, extra).map(_ => "0").mkString("") + p
   }
 
-  def decodeEncodeTestExp(value: Double): Unit = {
-    val exp = FloatToSingleByteEncoder.getExponent(value) - 127 //the exponent is biased
-
-    if (value > 0) {
-      val logValue = (Math.log(value) / Math.log(2.0)).floor
-      //println("+exp: " + exp + " " + logValue + " diff: " + (exp - logValue))
-    }
-    else {
-      val logValue = (Math.log(-value) / Math.log(2.0)).floor
-      println("-exp: " + exp + " " + logValue + " diff: " + (exp - logValue))
-    }
-
-
-  }
-
-  def decodeEncode(minExp: Int, maxExp: Int, value: Double): Byte = {
-    val encoded = FloatToSingleByteEncoder.encodeValue(minExp, maxExp, value)
-    val decoded = FloatToSingleByteEncoder.decodeValue(minExp, maxExp, encoded)
-    val error = value - decoded
-    //println("!!! orig: " + value + " decoded:" + value + " error:" + error)
-    encoded
-  }
-
   def addValues(values: Array[Double]): Unit = {
     if (values.length != numCols) {
       Utils.internalError()
     }
 
     FloatToSingleByteEncoder.encodeValues(values, minValuePerRecord, maxValuePerRecord, valuesBuffer)
-    /*
-    val decoded = Array.ofDim[Double](values.length)
-    FloatToSingleByteEncoder.decodeValues(currentRow, minValuePerRecord.array, maxValuePerRecord.array, currentRow*numCols, valuesBuffer.array, decoded)
-    values.zip(decoded).foreach{case (o,d) => {
-      println("o/d/e " + o + " " + d + " " + (o - d))
-    }}
-    */
     currentRow += 1
   }
 
   def getCurrentRowIndex = currentRow
 
   def build(): ValuesStore = {
-    //val values = valuesBuffer.toArray()
     new ValuesStoreAsSingleByte(numCols, minValuePerRecord.toArray(), maxValuePerRecord.toArray(), valuesBuffer.toArray())
   }
 
   def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
-
     val minValuePerRecord = new FixedLengthBuffer[Float](numTotalRows)
     val maxValuePerRecord = new FixedLengthBuffer[Float](numTotalRows)
     val valuesBuffer = new FixedLengthBuffer[Byte](numTotalRows * numCols)

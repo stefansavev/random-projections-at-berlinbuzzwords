@@ -14,7 +14,7 @@ object ValuesStoreAsDouble {
   }
 }
 
-class ValuesStoreAsDouble(val _numCols: Int, val data: Array[Double]) extends ValuesStore{
+class ValuesStoreAsDouble(val _numCols: Int, val data: Array[Double]) extends ValuesStore {
 
   def toTuple(): ValuesStoreAsDouble.TupleType = {
     (_numCols, data)
@@ -23,10 +23,10 @@ class ValuesStoreAsDouble(val _numCols: Int, val data: Array[Double]) extends Va
   def getBuilderType: StoreBuilderType = StoreBuilderAsDoubleType
 
   def fillRow(rowId: Int, output: Array[Double], isPos: Boolean): Unit = {
-    var offset = rowId*_numCols
+    var offset = rowId * _numCols
     var j = 0
-    while(j < _numCols){
-      if (isPos){
+    while (j < _numCols) {
+      if (isPos) {
         output(j) += data(offset)
       } else {
         output(j) -= data(offset)
@@ -37,9 +37,9 @@ class ValuesStoreAsDouble(val _numCols: Int, val data: Array[Double]) extends Va
   }
 
   def setRow(rowId: Int, input: Array[Double]): Unit = {
-    var offset = rowId*_numCols
+    var offset = rowId * _numCols
     var j = 0
-    while(j < _numCols){
+    while (j < _numCols) {
       data(offset) = input(j)
       offset += 1
       j += 1
@@ -48,9 +48,9 @@ class ValuesStoreAsDouble(val _numCols: Int, val data: Array[Double]) extends Va
 
 
   def fillRow(rowId: Int, columnIds: Array[Int], output: Array[Double]): Unit = {
-    val offset = rowId*_numCols
+    val offset = rowId * _numCols
     var j = 0
-    while(j < columnIds.length){
+    while (j < columnIds.length) {
       val columnId = columnIds(j)
       output(columnId) = data(offset + columnId)
       j += 1
@@ -58,42 +58,42 @@ class ValuesStoreAsDouble(val _numCols: Int, val data: Array[Double]) extends Va
   }
 
   override def multiplyRowComponentWiseBySparseVector(rowId: Int, sv: SparseVector, output: Array[Double]): Unit = {
-    val offset = rowId*_numCols
+    val offset = rowId * _numCols
     val columnIds = sv.ids
     val values = sv.values
     val dim = columnIds.length
     var j = 0
-    while(j < dim){
+    while (j < dim) {
       val columnId = columnIds(j)
       val value = values(j)
-      output(j) = data(offset + columnId)*value
+      output(j) = data(offset + columnId) * value
       j += 1
     }
   }
 
   def cosineForNormalizedData(query: Array[Double], id: Int): Double = {
-    var offset = id*_numCols
+    var offset = id * _numCols
     var j = 0
     var sum = 0.0
-    while(j < _numCols){
+    while (j < _numCols) {
       val v1 = query(j)
       val v2 = data(offset)
       val d = v1 - v2
-      sum += d*d
+      sum += d * d
       offset += 1
       j += 1
     }
-    1.0 - 0.5*sum
+    1.0 - 0.5 * sum
   }
 }
 
-class ValuesStoreBuilderAsDouble(numCols: Int) extends ValuesStoreBuilder{
+class ValuesStoreBuilderAsDouble(numCols: Int) extends ValuesStoreBuilder {
   val numValuesInPage = 1024
   val valuesBuffer = new DoubleArrayBuffer()
   var currentRow = 0
 
   def addValues(values: Array[Double]): Unit = {
-    if (values.length != numCols){
+    if (values.length != numCols) {
       Utils.internalError()
     }
     valuesBuffer ++= values
@@ -116,11 +116,11 @@ class ValuesStoreBuilderAsDouble(numCols: Int) extends ValuesStoreBuilder{
   }
 
   def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
-    val buffer = new FixedLengthBuffer[Double](numTotalRows*numCols)
-    for(store <- valueStores){
+    val buffer = new FixedLengthBuffer[Double](numTotalRows * numCols)
+    for (store <- valueStores) {
       val typedStore = store.asInstanceOf[ValuesStoreAsDouble]
       buffer ++= typedStore.data
-      if (typedStore._numCols != numCols){
+      if (typedStore._numCols != numCols) {
         Utils.internalError()
       }
     }

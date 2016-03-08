@@ -94,27 +94,6 @@ class ValuesStoreBuilderAsBytes(numCols: Int) extends ValuesStoreBuilder {
   val valuesBuffer = new ShortArrayBuffer()
   var currentRow = 0
 
-  /*
-  def encodeValue(value: Double): Short = {
-    val intRepr: Int = java.lang.Float.floatToRawIntBits(value.toFloat)
-    val s = (intRepr >>> 16).toShort
-    s
-  }
-
-  def decodeValue(s: Short): Double = {
-    val bits = (s & 0xFFFF) << 16
-    java.lang.Float.intBitsToFloat(bits)
-  }
-
-  def decodeEncode(value: Double): Short = {
-    val s = encodeValue(value)
-    val decoded = decodeValue(s)
-    val error = value - decoded
-    //println("orig: " + value + " decoded:" + value + " error:" + error)
-    s
-  }
-  */
-
   def addValues(values: Array[Double]): Unit = {
     if (values.length != numCols) {
       Utils.internalError()
