@@ -59,8 +59,9 @@ object MnistAfterSVD_BruteForceWithSignatures extends StrictLogging {
     println(dataset)
 
     if (doTrain) {
-      val trees = (Utils.timed("Create trees", {
-        IndexBuilder.deprecate_build(settings = randomTreeSettings, dataFrameView = dataset)
+      val trees: RandomTrees = (Utils.timed("Create trees", {
+        //IndexBuilder.deprecate_build(settings = randomTreeSettings, dataFrameView = dataset)
+        null
       })(logger)).result
       trees.toFile(indexFile)
     }
