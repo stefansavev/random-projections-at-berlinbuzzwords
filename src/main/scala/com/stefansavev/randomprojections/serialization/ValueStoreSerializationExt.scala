@@ -2,7 +2,7 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.File
 
-import com.stefansavev.core.serialization.core.Core
+import com.stefansavev.core.serialization.core.Utils
 import com.stefansavev.randomprojections.datarepr.dense.store.ValuesStore
 import com.stefansavev.randomprojections.serialization.DataFrameViewSerializers._
 
@@ -11,7 +11,7 @@ object ValueStoreSerializationExt {
 
   implicit class ValueStoreSerializerExt(input: ValuesStore){
     def toFile(file:File): Unit = {
-      Core.toFile(ser, file, input)
+      Utils.toFile(ser, file, input)
     }
 
     def toFile(fileName: String): Unit = {
@@ -19,7 +19,7 @@ object ValueStoreSerializationExt {
     }
 
     def toBytes(): Array[Byte] = {
-      Core.toBytes(ser, input)
+      Utils.toBytes(ser, input)
     }
   }
 
@@ -29,7 +29,7 @@ object ValueStoreSerializationExt {
         throw new IllegalStateException("file does not exist: " + file.getAbsolutePath)
       }
       println("Loading file: " + file.getAbsolutePath)
-      val output = Core.fromFile(ser, file)
+      val output = Utils.fromFile(ser, file)
       output
     }
 
@@ -38,7 +38,7 @@ object ValueStoreSerializationExt {
     }
 
     def fromBytes(input: Array[Byte]): ValuesStore = {
-      Core.fromBytes(ser, input)
+      Utils.fromBytes(ser, input)
     }
   }
 }

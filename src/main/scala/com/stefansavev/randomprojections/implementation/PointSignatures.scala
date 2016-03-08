@@ -4,9 +4,9 @@ import java.io.{FileInputStream, BufferedInputStream}
 
 import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.core.serialization.core.Core
+import com.stefansavev.core.serialization.core.{Utils => SerializationUtils}
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
-import com.stefansavev.randomprojections.utils.{Utils}
+import com.stefansavev.randomprojections.utils.Utils
 import com.typesafe.scalalogging.StrictLogging
 
 class SignatureVectors(val signatureVectors: Array[SparseVector]){
@@ -129,7 +129,7 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
       val input: Array[Byte] = new Array[Byte](size)
       inputStream.read(input)
       inputStream.close()
-      val values = Core.fromBytes(TypedLongArraySerializer, input)
+      val values = SerializationUtils.fromBytes(TypedLongArraySerializer, input)
       values
     }
 
@@ -169,7 +169,7 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
             }
             //Thread.sleep(5000)
             val partitionId = i //we remember i in the closure
-            val values = Core.fromBytes(TypedLongArraySerializer, bytesReceived)
+            val values = SerializationUtils.fromBytes(TypedLongArraySerializer, bytesReceived)
             val offset = partitionId * partitionSize * numSignatures
             //println("computed offset for part " + partitionId + " " + offset + " len: " + values.length)
             System.arraycopy(values, 0, buffer2, offset, values.length)

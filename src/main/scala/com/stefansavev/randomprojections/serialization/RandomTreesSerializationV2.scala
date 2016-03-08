@@ -3,9 +3,10 @@ package com.stefansavev.randomprojections.serialization
 import java.io.{InputStream, OutputStream}
 
 import com.stefansavev.core.serialization._
-import com.stefansavev.core.serialization.core.Core._
+import com.stefansavev.core.serialization.core.Utils._
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
 import com.stefansavev.core.serialization.core.TupleSerializers._
+import com.stefansavev.core.serialization.core.IsoSerializers._
 import com.stefansavev.core.serialization.core._
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector

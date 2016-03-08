@@ -3,10 +3,11 @@ package com.stefansavev.core.serialization
 import java.io.File
 
 import com.stefansavev.TemporaryFolderFixture
-import com.stefansavev.core.serialization.core.Core._
+import com.stefansavev.core.serialization.core.Utils._
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
 import com.stefansavev.core.serialization.core.SubtypeSerializers._
 import com.stefansavev.core.serialization.core.TupleSerializers._
+import com.stefansavev.core.serialization.core.IsoSerializers._
 import com.stefansavev.core.serialization.core.{Iso, TypedSerializer}
 import org.junit.runner.RunWith
 import org.scalatest._
@@ -131,7 +132,7 @@ class SerializersTest extends FunSuite with TemporaryFolderFixture with Matchers
 
   implicit class ToFileExtension[A](item: A){
     def toFile(outputFile: File)(implicit ser: TypedSerializer[A]): Unit = {
-      import com.stefansavev.core.serialization.core.Core.{toFile => toFileImpl}
+      import com.stefansavev.core.serialization.core.Utils.{toFile => toFileImpl}
       toFileImpl(ser, outputFile, item)
     }
   }

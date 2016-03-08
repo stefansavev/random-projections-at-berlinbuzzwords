@@ -3,7 +3,7 @@ package com.stefansavev.randomprojections.serialization
 import java.io.File
 
 import DataFrameViewSerializers._
-import com.stefansavev.core.serialization.core.Core
+import com.stefansavev.core.serialization.core.Utils
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 
 object DataFrameViewSerializationExt {
@@ -11,7 +11,7 @@ object DataFrameViewSerializationExt {
   implicit class DataFrameSerializerExt(input: DataFrameView){
     def toFile(file:File): Unit = {
       val ser = dataFrameSerializer()
-      Core.toFile(ser, file, input)
+      Utils.toFile(ser, file, input)
     }
 
     def toFile(fileName: String): Unit = {
@@ -27,7 +27,7 @@ object DataFrameViewSerializationExt {
       }
 
       val ser = dataFrameSerializer()
-      val output = Core.fromFile(ser, file)
+      val output = Utils.fromFile(ser, file)
       output
     }
 

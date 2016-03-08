@@ -7,7 +7,7 @@ import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.buffers.{LongArrayBuffer, IntArrayBuffer}
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.core.serialization.core.{LongArraySerializer, Core}
+import com.stefansavev.core.serialization.core.{LongArraySerializer, Utils}
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.utils.RandomUtils
 
@@ -294,7 +294,7 @@ class AsyncSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int,
   val positions = new LongArrayBuffer()
 
   def storePartition(): Unit = {
-    val bytes = Core.toBytes(TypedLongArraySerializer, buffer.toArray())
+    val bytes = Utils.toBytes(TypedLongArraySerializer, buffer.toArray())
 
     positions += nextBytesPos
     supervisor.write(0, bytes, nextBytesPos)

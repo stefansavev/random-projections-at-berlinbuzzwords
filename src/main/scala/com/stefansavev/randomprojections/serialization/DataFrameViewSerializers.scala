@@ -5,8 +5,10 @@ import java.io.{InputStream, OutputStream}
 import com.stefansavev.core.serialization.core.SubtypeSerializers._
 import com.stefansavev.core.string2id.String2IdHasherSerialization
 import String2IdHasherSerialization.String2IdHasherSerializer
-import com.stefansavev.core.serialization.core.Core._
+import com.stefansavev.core.serialization.core.Utils._
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
+import com.stefansavev.core.serialization.core.ImplicitSerializers._
+import com.stefansavev.core.serialization.core.IsoSerializers._
 import com.stefansavev.core.serialization.core.TupleSerializers._
 import com.stefansavev.core.serialization.core.{Iso, TypedSerializer}
 import com.stefansavev.core.string2id.String2IdHasher
