@@ -1,4 +1,4 @@
-package com.stefansavev.randomprojections.tuning
+package com.stefansavev.tuning
 
 import java.util.Random
 
