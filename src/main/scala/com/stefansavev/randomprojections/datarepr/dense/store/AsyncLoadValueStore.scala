@@ -1,6 +1,6 @@
 package com.stefansavev.randomprojections.datarepr.dense.store
 
-import java.io.{FileInputStream, BufferedInputStream, File}
+import java.io.{BufferedInputStream, File, FileInputStream}
 
 import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.buffers.LongArrayBuffer
@@ -155,7 +155,7 @@ class AsyncStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: Sto
   }
 
   def merge(numTotalRows: Int, valueStores: Iterator[ValuesStore]): ValuesStore = {
-    null //underlyingBuilder.getBuilder(numCols).merge(numTotalRows, valueStores)
+    throw new IllegalStateException("AsyncLoadValueStore does not support merge")
   }
 
   def isFull: Boolean = Utils.internalError()
