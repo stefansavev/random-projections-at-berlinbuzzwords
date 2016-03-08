@@ -3,6 +3,7 @@ package com.stefansavev
 import java.util.Random
 
 import com.stefansavev.randomprojections.datarepr.dense.store._
+import com.typesafe.scalalogging.StrictLogging
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FlatSpec, Matchers}
@@ -87,5 +88,12 @@ class TestValueStores extends FlatSpec with Matchers {
       }
       testValues()
     }
+  }
+}
+
+
+object Test extends StrictLogging {
+  def main(args: Array[String]) {
+    logger.info("hello")
   }
 }

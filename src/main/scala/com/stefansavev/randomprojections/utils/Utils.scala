@@ -3,6 +3,8 @@ package com.stefansavev.randomprojections.utils
 import java.io.File
 import java.util.Random
 
+import com.typesafe.scalalogging.Logger
+
 import scala.reflect.ClassTag
 
 case class TimedResult[T](result: T, timeMillisecs: Long)
@@ -21,6 +23,7 @@ object Utils{
   }
 
 
+  /*
   def timed[R](msg: String, codeBlock: => R): TimedResult[R] = {
     val start = System.currentTimeMillis()
     val result = codeBlock    // call-by-name
@@ -28,6 +31,17 @@ object Utils{
     val elapsed = end - start
     val timeAsStr = if (elapsed >= 1000) (elapsed/1000.0 + " secs.") else (elapsed + " ms.")
     println(s"Time for '${msg}' ${timeAsStr}")
+    TimedResult(result, elapsed)
+  }
+  */
+
+  def timed[R](msg: String, codeBlock: => R)(implicit logger: Logger): TimedResult[R] = {
+    val start = System.currentTimeMillis()
+    val result = codeBlock    // call-by-name
+    val end = System.currentTimeMillis()
+    val elapsed = end - start
+    val timeAsStr = if (elapsed >= 1000) (elapsed/1000.0 + " secs.") else (elapsed + " ms.")
+    logger.info(s"Time for '${msg}' ${timeAsStr}")
     TimedResult(result, elapsed)
   }
 

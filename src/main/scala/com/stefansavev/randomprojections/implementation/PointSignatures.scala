@@ -7,6 +7,7 @@ import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.core.serialization.core.Core
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.utils.{Utils}
+import com.typesafe.scalalogging.StrictLogging
 
 class SignatureVectors(val signatureVectors: Array[SparseVector]){
   def numSignatures: Int = signatureVectors.size
@@ -109,7 +110,7 @@ object PointSignatureReference{
   }
 }
 
-class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints: Int, numSignatures: Int, partitionSize: Int, positions: Array[Long]){
+class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints: Int, numSignatures: Int, partitionSize: Int, positions: Array[Long]) extends StrictLogging{
   def toTuple(): PointSignatureReference.TupleType = {
     //TODO: maybe just calling unapply on a case class would do the trick
     (backingDir, numPartitions, numPoints, numSignatures, partitionSize, positions)
@@ -139,9 +140,8 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
       for(i <- 0 until numPartitions){
         val partitionValues = readPartition(i)
         System.arraycopy(partitionValues, 0, buffer1, offset, partitionValues.length)
-        println("required offset for part " + i + " " + offset + " " + partitionValues.length)
+        logger.info(s"Reading signature file partition $i at ${offset} with length ${partitionValues.length}")
         offset += partitionValues.length
-
       }
     }
 

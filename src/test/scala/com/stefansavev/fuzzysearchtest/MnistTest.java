@@ -3,13 +3,15 @@ package com.stefansavev.fuzzysearchtest;
 import com.stefansavev.similaritysearch.*;
 import com.stefansavev.randomprojections.actors.Application;
 import com.stefansavev.similaritysearch.implementation.VectorTypes;
+import com.typesafe.scalalogging.LazyLogging;
+import com.typesafe.scalalogging.StrictLogging;
 
 import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class MnistTest {
+public class MnistTest{
 
     static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions){
         String[] tokens = line.split(",");

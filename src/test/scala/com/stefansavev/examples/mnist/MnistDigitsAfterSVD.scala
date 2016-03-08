@@ -11,9 +11,12 @@ import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{AllNearestNeighborsForDataset, Utils}
 import com.stefansavev.examples.ExamplesSettings
+import com.typesafe.scalalogging.StrictLogging
 
-object MnistDigitsAfterSVD {
+object MnistDigitsAfterSVD extends StrictLogging {
   import RandomTreesSerialization.Implicits._
+
+  implicit val _ = logger
 
   def loadData(fileName: String): DataFrameView ={
     val opt = CSVFileOptions(onlyTopRecords = None)

@@ -7,6 +7,7 @@ import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.datarepr.dense.PointIndexes
 import com.stefansavev.randomprojections.datarepr.dense.store.FixedLengthBuffer
 import com.stefansavev.randomprojections.interface.{BucketCollector, Index}
+import com.typesafe.scalalogging.StrictLogging
 
 object BucketCollectorImplUtils{
   val partitionFileSuffix = "_partition_"
@@ -15,7 +16,7 @@ object BucketCollectorImplUtils{
   }
 }
 
-class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketCollector{
+class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketCollector with StrictLogging{
   val pointIdsThreshold = 1 << 20
 
   var leafId = 0
@@ -27,7 +28,7 @@ class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketColl
   def savePartial(): Unit = {
     val fileName = BucketCollectorImplUtils.fileName(backingDir, numPartitions)
     val outputStream = new BufferedOutputStream(new FileOutputStream(fileName))
-    println("Writing partial buckets to file :" + fileName)
+    logger.info(s"Writing partial buckets to file ${fileName}")
     IntArraySerializer.write(outputStream, starts.toArray())
     IntArraySerializer.write(outputStream, pointIds.toArray())
     outputStream.close()

@@ -1,14 +1,17 @@
 package com.stefansavev.examples.randomdata
 
+import com.stefansavev.examples.mnist.MnistDigitsAfterSVD._
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScoreSettings, PriorityQueueBasedBucketSearchSettings}
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{Utils, AllNearestNeighborsForDataset}
+import com.typesafe.scalalogging.StrictLogging
 
 
-object TestOnRandomData {
+object TestOnRandomData extends StrictLogging{
+  implicit val _ = logger
 
   def main (args: Array[String]): Unit = {
     val dataGenSettings = RandomBitStrings.RandomBitSettings(

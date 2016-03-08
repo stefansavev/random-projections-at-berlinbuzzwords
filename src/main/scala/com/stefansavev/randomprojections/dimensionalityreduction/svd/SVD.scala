@@ -7,6 +7,7 @@ import com.github.fommil.netlib.BLAS
 import com.stefansavev.randomprojections.datarepr.dense.{DenseRowStoredMatrixViewBuilderFactory, ColumnHeaderBuilder, DataFrameView}
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{DimensionalityReductionTransform, DimensionalityReductionParams}
 import com.stefansavev.randomprojections.utils.{Utils, DenseMatrixUtils}
+import com.typesafe.scalalogging.StrictLogging
 import no.uib.cipr.matrix.{SVD => MatrixSVD, DenseMatrix}
 
 trait SVDMethod{
@@ -192,7 +193,7 @@ object SVDFromRandomizedDataEmbedding extends SVDMethod{
 case class SVDParams(k: Int, svdMethod: SVDMethod) extends DimensionalityReductionParams{
 }
 
-class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends DimensionalityReductionTransform{
+class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends DimensionalityReductionTransform with StrictLogging{
   def reduceToTopK(newK: Int): SVDTransform = {
     if (newK == k){
       this
@@ -245,7 +246,7 @@ class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends Dimensionali
       dataFrame.getPointAsDenseVector(i, colIds, vec)
       projectOnToRowsVt(k, vec, weightedVt, output)
       if (i % 5000 == 0){
-        println("Processed " + i + " rows")
+        logger.info(s"Processed ${i} rows")
       }
       builder.addRow(dataFrame.getLabel(i), newIds, output)
       i += 1
@@ -256,16 +257,16 @@ class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends Dimensionali
   }
 }
 
-object SVD {
+object SVD extends StrictLogging{
 
   def fit(params: SVDParams, dataFrame: DataFrameView): SVDTransform = {
     params.svdMethod.fit(params, dataFrame)
   }
 
   def transform(svdTransform: SVDTransform, inputData: DataFrameView): DataFrameView = {
-    println("Started transformation with SVD")
+    logger.info("Started transformation with SVD")
     val result = svdTransform.projectDataset(inputData)
-    println("Finished transformation with SVD")
+    logger.info("Finished transformation with SVD")
     result
   }
 }

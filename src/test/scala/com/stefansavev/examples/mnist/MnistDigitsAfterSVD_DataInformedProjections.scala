@@ -1,6 +1,7 @@
 package com.stefansavev.examples.mnist
 
 import java.io.PrintWriter
+import com.stefansavev.examples.mnist.MnistDigitsAfterSVD._
 import com.stefansavev.randomprojections.datarepr.dense.{DataFrameOptions, DataFrameView, DenseRowStoredMatrixViewBuilderFactory, RowStoredMatrixView}
 import com.stefansavev.randomprojections.file.CSVFileOptions
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
@@ -11,9 +12,11 @@ import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.Evaluation
 import com.stefansavev.randomprojections.utils.{AllNearestNeighborsForDataset, Utils}
 import com.stefansavev.examples.ExamplesSettings
+import com.typesafe.scalalogging.StrictLogging
 
-object MnistDigitsAfterSVD_DataInformedProjections {
+object MnistDigitsAfterSVD_DataInformedProjections extends StrictLogging{
   import RandomTreesSerialization.Implicits._
+  implicit val _ = logger
 
   def main (args: Array[String]): Unit = {
     val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")

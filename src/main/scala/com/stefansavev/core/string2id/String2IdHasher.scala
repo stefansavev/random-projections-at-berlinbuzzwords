@@ -441,7 +441,7 @@ class String2IdHasher(settings: StringIdHasherSettings){
     output.toArray()
   }
 
-
+  /*
   def dumpContents(): Unit = {
     var i = 0
     while(i < pointersToValues.length){
@@ -454,6 +454,7 @@ class String2IdHasher(settings: StringIdHasherSettings){
       i += 1
     }
   }
+  */
 
   def getStringAtIndex(index: Int): Option[String] = {
     val internalId = getInternalId(index)

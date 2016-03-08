@@ -8,6 +8,7 @@ import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.utils.Utils
+import com.typesafe.scalalogging.StrictLogging
 
 object BinaryFileSerializerSig{
   val signature = Array(80,42,51,67)
@@ -64,7 +65,7 @@ object DataFrameViewSerializer{
   }
 }
 
-object PointSignaturesSerializer{
+object PointSignaturesSerializer extends StrictLogging{
 
   def toBinary(outputStream: OutputStream, pointSignatures: PointSignatures): Unit = {
     //TODO: this functionality should be split into 2 classes
@@ -112,18 +113,17 @@ object PointSignaturesSerializer{
       val data = Array.ofDim[Long](numPoints*numSig)
       var offset = 0
 
-      Utils.timed("SeqRead", {
+      Utils.timed("Read Signature Vectors", {
         var i = 0
         while (i < numPartitions) {
           val subStream = new BufferedInputStream(new FileInputStream(DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, i)))
           val output = LongArraySerializer.read(subStream)
-          println("output.len: " + output.length)
           subStream.close()
           System.arraycopy(output, 0, data, offset, output.length)
           offset += output.length
           i += 1
         }
-      })
+      })(logger)
 
       if (offset != data.length){
         Utils.internalError()

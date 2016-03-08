@@ -10,6 +10,7 @@ import java.util.concurrent.{Executors, ExecutorService, ThreadPoolExecutor}
 
 import akka.actor._
 import com.stefansavev.randomprojections.utils.Utils
+import com.typesafe.scalalogging.StrictLogging
 import scala.collection.mutable
 
 
@@ -57,12 +58,12 @@ case class ReadResult(readRequest: Read, bytes: Array[Byte]) extends AsyncFileEv
 case class WriteResult(writerId: Int, bytesWritten: Int, position: Long) extends AsyncFileEvent
 case class CommandFailed(cmd: AsyncFileCommand, cause: Throwable) extends AsyncFileEvent
 
-trait BasicCompletionHandler[A, B] extends CompletionHandler[A, B] {
+trait BasicCompletionHandler[A, B] extends CompletionHandler[A, B] with StrictLogging {
   def receiver: ActorRef
   def cmd: AsyncFileCommand
 
   override def failed(exc: Throwable, attachment: B): Unit = {
-    println("Failed " + exc)
+    logger.error("Asyncronous read/write command failed", exc)
     receiver ! CommandFailed(cmd, exc)
   }
 }
@@ -163,7 +164,7 @@ class FileReaderSupervisor(supervisorActor: ActorRef){
   }
 }
 
-class ActorFileWriterSupervisor(maxNumberOfPendingWrites: Int, writers: Array[AsyncFileWriter]) extends Actor{
+class ActorFileWriterSupervisor(maxNumberOfPendingWrites: Int, writers: Array[AsyncFileWriter]) extends Actor with StrictLogging{
   import ActorFileWriterSupervisorMessages._
   import akka.pattern.ask
 
@@ -189,7 +190,7 @@ class ActorFileWriterSupervisor(maxNumberOfPendingWrites: Int, writers: Array[As
 
   override def receive = {
     case Write(writerId: Int, buffer: Array[Byte], position: Long) => {
-      println("writing at pos " + position + " with pending writes " + numWritesPending)
+      logger.info(s"Writing at pos ${position}  with pending writes ${numWritesPending}")
       if (numWritesPending > maxNumberOfPendingWrites){
         if (scheduledWrite.isDefined){
           throw new IllegalStateException("One one pending message is allowed")
@@ -334,9 +335,9 @@ class ActorFileReaderSupervisor(maxNumberOfPendingReads: Int, readers: Array[Asy
   }
 }
 
-class AsyncFileWriter(fileName: String, system: ActorSystem, pool: ExecutorService, actorNameSuffix: String){
-  println("creating async file: " + fileName)
-  //Files.delete(Paths.get(fileName))
+class AsyncFileWriter(fileName: String, system: ActorSystem, pool: ExecutorService, actorNameSuffix: String) extends StrictLogging{
+  logger.info(s"Creating file ${fileName} for asyncronous writing")
+
   val fileWriter = AsyncFile.openWrite(fileName, pool)
   val fileWriterActorProps = Props(classOf[ActorFileWriter], fileWriter)
   val fileWriterActor = system.actorOf(fileWriterActorProps, "FileWriter_" + actorNameSuffix)

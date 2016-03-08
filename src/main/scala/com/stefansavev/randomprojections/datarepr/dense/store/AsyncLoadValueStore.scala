@@ -7,6 +7,7 @@ import com.stefansavev.randomprojections.buffers.LongArrayBuffer
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.serialization.ValueStoreSerializationExt
 import com.stefansavev.randomprojections.utils.Utils
+import com.typesafe.scalalogging.StrictLogging
 
 object AsyncLoadValueStore {
   val partitionFileNamePrefix = "_dataset_partition_"
@@ -108,7 +109,7 @@ class AsyncLoadValueStore(backingDir: String, chunkOffsets: Array[Long], numPart
   }
 }
 
-class AsyncStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: StoreBuilderType) extends ValuesStoreBuilder {
+class AsyncStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: StoreBuilderType) extends ValuesStoreBuilder with StrictLogging{
   var currentRow = 0
   val numPointsInPartition = 1 << 14
   var currentPartition = 0
@@ -125,7 +126,7 @@ class AsyncStoreBuilder(backingDir: String, numCols: Int, underlyingBuilder: Sto
 
   def savePartition(): Unit = {
     import ValueStoreSerializationExt._
-    println("saving partition " + currentPartition)
+    logger.info(s"Saving partition ${currentPartition}")
     val currentStore = currentBuilder.build() //serialize to bytes and send them to the async serializer
     val bytes = currentStore.toBytes()
     val writerId = 0

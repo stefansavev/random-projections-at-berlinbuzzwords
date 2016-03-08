@@ -29,9 +29,12 @@ import com.stefansavev.randomprojections.utils.AllNearestNeighborsForDataset
 import com.stefansavev.randomprojections.utils.Utils
 import com.stefansavev.randomprojections.utils.{AllNearestNeighborsForDataset, Utils}
 import com.stefansavev.examples.ExamplesSettings
+import com.typesafe.scalalogging.StrictLogging
 
-object MnistAfterSVD_BruteForceWithSignatures {
+object MnistAfterSVD_BruteForceWithSignatures extends StrictLogging {
   import RandomTreesSerialization.Implicits._
+
+  implicit val _ = logger
 
   def main (args: Array[String]): Unit = {
     val trainFile = Utils.combinePaths(ExamplesSettings.inputDirectory, "mnist/svdpreprocessed/train.csv")
@@ -56,9 +59,9 @@ object MnistAfterSVD_BruteForceWithSignatures {
     println(dataset)
 
     if (doTrain) {
-      val trees = Utils.timed("Create trees", {
+      val trees = (Utils.timed("Create trees", {
         IndexBuilder.deprecate_build(settings = randomTreeSettings, dataFrameView = dataset)
-      }).result
+      })(logger)).result
       trees.toFile(indexFile)
     }
 

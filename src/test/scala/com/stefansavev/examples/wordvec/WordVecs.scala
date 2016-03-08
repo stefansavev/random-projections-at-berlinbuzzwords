@@ -1,5 +1,6 @@
 package com.stefansavev.examples.wordvec
 
+import com.stefansavev.examples.mnist.MnistDigitsAfterSVD._
 import com.stefansavev.similaritysearch.implementation.FuzzySearchResultsWrapper
 import com.stefansavev.similaritysearch.{SimilaritySearchResults, SimilaritySearchResult, SimilaritySearchResultBuilder}
 import com.stefansavev.randomprojections.datarepr.dense._
@@ -10,11 +11,14 @@ import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScore
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 import com.stefansavev.randomprojections.evaluation.{RecallEvaluator, Evaluation}
 import com.stefansavev.randomprojections.utils.{Utils, AllNearestNeighborsForDataset}
+import com.typesafe.scalalogging.StrictLogging
 
 import scala.collection.mutable.ArrayBuffer
 import com.stefansavev.examples.{WordVecGroundTruth, ExamplesSettings}
 
-object WordVecs {
+object WordVecs extends StrictLogging{
+  implicit val _ = logger
+
   def fromFile(fileName: String,  opt: CSVFileOptions, dataFrameOptions: DataFrameOptions,  matrixBuilderFactory: RowStoredMatrixViewBuilderFactory, topK: Int): DataFrameView = {
     if (opt.hasHeader){
       throw new IllegalStateException("Header cannot be set for this data")

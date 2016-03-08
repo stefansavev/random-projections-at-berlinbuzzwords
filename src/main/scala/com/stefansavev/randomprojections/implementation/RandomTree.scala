@@ -138,7 +138,6 @@ class TreeWriteBuffer(initialSize: Int){
 
   def getInternalRepr(): Array[Int] = {
     val size = pntr
-    println("#storage of tree: " + (size.toDouble/(1024.0*1024.0)) + " MB")
     val origin = output
     val truncated = Array.ofDim[Int](size)
     System.arraycopy(origin, 0, truncated, 0, size)

@@ -8,6 +8,7 @@ import com.stefansavev.randomprojections.datarepr.dense._
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{NoDimensionalityReductionTransform, DimensionalityReduction}
 import com.stefansavev.randomprojections.dimensionalityreduction.svd._
 import com.stefansavev.randomprojections.utils.Utils
+import com.typesafe.scalalogging.StrictLogging
 
 trait Point2LeavesMap{
   def getTreeLeaves(pointId: Int): Array[(Int, Int)]
@@ -19,7 +20,7 @@ class Point2LeavesMapImpl(map: scala.collection.mutable.HashMap[Int, Array[(Int,
   }
 }
 
-object IndexBuilder{
+object IndexBuilder extends StrictLogging{
   class Counter(){
     var index = 0
 
@@ -170,7 +171,7 @@ object IndexBuilder{
     val rnd = new Random(settings.randomSeed)
     val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, dataFrameView)
     val splitStrategy = settings.projectionStrategyBuilder.datasetSplitStrategy
-    val logger = new IndexCounters()
+    val indexCounters = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
     val (signatureVecs, signatures) = Signatures.computePointSignatures(2, rnd, dataFrameView)
     dataFrameView.setPointSignatures(signatures)
@@ -181,8 +182,10 @@ object IndexBuilder{
       case _ => settings.numTrees
     }
     for(i <- 0 until numTrees){
-      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, dataFrameView, bucketCollector, splitStrategy, projStrategy, logger)}).result
-      randomTrees(i) = randomTree
+      val randomTree = Utils.timed(s"Build tree ${i}", {
+                                        buildTree(i, rnd, settings, dataFrameView, bucketCollector, splitStrategy, projStrategy, indexCounters)
+                                  })(logger)
+      randomTrees(i) = randomTree.result
     }
     new RandomTrees(NoDimensionalityReductionTransform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
   }
@@ -190,7 +193,7 @@ object IndexBuilder{
   def deprecate_buildWithPreprocessing(numInterProj: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
     val bucketCollector = new BucketCollectorImpl(null, dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
-    val logger = new IndexCounters()
+    val indexCounters = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
     val emptyScores = Array.ofDim[Double](dataFrameView.indexes.indexes.length)
     val newIndexes = PointIndexes(dataFrameView.indexes.indexes)
@@ -206,8 +209,10 @@ object IndexBuilder{
       savedRes = modifyDataFrame(newDataFrameView, newProjS)
       val (absProjV, modDF) = savedRes
       val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, modDF)
-      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, modDF, bucketCollector, splitStrategy, projStrategy, logger)}).result
-      randomTrees(i) = RandomTreeNodeRoot(absProjV, randomTree)
+      val randomTree = Utils.timed(s"Build tree ${i}", {
+                                  buildTree(i, rnd, settings, modDF, bucketCollector, splitStrategy, projStrategy, indexCounters)
+                        })(logger)
+      randomTrees(i) = RandomTreeNodeRoot(absProjV, randomTree.result)
     }
 
     new RandomTrees(NoDimensionalityReductionTransform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
@@ -234,7 +239,7 @@ object IndexBuilder{
                                     precomputedSigVec: Option[(SignatureVectors, PointSignatures)] = None): RandomTrees = {
     val bucketCollector = new BucketCollectorImpl(treesBackingDir, dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
-    val logger = new IndexCounters()
+    val indexCounters = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
 
     //phase 1: dimensionality reduction
@@ -275,8 +280,10 @@ object IndexBuilder{
       //val (rotationTransform, rotatedDataFrameView) = modifyInPlace(datasetAfterSVD, randomRotation)
 
       val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, rotatedDataFrameView)
-      val randomTree = Utils.timed(s"Build tree ${i}", {toEfficientlyStoredTree(buildTree(i, rnd, settings, rotatedDataFrameView, bucketCollector, splitStrategy, projStrategy, logger))}).result
-      randomTrees(i) = RandomTreeNodeRoot(rotationTransform, randomTree)
+      val randomTree = Utils.timed(s"Build tree ${i}", {
+                                toEfficientlyStoredTree(buildTree(i, rnd, settings, rotatedDataFrameView, bucketCollector, splitStrategy, projStrategy, indexCounters))
+                            })(logger)
+      randomTrees(i) = RandomTreeNodeRoot(rotationTransform, randomTree.result)
     }
 
     new RandomTrees(svdTransform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)
@@ -285,7 +292,7 @@ object IndexBuilder{
   def deprecate_buildWithSVD(k: Int, settings: IndexSettings, dataFrameView: DataFrameView): RandomTrees = {
     val bucketCollector = new BucketCollectorImpl(null, dataFrameView.numRows)
     val rnd = new Random(settings.randomSeed)
-    val logger = new IndexCounters()
+    val indexCounters = new IndexCounters()
     val randomTrees = Array.ofDim[RandomTree](settings.numTrees)
     val emptyScores = Array.ofDim[Double](dataFrameView.indexes.indexes.length)
     val newIndexes = PointIndexes(dataFrameView.indexes.indexes)
@@ -304,8 +311,10 @@ object IndexBuilder{
     val reportingDistanceEvaluator = settings.reportingDistanceEvaluator.build(dataFrameView)
     val projStrategy: ProjectionStrategy = settings.projectionStrategyBuilder.build(settings, rnd, transformedDataset)
     for(i <- 0 until settings.numTrees){
-      val randomTree = Utils.timed(s"Build tree ${i}", {buildTree(i, rnd, settings, transformedDataset, bucketCollector, splitStrategy, projStrategy, logger)}).result
-      randomTrees(i) = randomTree
+      val randomTree = Utils.timed(s"Build tree ${i}", {
+                        buildTree(i, rnd, settings, transformedDataset, bucketCollector, splitStrategy, projStrategy, indexCounters)
+                      }) (logger)
+      randomTrees(i) = randomTree.result
     }
 
     new RandomTrees(transformResult.transform, reportingDistanceEvaluator, signatureVecs, splitStrategy, dataFrameView.rowStoredView.getColumnHeader, bucketCollector.build(signatures, dataFrameView.getAllLabels()), randomTrees)

@@ -13,6 +13,7 @@ import com.stefansavev.randomprojections.implementation.bucketsearch.{PointScore
 import com.stefansavev.randomprojections.implementation.indexing.IndexBuilder
 import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.utils.Utils
+import com.typesafe.scalalogging.StrictLogging
 
 class FuzzySearchIndexWrapper(trees: RandomTrees, dataset: DataFrameView) {
   val searcherSettings = SearcherSettings (
@@ -142,7 +143,7 @@ object FuzzySearchIndexWrapper{
   }
 }
 
-class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: Int, valueSize: StorageSize){
+class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: Int, valueSize: StorageSize) extends StrictLogging{
   if (dim < 8){
     throw new IllegalStateException("The data dimension has to be greater or equal to 8")
   }
@@ -163,7 +164,7 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
       }
       val unrecognizedFiles = fullDir.listFiles(new FileFilter {
         override def accept(pathName: File): Boolean = {
-          ! acceptsFile(pathName)
+          !acceptsFile(pathName)
         }
       })
       if (unrecognizedFiles.length > 0){
@@ -176,7 +177,7 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
         }
       })
       filesToBeDeleted.foreach(f => {
-        println("FILE TO BE DELETED " + f)
+        logger.info(s"FILE TO BE DELETED $f")
         f.delete()
       })
       if (fullDir.listFiles().length > 0){
@@ -252,11 +253,11 @@ class FuzzySearchIndexBuilderWrapper(backingFile: String, dim: Int, numTrees: In
     println(dataset)
 
     val signatures = onlineSigVecs.buildPointSignatures()
-    val trees = Utils.timed("Create trees", {
+    val trees = (Utils.timed("Create trees", {
       val treePartitionsDir = new File(backingFile, FuzzySearchIndexWrapper.randomTreesPartitionsDir).getAbsolutePath
       val svdDim = Math.min(32, HadamardUtils.roundDown(dim))
       IndexBuilder.buildWithSVDAndRandomRotation(treePartitionsDir, svdDim, settings = randomTreeSettings, dataFrameView = dataset, Some(svdTransform), Some(signatures))
-    }).result
+    })(logger)).result
 
     def save(fileName: String): Unit = {
       import RandomTreesSerialization.Implicits._
