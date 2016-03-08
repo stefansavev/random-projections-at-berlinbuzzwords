@@ -141,7 +141,7 @@ class FileWriterSupervisor(supervisorActor: ActorRef){
   }
 }
 
-class FileReaderSupervisor(supervisorActor: ActorRef){
+class FileReaderSupervisor(supervisorActor: ActorRef) extends StrictLogging{
   import ActorFileReaderSupervisorMessages._
   import akka.util.Timeout
   import scala.concurrent.Await
@@ -152,14 +152,13 @@ class FileReaderSupervisor(supervisorActor: ActorRef){
     implicit val timeout = Timeout(5000 seconds)
     val future = supervisorActor ? Read(-1, fromPos, toPos, hook)
     Await.result(future, timeout.duration).asInstanceOf[ScheduledReadMessage.type] //ignore result
-    println("finished waiting for read to get scheduled")
   }
 
   def waitUntilDone(): ReaderDone = {
     implicit val timeout = Timeout(5000 seconds)
     val future = supervisorActor ? ReaderWaitUntilDone
     val result = Await.result(future, timeout.duration).asInstanceOf[ReaderDone]
-    println("reader done")
+    logger.info("Finished reading")
     result
   }
 }
@@ -262,19 +261,15 @@ class ActorFileReaderSupervisor(maxNumberOfPendingReads: Int, readers: Array[Asy
   }
 
   def scheduleRead(scheduledRead: ScheduledRead): Unit = {
-    println("scheduling read with # pending " + numReadsPending)
     numReadsPending += 1
     val readerId = availableReaders.dequeue()
-    println("scheduling at reader: " + readerId)
     readers(readerId).read(scheduledRead.readMessage.copy(readerId = readerId))
     scheduledRead.sender ! ScheduledReadMessage
   }
 
   override def receive = {
     case readMessage@Read(_, fromPosition, toPosition, internalMessage) => {
-      println("read message with #reads pending " + numReadsPending)
       if (numReadsPending >= maxNumberOfPendingReads){
-        println("queuing read message with #pending " + numReadsPending)
         if (scheduledRead.isDefined){
           throw new IllegalStateException("One one pending message is allowed")
         }
@@ -295,7 +290,6 @@ class ActorFileReaderSupervisor(maxNumberOfPendingReads: Int, readers: Array[Asy
       numReadsPending -= 1
 
       if (scheduledRead.isDefined){
-        println("releasing pending # " + numReadsPending)
         scheduleRead(scheduledRead.get)
         scheduledRead = None
       }
@@ -314,7 +308,6 @@ class ActorFileReaderSupervisor(maxNumberOfPendingReads: Int, readers: Array[Asy
     }
 
     case ReaderWaitUntilDone => {
-      println("reader wait until done")
       if (waiter.isDefined){
         Utils.internalError()
       }

@@ -10,6 +10,7 @@ import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.core.serialization.core.{LongArraySerializer, Utils}
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.utils.RandomUtils
+import com.typesafe.scalalogging.StrictLogging
 
 object Counts{
   /*
@@ -36,41 +37,6 @@ object Signatures {
 
   def getSign(v: Double): Int = if (v >= 0) 1 else -1
   def isSignificant(v: Double): Boolean = Math.abs(v)> Math.sqrt(1.0/64)
-  def debugOverlap(signs: SparseVector, q1: Array[Double], q2: Array[Double],s1: Long, s2: Long): Double = {
-    val r1 = hadamardRepr(signs, q1)
-    val r2 = hadamardRepr(signs, q2)
-    var i = 0
-    var dotProd = 0.0
-    while(i < Math.min(64, r1.length)){
-      val signsAgree1 = if (getSign(r1(i))==getSign(r2(i))) 1.0 else 0.0
-      val signsAgree = if (isSignificant(r1(i)) && isSignificant(r2(i)) && getSign(r1(i))==getSign(r2(i))) 1.0 else 0.0
-      dotProd += (r1(i)*r2(i)) //signsAgree1 + 2.0*signsAgree //(r1(i)*r2(i))
-      i += 1
-    }
-    dotProd
-
-    val h1 = computePointSignature(signs, q1)
-    val h2 = computePointSignature(signs, q2)
-    if (s1 != h1){
-      println("error 1")
-    }
-    if (s2 != h2){
-      println("error 2")
-    }
-    val v1 = hashToVector(s1)
-    val v2 = hashToVector(s2)
-    i = 0
-    var dotProd2 = 0.0
-    while(i < v1.length){
-      val signsAgree = if (getSign(v1(i))==getSign(v2(i))) 1.0 else 0.0
-      dotProd2 += signsAgree //(r1(i)*r2(i))
-      i += 1
-    }
-    val o = overlap(s1, s2)
-    //println(" " + dotProd + " " + dotProd2 + " " + o)
-    //o
-    dotProd
-  }
 
   def vectorToHash(vec: Array[Double]): Long = {
     var i = 0
@@ -238,7 +204,7 @@ object DiskBackedOnlineSignatureVectorsUtils{
   }
 }
 
-class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int, numColumns: Int){
+class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int, numColumns: Int) extends StrictLogging{
   val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
   var buffer = new LongArrayBuffer()
   var numPoints = 0
@@ -248,7 +214,7 @@ class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSigna
   def storePartition(): Unit = {
     val fileName = DiskBackedOnlineSignatureVectorsUtils.fileName(backingDir, currentPartition)
     val outputStream = new BufferedOutputStream(new FileOutputStream(fileName))
-    println("Writing signature partitioned file:" + fileName)
+    logger.info(s"Writing signature partitioned file  $fileName")
     LongArraySerializer.write(outputStream, buffer.toArray())
     outputStream.close()
     buffer = new LongArrayBuffer()

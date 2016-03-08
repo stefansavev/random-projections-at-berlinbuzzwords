@@ -17,9 +17,6 @@ object AllNearestNeighborsForDataset {
       val knns = searcher.getNearestNeighborsByVector(query, topNearestNeighbors)
       knnsBuffer += (knns.copy(pointId = i))
       i += 1
-      if (i % 1000 == 0){
-        println(i)
-      }
     }
     knnsBuffer.toArray
   }

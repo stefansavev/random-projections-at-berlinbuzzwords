@@ -156,7 +156,7 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
       //val handledPartitions = new ArrayBuffer[Int]()
       for (i <- 0 until numPartitions) {
         //val i = j //shuffledPartitions(j)
-        println("reading partition " + i)
+        logger.info("reading partition " + i)
         //synchronous code
         //val partitionValues = readPartition(i)
         //System.arraycopy(partitionValues, 0, buffer, offset, partitionValues.length)
@@ -175,7 +175,7 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
             System.arraycopy(values, 0, buffer2, offset, values.length)
             for(k <- offset until (offset + values.length)){
               if (buffer1(k) != buffer2(k)){
-                println("Error at offset: " + (k - offset))
+                logger.info("Error at offset: " + (k - offset))
                 Utils.internalError()
               }
             }

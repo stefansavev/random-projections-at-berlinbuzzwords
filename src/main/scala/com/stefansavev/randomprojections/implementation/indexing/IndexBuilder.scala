@@ -37,7 +37,7 @@ object IndexBuilder extends StrictLogging{
                  collector: BucketCollector,
                  splitStrategy: DatasetSplitStrategy,
                  projStrategy: ProjectionStrategy,
-                 logger: IndexCounters): RandomTree = {
+                 indexCounters: IndexCounters): RandomTree = {
 
     val counter = new Counter()
     def loop(dataFrameView: DataFrameView, prevProjection: AbstractProjectionVector, depth: Int, noProgressCount: Int): RandomTree = {
@@ -48,7 +48,7 @@ object IndexBuilder extends StrictLogging{
       else if (hasReachedDepth || (dataFrameView.numRows < settings.maxPntsPerBucket || noProgressCount >= 10)) {
         if (noProgressCount >= 10){
           val numPointsInBucket = dataFrameView.getUnderlyingIndexes().size
-          println(s"No progress in >= 10 iterations. Saving ${numPointsInBucket} datapoints to the bucket")
+          logger.info(s"No progress in >= 10 iterations. Saving ${numPointsInBucket} datapoints to the bucket")
         }
         collector.collectPoints(dataFrameView.getUnderlyingIndexes())
       }

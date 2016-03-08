@@ -89,7 +89,7 @@ object SVDUtils{
   }
 }
 
-object FullDenseSVD extends SVDMethod {
+object FullDenseSVD extends SVDMethod with StrictLogging{
   def XtTimesX(X: DenseMatrix): DenseMatrix = {
     val numCols = X.numColumns()
     val numRows = X.numRows()
@@ -116,7 +116,7 @@ object FullDenseSVD extends SVDMethod {
 
 
   def fit(params: SVDParams, dataFrame: DataFrameView): SVDTransform = {
-    println("Using SVD on the full data")
+    logger.info("Using SVD on the full data")
     val X = SVDUtils.datasetToDenseMatrix(dataFrame)
     val numCols = dataFrame.numCols
     val output = XtTimesX(X)
@@ -131,7 +131,7 @@ object FullDenseSVD extends SVDMethod {
   }
 }
 
-object SVDFromRandomizedDataEmbedding extends SVDMethod{
+object SVDFromRandomizedDataEmbedding extends SVDMethod with StrictLogging{
   def computeSummary(numProj: Int, rnd: Random, dataFrame: DataFrameView): DenseMatrix = {
     val numCols = dataFrame.numCols
     val summary = new DenseMatrix(numProj, numCols)
@@ -161,7 +161,7 @@ object SVDFromRandomizedDataEmbedding extends SVDMethod{
     val rnd = new Random(28841)
     val numProj = Math.min(1000, dataFrame.numRows)
     val summary = computeSummary(numProj, rnd, dataFrame)
-    println("Computed dataset summary using one pass")
+    logger.info("Computed dataset summary using one pass")
     //val summary = computeSummary2(rnd, dataFrame, 200, 20) //it should be that 2*200 < numCols
     //may be divide by num rows
     val numCols = dataFrame.numCols

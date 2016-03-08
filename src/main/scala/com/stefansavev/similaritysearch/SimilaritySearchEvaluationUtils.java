@@ -68,7 +68,7 @@ public class SimilaritySearchEvaluationUtils {
         SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
         SimilaritySearchResults testSet = generateRandomTestSet(rnd, numQueries, index);
         SimilaritySearchResults testSet1 = generateRandomTestSet(rnd, numQueries, index);
-        System.out.println("loaded dataset");
+        logger.info("Loaded dataset");
         resultsOnTestSet(index, testSet, numResults, false); //with the system
         resultsOnTestSet(index, testSet1, numResults, false); //with the system
         resultsOnTestSet(index, testSet, numResults, false); //with the system

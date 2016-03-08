@@ -5,6 +5,7 @@ import java.io.File
 import com.stefansavev.core.serialization.core.Utils
 import com.stefansavev.randomprojections.datarepr.dense.store.ValuesStore
 import com.stefansavev.randomprojections.serialization.DataFrameViewSerializers._
+import com.typesafe.scalalogging.StrictLogging
 
 object ValueStoreSerializationExt {
   val ser = valuesStoreSerializer()
@@ -23,12 +24,12 @@ object ValueStoreSerializationExt {
     }
   }
 
-  implicit class ValueStoreDeserializerExt(t: ValuesStore.type){
+  implicit class ValueStoreDeserializerExt(t: ValuesStore.type) extends StrictLogging{
     def fromFile(file:File): ValuesStore = {
       if (!file.exists()) {
         throw new IllegalStateException("file does not exist: " + file.getAbsolutePath)
       }
-      println("Loading file: " + file.getAbsolutePath)
+      logger.info("Loading file: " + file.getAbsolutePath)
       val output = Utils.fromFile(ser, file)
       output
     }

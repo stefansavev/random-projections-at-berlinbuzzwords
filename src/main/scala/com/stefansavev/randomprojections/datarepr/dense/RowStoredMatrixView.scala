@@ -3,6 +3,7 @@ package com.stefansavev.randomprojections.datarepr.dense
 import com.stefansavev.randomprojections.datarepr.dense.store.StoreBuilderType
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.file.{CSVFile, CSVFileOptions}
+import com.typesafe.scalalogging.StrictLogging
 
 trait RowStoredMatrixView{
   def getAllRowNames(): Array[String]
@@ -22,7 +23,7 @@ trait RowStoredMatrixView{
   def getBuilderType: StoreBuilderType
 }
 
-object RowStoredMatrixView{
+object RowStoredMatrixView extends StrictLogging{
 
   def fromFile(fileName: String,  opt: CSVFileOptions, dataFrameOptions: DataFrameOptions): DataFrameView = {
     val matrixBuilderFactory = dataFrameOptions.builderFactory
@@ -101,7 +102,7 @@ object RowStoredMatrixView{
       builder.addRow(label, indexes, normalizedValues)
       numRows += 1
       if (numRows % 1000 == 0){
-        println("Line " + numRows)
+        logger.info("Read lines " + numRows)
       }
     }
     file.close()

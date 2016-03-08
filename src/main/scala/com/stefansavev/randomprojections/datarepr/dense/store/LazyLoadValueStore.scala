@@ -24,7 +24,6 @@ object LazyLoadValueStore {
 }
 
 class LazyLoadValueStore(dirName: String, numPointsInPartition: Int, numPartitions: Int, numTotalRows: Int, numColumns: Int) extends ValuesStore {
-  println("numPointsInPartition " + numPointsInPartition)
   if (!HadamardUtils.isPowerOf2(numPointsInPartition)) {
     Utils.internalError()
   }
@@ -104,11 +103,9 @@ class LazyLoadValuesStoreBuilder(backingDir: String, numCols: Int, underlyingBui
 
   def savePartition(): Unit = {
     import ValueStoreSerializationExt._
-    println("saving partition " + currentBuilder.getCurrentRowIndex)
 
     val currentStore = currentBuilder.build()
     val outputFile = LazyLoadValueStore.getPartitionFileName(backingDir, currentPartition)
-    println("#output file: " + outputFile)
     if (new File(outputFile).exists()) {
       Utils.internalError()
     }
