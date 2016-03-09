@@ -1,15 +1,15 @@
 package com.stefansavev.randomprojections.implementation
 
-import java.io.{FileInputStream, BufferedInputStream}
+import java.io.{BufferedInputStream, FileInputStream}
 
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
+import com.stefansavev.core.serialization.core.{Utils => SerializationUtils}
 import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.core.serialization.core.{Utils => SerializationUtils}
-import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.utils.Utils
 import com.typesafe.scalalogging.StrictLogging
 
-class SignatureVectors(val signatureVectors: Array[SparseVector]){
+class SignatureVectors(val signatureVectors: Array[SparseVector]) {
   def numSignatures: Int = signatureVectors.size
 
   def computePointSignatures(query: Array[Double]): Array[Long] = {
@@ -17,7 +17,7 @@ class SignatureVectors(val signatureVectors: Array[SparseVector]){
     val numSignatures = signatureVectors.size
     val signatures = Array.ofDim[Long](numSignatures)
     var i = 0
-    while(i < numSignatures){
+    while (i < numSignatures) {
       signatures(i) = Signatures.computePointSignature(signatureVectors(i), query)
       i += 1
     }
@@ -29,7 +29,7 @@ class SignatureVectors(val signatureVectors: Array[SparseVector]){
     val signatures = Array.ofDim[Long](toIndex - fromIndex)
     var i = fromIndex
     var j = 0
-    while(i < toIndex){
+    while (i < toIndex) {
       signatures(j) = Signatures.computePointSignature(signatureVectors(i), query)
       i += 1
       j += 1
@@ -38,60 +38,17 @@ class SignatureVectors(val signatureVectors: Array[SparseVector]){
   }
 }
 
-//TODO: maybe reorganize the arrays to be by pointid =? [sig1, sig2, ...] and not by sig
-/*
-class PointSignatures__Old(val pointSignatures: Array[Array[Long]]) {
-  def overlap(querySig: Array[Long], pointId: Int): Int = {
-    val pointSignatures = this.pointSignatures
-    val len = querySig.size
-    var sum = 0
-    var i = 0
-    while(i < len){
-      sum += Signatures.overlap(querySig(i), pointSignatures(i)(pointId))
-      i += 1
-    }
-    sum
-  }
-
-  def pointSignature(pointId: Int): Array[Long] = {
-    val output = Array.ofDim[Long](pointSignatures.length)
-    var i = 0
-    while(i < pointSignatures.length){
-      output(i) = pointSignatures(i)(pointId)
-      i += 1
-    }
-    output
-  }
-
-  def overlap(querySig: Array[Long], pointId: Int, fromIndex: Int, toIndex: Int): Int = {
-    //TODO: it will be good to align the accesses (store all signature longs consequtively)
-    val pointSignatures = this.pointSignatures
-    val len = toIndex - fromIndex //should be equal to querySig.size
-    var sum = 0
-    var i = 0
-    var j = fromIndex
-    while(i < len){
-      sum += Signatures.overlap(querySig(i), pointSignatures(j)(pointId))
-      i += 1
-      j += 1
-    }
-    sum
-  }
-
-}
-*/
-
-object PointSignatures{
+object PointSignatures {
   def fromPreviousVersion(data: Array[Array[Long]]): PointSignatures = {
     val numSignatures = data.length
     val numPoints = data(0).length
     val newData = Array.ofDim[Long](numSignatures*numPoints)
     var pntId = 0
-    while(pntId < numPoints){
+    while (pntId < numPoints) {
       var sigId = 0
-      while(sigId < numSignatures){
+      while (sigId < numSignatures) {
         val sig = data(sigId)(pntId)
-        val offset = pntId*numSignatures + sigId
+        val offset = pntId * numSignatures + sigId
         newData(offset) = sig
         sigId += 1
       }
@@ -101,7 +58,7 @@ object PointSignatures{
   }
 }
 
-object PointSignatureReference{
+object PointSignatureReference {
   type TupleType = (String, Int, Int, Int, Int, Array[Long])
 
   def fromTuple(t: TupleType): PointSignatureReference = {
@@ -110,7 +67,7 @@ object PointSignatureReference{
   }
 }
 
-class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints: Int, numSignatures: Int, partitionSize: Int, positions: Array[Long]) extends StrictLogging{
+class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints: Int, numSignatures: Int, partitionSize: Int, positions: Array[Long]) extends StrictLogging {
   def toTuple(): PointSignatureReference.TupleType = {
     //TODO: maybe just calling unapply on a case class would do the trick
     (backingDir, numPartitions, numPoints, numSignatures, partitionSize, positions)
@@ -135,9 +92,9 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
 
     val readSynchronously = true
     val readAsync = false
-    if (readSynchronously){
+    if (readSynchronously) {
       var offset = 0
-      for(i <- 0 until numPartitions){
+      for (i <- 0 until numPartitions) {
         val partitionValues = readPartition(i)
         System.arraycopy(partitionValues, 0, buffer1, offset, partitionValues.length)
         logger.info(s"Reading signature file partition $i at ${offset} with length ${partitionValues.length}")
@@ -145,7 +102,7 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
       }
     }
 
-    //code still in testing
+    //readAsync does not work at the moment
     if (readAsync) {
       val buffer2 = Array.ofDim[Long](numPoints*numSignatures)
       val fileName = AsyncSignatureVectorsUtils.fileName(backingDir)
@@ -164,24 +121,24 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
         val toByte = positions(i + 1)
         //the read may block, but usually will not block
         supervisor.read(fromByte, toByte, { bytesReceived => {
-            if (((toByte - fromByte).toInt) != bytesReceived.length) {
+          if (((toByte - fromByte).toInt) != bytesReceived.length) {
+            Utils.internalError()
+          }
+          //Thread.sleep(5000)
+          val partitionId = i //we remember i in the closure
+          val values = SerializationUtils.fromBytes(TypedLongArraySerializer, bytesReceived)
+          val offset = partitionId * partitionSize * numSignatures
+          //println("computed offset for part " + partitionId + " " + offset + " len: " + values.length)
+          System.arraycopy(values, 0, buffer2, offset, values.length)
+          for (k <- offset until (offset + values.length)) {
+            if (buffer1(k) != buffer2(k)) {
+              logger.info("Error at offset: " + (k - offset))
               Utils.internalError()
             }
-            //Thread.sleep(5000)
-            val partitionId = i //we remember i in the closure
-            val values = SerializationUtils.fromBytes(TypedLongArraySerializer, bytesReceived)
-            val offset = partitionId * partitionSize * numSignatures
-            //println("computed offset for part " + partitionId + " " + offset + " len: " + values.length)
-            System.arraycopy(values, 0, buffer2, offset, values.length)
-            for(k <- offset until (offset + values.length)){
-              if (buffer1(k) != buffer2(k)){
-                logger.info("Error at offset: " + (k - offset))
-                Utils.internalError()
-              }
-            }
-            //println("completed array copy at index " + partitionId)
-            //handledPartitions += partitionId
           }
+          //println("completed array copy at index " + partitionId)
+          //handledPartitions += partitionId
+        }
         })
         //println("finished read at index " + i)
       }
@@ -200,8 +157,8 @@ class PointSignatures(val pointSigReference: PointSignatureReference, val backin
     val len = querySig.size
     var sum = 0
     var i = 0
-    var offset = pointId*numSignatures
-    while(i < len){
+    var offset = pointId * numSignatures
+    while (i < len) {
       sum += Signatures.overlap(querySig(i), pointSignatures(offset))
       i += 1
       offset += 1
@@ -213,12 +170,12 @@ class PointSignatures(val pointSigReference: PointSignatureReference, val backin
     val pointSignatures = this.pointSignatures
     val len = Math.min(k, pointSignatures.length)
 
-    var offset1 = pointId1*numSignatures
-    var offset2 = pointId2*numSignatures
+    var offset1 = pointId1 * numSignatures
+    var offset2 = pointId2 * numSignatures
 
     var sum = 0
     var i = 0
-    while(i < len){
+    while (i < len) {
       sum += Signatures.overlap(pointSignatures(offset1), pointSignatures(offset2))
       offset1 += 1
       offset2 += 1
@@ -237,17 +194,17 @@ class PointSignatures(val pointSigReference: PointSignatureReference, val backin
       angle = (1.0 - p_agree)*pi
     */
     val overlap = overlapTwoPoints(pointId1, pointId2, k)
-    val numSigBits = 64.0*k.toDouble //number of bits in signature
+    val numSigBits = 64.0 * k.toDouble //number of bits in signature
     val p = overlap.toDouble / numSigBits
-    val angle = (1.0 - p)*Math.PI
+    val angle = (1.0 - p) * Math.PI
     Math.cos(angle)
   }
 
   def pointSignature(pointId: Int): Array[Long] = {
     val output = Array.ofDim[Long](pointSignatures.length)
     var i = 0
-    var offset = pointId*numSignatures
-    while(i < pointSignatures.length){
+    var offset = pointId * numSignatures
+    while (i < pointSignatures.length) {
       output(i) = pointSignatures(offset)
       i += 1
       offset += 1
@@ -260,8 +217,8 @@ class PointSignatures(val pointSigReference: PointSignatureReference, val backin
     val len = toIndex - fromIndex //should be equal to querySig.size
     var sum = 0
     var i = 0
-    var offset = fromIndex + pointId*numSignatures
-    while(i < len){
+    var offset = fromIndex + pointId * numSignatures
+    while (i < len) {
       sum += Signatures.overlap(querySig(i), pointSignatures(offset))
       i += 1
       offset += 1

@@ -3,14 +3,14 @@ package com.stefansavev.randomprojections.serialization
 import java.io._
 import java.nio.ByteBuffer
 
-import RandomTreesSerializersV2.RandomTreesSerializer
 import com.stefansavev.core.serialization.core.{IntSerializer, StringSerializer}
 import com.stefansavev.randomprojections.implementation.{BucketCollectorImpl, IndexImpl, Leaf2Points, RandomTrees}
 import com.stefansavev.randomprojections.serialization.RandomTreesSerialization.BinaryFileDeserializer
+import com.stefansavev.randomprojections.serialization.RandomTreesSerializersV2.RandomTreesSerializer
 
 import scala.collection.mutable.ArrayBuffer
 
-object InvertedIndexSerializer{
+object InvertedIndexSerializer {
   def fromFile(file: File): IndexImpl = {
 
     val deser = new BinaryFileDeserializer(file)
@@ -25,7 +25,7 @@ object InvertedIndexSerializer{
         val numLeaves = deser.getInt()
         new Leaf2Points(leafArrays(0), leafArrays(1))
       }
-      else{
+      else {
         val leaf2PointsDir = StringSerializer.read(deser.stream)
         val startBufferLen = deser.getInt()
         val numPoints = deser.getInt()
@@ -45,9 +45,9 @@ object InvertedIndexSerializer{
   }
 }
 
-object RandomTreesSerialization{
+object RandomTreesSerialization {
 
-  class BinaryFileDeserializer(file: File){
+  class BinaryFileDeserializer(file: File) {
     val stream = new BufferedInputStream(new FileInputStream(file))
     val bytes = Array.ofDim[Byte](4)
     val b = ByteBuffer.allocate(4)
@@ -58,7 +58,7 @@ object RandomTreesSerialization{
       try {
         BinaryFileSerializerSig.isValidSignature(getIntArray())
       }
-      catch{
+      catch {
         case e: IOException => false
       }
     }
@@ -75,7 +75,7 @@ object RandomTreesSerialization{
 
       var i = 0
 
-      while(i < len){
+      while (i < len) {
         output(i) = getInt()
         i += 1
       }
@@ -84,7 +84,7 @@ object RandomTreesSerialization{
 
     def getIntArrays(k: Int): Array[Array[Int]] = {
       val buf = new ArrayBuffer[Array[Int]]()
-      for(i <- 0 until k){
+      for (i <- 0 until k) {
         buf += getIntArray()
 
       }
@@ -100,13 +100,13 @@ object RandomTreesSerialization{
     val modelFileName = "model.bin"
     val indexFileName = "index.bin"
 
-    implicit class RandomTreesSerExt(trees: RandomTrees){
+    implicit class RandomTreesSerExt(trees: RandomTrees) {
 
-      def toFile(file:File): Unit = {
+      def toFile(file: File): Unit = {
         if (!file.exists()) {
           file.mkdir()
         }
-        else{
+        else {
           if (!file.isDirectory) {
             throw new IllegalStateException("File " + file + " should be directory")
           }
@@ -114,16 +114,16 @@ object RandomTreesSerialization{
 
         val indexFile = new File(file, indexFileName)
 
-        if (indexFile.exists()){
+        if (indexFile.exists()) {
           val deser = new BinaryFileDeserializer(indexFile) //maybe the file cannot be opened
           val isValid = deser.isValid()
           deser.close()
-          if (isValid){
-            if (!indexFile.delete()){
+          if (isValid) {
+            if (!indexFile.delete()) {
               throw new IllegalStateException("old index file cannot be deleted" + indexFile.getAbsolutePath)
             }
           }
-          else{
+          else {
             throw new IllegalStateException("unrecognized file cannot be deleted: " + indexFile.getAbsolutePath)
           }
         }
@@ -140,14 +140,14 @@ object RandomTreesSerialization{
       }
     }
 
-    implicit class RandomTreesDeserExt(t: RandomTrees.type){
+    implicit class RandomTreesDeserExt(t: RandomTrees.type) {
 
-      def fromFile(file:File): RandomTrees = {
+      def fromFile(file: File): RandomTrees = {
         if (!file.exists()) {
           throw new IllegalStateException("file does not exist: " + file)
         }
 
-        if (!file.isDirectory()){
+        if (!file.isDirectory()) {
           throw new IllegalStateException("File is not a directory")
         }
         val modelFile = new File(file, modelFileName)
@@ -158,8 +158,8 @@ object RandomTreesSerialization{
         val trees_0 = RandomTreesSerializer.fromBinary(bos)
         //must set the index
         val trees = new RandomTrees(trees_0.dimReductionTransform, trees_0.reportingDistanceEvaluator,
-                                    trees_0.signatureVecs, trees_0.datasetSplitStrategy,
-                                    trees_0.header, invIndex, trees_0.trees)
+          trees_0.signatureVecs, trees_0.datasetSplitStrategy,
+          trees_0.header, invIndex, trees_0.trees)
 
 
         bos.close()

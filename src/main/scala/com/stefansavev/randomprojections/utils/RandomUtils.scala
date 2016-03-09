@@ -24,20 +24,20 @@ object RandomUtils {
     val signs = columnIds.map(_ => (if (rnd.nextDouble() >= 0.5) 1.0 else -1.0))
     var sum = 0.0
     var i = 0
-    while(i < signs.length){
+    while (i < signs.length) {
       val v = signs(i)
-      sum += v*v
+      sum += v * v
       i += 1
     }
     sum = Math.sqrt(sum)
 
     i = 0
-    while(i < signs.length){
+    while (i < signs.length) {
       signs(i) /= sum
       i += 1
     }
 
-    val sparseVec = new SparseVector(numCols, columnIds,signs)
+    val sparseVec = new SparseVector(numCols, columnIds, signs)
     sparseVec
   }
 
@@ -48,13 +48,17 @@ object RandomUtils {
   //TODO: use a version of reservoir sampling together with random shuffle
   def sample(rnd: Random, k: Int, arr: Array[Int]): Array[Int] = {
     def getValue(arr: Array[Int], overWrites: scala.collection.mutable.HashMap[Int, Int], index: Int): Int = {
-      if (overWrites.contains(index)){ overWrites(index) } else {arr(index)}
+      if (overWrites.contains(index)) {
+        overWrites(index)
+      } else {
+        arr(index)
+      }
     }
     var currentLength = arr.length
     val buffer = new IntArrayBuffer()
     val overWrites = new scala.collection.mutable.HashMap[Int, Int]()
     var i = 0
-    while(i < k && currentLength > 0){
+    while (i < k && currentLength > 0) {
       val nextPos = rnd.nextInt(currentLength)
       val sampledValue = getValue(arr, overWrites, nextPos)
       buffer += sampledValue

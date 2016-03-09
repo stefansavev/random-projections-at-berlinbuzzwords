@@ -1,7 +1,7 @@
 package com.stefansavev.randomprojections.implementation.bucketsearch
 
-import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer
 import com.stefansavev.randomprojections.implementation._
+import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 
 case class PriorityQueueBasedBucketSearchSettings(numberOfRequiredPointsPerTree: Int, enableGreedy: Boolean = false) extends BucketSearchSettings
@@ -12,12 +12,12 @@ class PriorityQueueBasedBucketSearchStrategy(datasetSplitStrategy: DatasetSplitS
     datasetSplitStrategy.processNonChildNodeDuringBucketSearch(numberOfRequiredPointsPerTree, enableGreedy, pq, depth, prevScoresSum, rtn, query, state)
   }
 
-  def fillBucketIndexes(datasetSplitStrategy: DatasetSplitStrategy, requiredDataPoints: Int, enableGreedy: Boolean, root: RandomTree, query: Array[Double], state: SearchBucketsResult): Unit ={
+  def fillBucketIndexes(datasetSplitStrategy: DatasetSplitStrategy, requiredDataPoints: Int, enableGreedy: Boolean, root: RandomTree, query: Array[Double], state: SearchBucketsResult): Unit = {
     val pq = new OptimizedPriorityQueueSimpleImpl()
     var totalDataPoints = 0
     pq.add(0.0, 0, root)
     val reusedPQEntry = PQEntry(0.0, 0, null)
-    while(totalDataPoints < requiredDataPoints && pq.remove(reusedPQEntry)){
+    while (totalDataPoints < requiredDataPoints && pq.remove(reusedPQEntry)) {
       PerformanceCounters.exploreNode()
       val node = reusedPQEntry.node
       node match {
@@ -35,9 +35,6 @@ class PriorityQueueBasedBucketSearchStrategy(datasetSplitStrategy: DatasetSplitS
         }
       }
     }
-
-    //println("pos/all/examined " + pos + " " + all + " " + 100.0*pos/all + " " + totalNodes)
-    //println("Total nodes: " + totalNodes + " in queue " + pq.size())
   }
 
   def getBucketIndexes(randomTrees: RandomTrees, inputQuery: Array[Double], scratchBuffer: NearestNeigbhorQueryScratchBuffer): SearchBucketsResult = {
@@ -49,7 +46,7 @@ class PriorityQueueBasedBucketSearchStrategy(datasetSplitStrategy: DatasetSplitS
     val state = new SearchBucketsResult(query.length, scratchBuffer)
     val trees = randomTrees.trees
     var i = 0
-    while(i < trees.length){
+    while (i < trees.length) {
       val tree = trees(i)
       val (childTree, modifiedQuery) = tree match {
         case root: RandomTreeNodeRoot => {

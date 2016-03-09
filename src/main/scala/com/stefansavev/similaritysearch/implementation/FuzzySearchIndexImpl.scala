@@ -122,13 +122,13 @@ object FuzzySearchIndexWrapper {
   val fileVersion = "0_1"
   val treesSubDir = s"fuzzysearch_trees_dir_${fileVersion}"
   val datasetFile = s"fuzzysearch_dataset_file_${fileVersion}"
-  val datasetPartitionsDir = "fuzzysearch_dataset_partitions_${fileVersion}"
+  val datasetPartitionsDir = s"fuzzysearch_dataset_partitions_${fileVersion}"
   val datasetPartitionFile = LazyLoadValueStore.partitionFileNamePrefix
-  val signaturePartitionsDir = "fuzzysearch_signature_partitions_${fileVersion}"
+  val signaturePartitionsDir = s"fuzzysearch_signature_partitions_${fileVersion}"
   val signaturePartitionFile = DiskBackedOnlineSignatureVectorsUtils.partitionFileNamePrefix
   val randomTreesModelFile = RandomTreesSerialization.Implicits.modelFileName
   val randomTreesIndexFile = RandomTreesSerialization.Implicits.indexFileName
-  val randomTreesPartitionsDir = "fuzzysearch_tree_partitions_${fileVersion}"
+  val randomTreesPartitionsDir = s"fuzzysearch_tree_partitions_${fileVersion}"
   val randomTreesPartitionFile = BucketCollectorImplUtils.partitionFileSuffix
 
   def open(fileName: String): FuzzySearchIndexWrapper = {

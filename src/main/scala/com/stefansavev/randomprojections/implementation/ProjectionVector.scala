@@ -7,28 +7,33 @@ import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer
 
-trait AbstractProjectionVector{
+trait AbstractProjectionVector {
   def getProjectionTypeName: String
 }
 
-case class HadamardProjectionVector(signs: SparseVector) extends AbstractProjectionVector{
-  def getProjectionTypeName: String  = "hadamardProjectionVector"
+case class HadamardProjectionVector(signs: SparseVector) extends AbstractProjectionVector {
+  def getProjectionTypeName: String = "HadamardProjectionVector"
 }
 
-trait ProjectionStrategy{
+trait ProjectionStrategy {
   def nextRandomProjection(depth: Int, view: DataFrameView, prevProjection: AbstractProjectionVector): AbstractProjectionVector
 }
 
-trait ProjectionStrategyBuilder{
+trait ProjectionStrategyBuilder {
   type T <: ProjectionStrategy
+
   def build(settings: IndexSettings, rnd: Random, dataFrameView: DataFrameView): T
+
   def datasetSplitStrategy: DatasetSplitStrategy
 }
 
-class SearchBucketsResult(numFeatures: Int, scratch: NearestNeigbhorQueryScratchBuffer){
+class SearchBucketsResult(numFeatures: Int, scratch: NearestNeigbhorQueryScratchBuffer) {
   var depth: Int = 1
+
   def tmpInput: Array[Double] = scratch.tmpInput
+
   def tmpOutput: Array[Double] = scratch.tmpOutput
+
   val bucketIndexBuffer: IntArrayBuffer = new IntArrayBuffer()
   val bucketScoreBuffer: DoubleArrayBuffer = new DoubleArrayBuffer()
 }

@@ -2,14 +2,14 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.File
 
-import DataFrameViewSerializers._
 import com.stefansavev.core.serialization.core.Utils
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
+import com.stefansavev.randomprojections.serialization.DataFrameViewSerializers._
 
 object DataFrameViewSerializationExt {
 
-  implicit class DataFrameSerializerExt(input: DataFrameView){
-    def toFile(file:File): Unit = {
+  implicit class DataFrameSerializerExt(input: DataFrameView) {
+    def toFile(file: File): Unit = {
       val ser = dataFrameSerializer()
       Utils.toFile(ser, file, input)
     }
@@ -19,9 +19,9 @@ object DataFrameViewSerializationExt {
     }
   }
 
-  implicit class DataFrameDeserializerExt(t: DataFrameView.type){
+  implicit class DataFrameDeserializerExt(t: DataFrameView.type) {
 
-    def fromFile(file:File): DataFrameView = {
+    def fromFile(file: File): DataFrameView = {
       if (!file.exists()) {
         throw new IllegalStateException("file does not exist")
       }
@@ -35,4 +35,5 @@ object DataFrameViewSerializationExt {
       fromFile(new File(dir))
     }
   }
+
 }

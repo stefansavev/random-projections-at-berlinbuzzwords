@@ -20,8 +20,7 @@ object TestOnRandomData extends StrictLogging{
       numRowsPerGroup = 2,
       numCols=256,
       per1sInPrototype = 0.5,
-      perNoise = 0.2)
-
+      perNoise = 0.1)
 
       val debug = false
       val randomBitStringsDataset = RandomBitStrings.genRandomData(58585, dataGenSettings, debug, true)

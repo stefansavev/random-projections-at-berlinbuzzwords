@@ -1,21 +1,21 @@
 package com.stefansavev.randomprojections.implementation
 
-import com.stefansavev.randomprojections.datarepr.sparse.{BinarySparseVector8}
+import com.stefansavev.randomprojections.datarepr.sparse.BinarySparseVector8
 import com.stefansavev.randomprojections.utils.Utils
 
-trait RandomTree{
+trait RandomTree {
   def getCount: Int
 }
 
-case object EmptyLeaf extends RandomTree{
+case object EmptyLeaf extends RandomTree {
   def getCount: Int = 0
 }
 
-case class RandomTreeLeaf(leafId: Int, count: Int) extends RandomTree{
+case class RandomTreeLeaf(leafId: Int, count: Int) extends RandomTree {
   def getCount: Int = count
 }
 
-case class RandomTreeNodeRoot(projVector: AbstractProjectionVector, child: RandomTree) extends RandomTree{
+case class RandomTreeNodeRoot(projVector: AbstractProjectionVector, child: RandomTree) extends RandomTree {
   def modifyQuery(query: Array[Double]): Array[Double] = {
     val sparseVec = projVector.asInstanceOf[HadamardProjectionVector].signs
     val input = Array.ofDim[Double](sparseVec.ids.length) //TODO: REMOVE
@@ -35,32 +35,32 @@ case class RandomTreeNodeRoot(projVector: AbstractProjectionVector, child: Rando
   def getCount: Int = child.getCount
 }
 
-case class RandomTreeNode(id: Int, projVector: AbstractProjectionVector, count: Int, means: Array[Double], children: Array[RandomTree]) extends RandomTree{
+case class RandomTreeNode(id: Int, projVector: AbstractProjectionVector, count: Int, means: Array[Double], children: Array[RandomTree]) extends RandomTree {
   def getCount: Int = count
 }
 
-class MutableTreeLeaf{
+class MutableTreeLeaf {
   var leafId: Int = 0
   var count: Int = 0
 }
 
-class MutableTreeNonLeaf{
+class MutableTreeNonLeaf {
   var childArray: Array[Int] = null
   var proj: Array[Byte] = null
 }
 
-class TreeReadBuffer(values: Array[Int]){
+class TreeReadBuffer(values: Array[Int]) {
 
   def getInternalStore(): Array[Int] = values
 
   var pntr = 0
 
   def position(pos: Int): Unit = {
-    pntr = pos/4
+    pntr = pos / 4
   }
 
   def position(): Int = {
-    val p2 = 4*pntr
+    val p2 = 4 * pntr
     p2
   }
 
@@ -70,10 +70,10 @@ class TreeReadBuffer(values: Array[Int]){
     tmp
   }
 
-  def get8Bytes(output: Array[Byte]): Unit ={
+  def get8Bytes(output: Array[Byte]): Unit = {
     var i = 0
     var j = 0
-    while(i < 2){
+    while (i < 2) {
       val intValue = values(pntr + i)
       output(j + 0) = intValue.toByte
       output(j + 1) = (intValue >>> 8).toByte
@@ -86,7 +86,7 @@ class TreeReadBuffer(values: Array[Int]){
   }
 
   def get(arr: Array[Byte]): Unit = {
-    if (arr.length != 8){
+    if (arr.length != 8) {
       Utils.internalError()
     }
     get8Bytes(arr)
@@ -94,25 +94,25 @@ class TreeReadBuffer(values: Array[Int]){
 }
 
 
-class TreeWriteBuffer(initialSize: Int){
+class TreeWriteBuffer(initialSize: Int) {
   val adjustedInitialSize = HadamardUtils.largestPowerOf2(initialSize)
   var output = Array.ofDim[Int](adjustedInitialSize)
 
   var pntr = 0
 
   def position(pos: Int): Unit = {
-    pntr = pos/4
+    pntr = pos / 4
   }
 
   def position(): Int = {
-    4*pntr
+    4 * pntr
   }
 
   def ensureAvailableSpace(numNewValues: Int): Unit = {
     val expectedSize = pntr + numNewValues
-    if (expectedSize >= output.length){
+    if (expectedSize >= output.length) {
       var nextSize = output.length << 1
-      while(nextSize < expectedSize){
+      while (nextSize < expectedSize) {
         nextSize <<= 1
       }
       val newOutput = Array.ofDim[Int](nextSize)
@@ -145,7 +145,7 @@ class TreeWriteBuffer(initialSize: Int){
   }
 }
 
-class TreeReader(bytes: TreeReadBuffer){
+class TreeReader(bytes: TreeReadBuffer) {
   def getInternalStore(): Array[Int] = bytes.getInternalStore()
 
   def buildMutableTreeLeaf(): MutableTreeLeaf = {
@@ -171,13 +171,13 @@ class TreeReader(bytes: TreeReadBuffer){
   def decodeLeaf(ref: Int, leaf: MutableTreeLeaf): MutableTreeLeaf = {
     bytes.position(ref)
     val len = bytes.getInt()
-    if (len < 0){
+    if (len < 0) {
       val count = bytes.getInt()
-      leaf.leafId = -len -1
+      leaf.leafId = -len - 1
       leaf.count = count
       leaf
     }
-    else{
+    else {
       Utils.internalError()
     }
   }
@@ -185,7 +185,7 @@ class TreeReader(bytes: TreeReadBuffer){
   def decodeNonLeaf(ref: Int, output: MutableTreeNonLeaf): MutableTreeNonLeaf = {
     bytes.position(ref)
     val len = bytes.getInt()
-    if (len < 0){
+    if (len < 0) {
       throw new IllegalStateException()
     }
     else {
@@ -194,21 +194,21 @@ class TreeReader(bytes: TreeReadBuffer){
       val childArray = output.childArray
       var posNextChildNode = bytes.position()
       var i = 0
-      while(mask != 0){
-        if ((mask & 1) == 1){
+      while (mask != 0) {
+        if ((mask & 1) == 1) {
           childArray(i) = (posNextChildNode)
           bytes.position(posNextChildNode)
           val childNodeLen = bytes.getInt()
           val adjustedLen = if (childNodeLen < 0) 8 else childNodeLen //we store the leaf id and count (count is redundant)
           posNextChildNode += adjustedLen
         }
-        else{
+        else {
           childArray(i) = -1
         }
         mask >>>= 1
         i += 1
       }
-      while(i < 16){
+      while (i < 16) {
         childArray(i) = -1
         i += 1
       }
@@ -217,7 +217,7 @@ class TreeReader(bytes: TreeReadBuffer){
   }
 }
 
-class EfficientlyStoredNodeBuilder(val pos: Int, treeBuilder: EfficientlyStoredTreeBuilder){
+class EfficientlyStoredNodeBuilder(val pos: Int, treeBuilder: EfficientlyStoredTreeBuilder) {
   var childrenMask = 0
 
   def finishNode(): Unit = {
@@ -225,7 +225,7 @@ class EfficientlyStoredNodeBuilder(val pos: Int, treeBuilder: EfficientlyStoredT
   }
 
   def addedChild(index: Int): Unit = {
-    if (index >= 16){
+    if (index >= 16) {
       Utils.internalError()
     }
     val currentMask = (1 << index)
@@ -233,17 +233,18 @@ class EfficientlyStoredNodeBuilder(val pos: Int, treeBuilder: EfficientlyStoredT
   }
 }
 
-class EfficientlyStoredTreeBuilder{
-  val bytes = new TreeWriteBuffer(1024*100)
+class EfficientlyStoredTreeBuilder {
+  val bytes = new TreeWriteBuffer(1024 * 100)
 
-  def putRecord(proj: Array[Byte] /*an array of length 8*/): Int = {
-    if (proj.length != 8){
+  def putRecord(proj: Array[Byte]): Int = {
+    /*proj must be an array of length 8*/
+    if (proj.length != 8) {
       throw new IllegalStateException("proj must have 8 bytes")
     }
     val pos = bytes.position()
-    bytes.putInt(0)  //reserved to be filled when the node is finished
-    bytes.putInt(0)  //reserved to be filled when the node is finished 2 bytes
-    bytes.put(proj)  //8 bytes
+    bytes.putInt(0) //reserved to be filled when the node is finished
+    bytes.putInt(0) //reserved to be filled when the node is finished 2 bytes
+    bytes.put(proj) //8 bytes
     pos
   }
 
@@ -273,11 +274,11 @@ class EfficientlyStoredTreeBuilder{
   }
 }
 
-case class EfficientlyStoredTree(val treeReader: TreeReader) extends RandomTree{
+case class EfficientlyStoredTree(val treeReader: TreeReader) extends RandomTree {
   def getCount: Int = Utils.internalError()
 }
 
-object RandomTree2EfficientlyStoredTreeConverter{
+object RandomTree2EfficientlyStoredTreeConverter {
 
   def roundTrip(tree: RandomTree): RandomTree = {
     val internalRepr = fromRandomTree(tree)
@@ -298,9 +299,9 @@ object RandomTree2EfficientlyStoredTreeConverter{
           val sv = rtn.projVector.asInstanceOf[HadamardProjectionVector].signs
           val binarySV8 = BinarySparseVector8.fromSparseVec(sv)
           val childNodeBuilder = builder.newRandomTreeNode(binarySV8)
-          for((child, index) <- rtn.children.zipWithIndex){
-            if (child != null){
-              if (loop(child)){
+          for ((child, index) <- rtn.children.zipWithIndex) {
+            if (child != null) {
+              if (loop(child)) {
                 childNodeBuilder.addedChild(index)
               }
             }
@@ -325,12 +326,12 @@ object RandomTree2EfficientlyStoredTreeConverter{
     val reader = new TreeReader(new TreeReadBuffer(ints))
 
     def recurse(nodeRef: Int): RandomTree = {
-      if (reader.isLeaf(nodeRef)){
+      if (reader.isLeaf(nodeRef)) {
         val leafNode = reader.buildMutableTreeLeaf()
         reader.decodeLeaf(nodeRef, leafNode)
         RandomTreeLeaf(leafNode.leafId, leafNode.count)
       }
-      else{
+      else {
         val nonLeaf = reader.buildMutableNonLeaf()
         reader.decodeNonLeaf(nodeRef, nonLeaf)
         val proj = HadamardProjectionVector((new BinarySparseVector8(nonLeaf.proj)).toNormalizedSparseVector())
@@ -338,17 +339,16 @@ object RandomTree2EfficientlyStoredTreeConverter{
         val len = children.length
         val randomTreeChildren = Array.ofDim[RandomTree](len)
         var i = 0
-        while(i < nonLeaf.childArray.length){
+        while (i < nonLeaf.childArray.length) {
           val childRef = nonLeaf.childArray(i)
-          if (childRef >= 0){
+          if (childRef >= 0) {
             randomTreeChildren(i) = recurse(childRef)
           }
           i += 1
         }
-        new RandomTreeNode(id = -1 /*not kept*/, projVector = proj, count = -1 /*not kept*/, Array(), randomTreeChildren)
+        new RandomTreeNode(id = -1 /*not kept*/ , projVector = proj, count = -1 /*not kept*/ , Array(), randomTreeChildren)
       }
     }
     recurse(0)
   }
-
 }

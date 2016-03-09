@@ -9,14 +9,15 @@ import com.stefansavev.randomprojections.datarepr.dense.store.FixedLengthBuffer
 import com.stefansavev.randomprojections.interface.{BucketCollector, Index}
 import com.typesafe.scalalogging.StrictLogging
 
-object BucketCollectorImplUtils{
+object BucketCollectorImplUtils {
   val partitionFileSuffix = "_partition_"
+
   def fileName(dirName: String, partitionId: Int): String = {
     (new File(dirName, partitionFileSuffix + partitionId)).getAbsolutePath
   }
 }
 
-class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketCollector with StrictLogging{
+class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketCollector with StrictLogging {
   val pointIdsThreshold = 1 << 20
 
   var leafId = 0
@@ -28,7 +29,7 @@ class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketColl
   def savePartial(): Unit = {
     val fileName = BucketCollectorImplUtils.fileName(backingDir, numPartitions)
     val outputStream = new BufferedOutputStream(new FileOutputStream(fileName))
-    logger.info(s"Writing partial buckets to file ${fileName}")
+    logger.info(s"Writing partial buckets to file $fileName")
     IntArraySerializer.write(outputStream, starts.toArray())
     IntArraySerializer.write(outputStream, pointIds.toArray())
     outputStream.close()
@@ -45,7 +46,7 @@ class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketColl
     pointIds ++= names.indexes
     leafId += 1
 
-    if (pointIds.size > pointIdsThreshold){
+    if (pointIds.size > pointIdsThreshold) {
       savePartial()
     }
     leaf
@@ -60,17 +61,18 @@ class BucketCollectorImpl(backingDir: String, totalRows: Int) extends BucketColl
   def build(pointSignatures: PointSignatures, labels: Array[Int]): Index = {
     starts += globalIndex
     savePartial()
+    //TODO: now leaving leaf2Points as null, fix it
     //val leaf2Points = new Leaf2Points(getIntArrayAndClear(starts), getIntArrayAndClear(pointIds))
     val index = new IndexImpl(pointSignatures, labels.length, Some((backingDir, leafId + 1, globalIndex, numPartitions)), null, labels)
     index
   }
 }
 
-object BucketCollectorImpl{
+object BucketCollectorImpl {
   def mergeLeafData(backingDir: String, startBufferLen: Int, numPoints: Int, numPartitions: Int): Leaf2Points = {
     val starts = new FixedLengthBuffer[Int](startBufferLen)
     val pointsIds = new FixedLengthBuffer[Int](numPoints)
-    for(i <- 0 until numPartitions){
+    for (i <- 0 until numPartitions) {
       val fileName = BucketCollectorImplUtils.fileName(backingDir, i)
       val inputStream = new BufferedInputStream(new FileInputStream(fileName))
       starts ++= IntArraySerializer.read(inputStream)

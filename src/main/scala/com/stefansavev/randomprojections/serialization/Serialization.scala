@@ -1,7 +1,6 @@
 package com.stefansavev.randomprojections.serialization
 
 import java.io._
-import java.nio.ByteBuffer
 
 import com.stefansavev.core.serialization.core._
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
@@ -10,21 +9,22 @@ import com.stefansavev.randomprojections.implementation._
 import com.stefansavev.randomprojections.utils.Utils
 import com.typesafe.scalalogging.StrictLogging
 
-object BinaryFileSerializerSig{
-  val signature = Array(80,42,51,67)
+object BinaryFileSerializerSig {
+  val signature = Array(80, 42, 51, 67)
 
-  def isValidSignature(arr: Array[Int]):Boolean = {
+  def isValidSignature(arr: Array[Int]): Boolean = {
     if (arr.length != signature.length)
       false
-    else{
-      !arr.zip(signature).exists({ case (found, expected) => found != expected})
+    else {
+      !arr.zip(signature).exists({ case (found, expected) => found != expected })
     }
   }
 }
 
-class BinaryFileSerializer(file: File){
+class BinaryFileSerializer(file: File) {
 
   import java.nio.ByteBuffer
+
   val stream = new BufferedOutputStream(new FileOutputStream(file))
   val b = ByteBuffer.allocate(4)
   putIntArray(BinaryFileSerializerSig.signature)
@@ -34,7 +34,7 @@ class BinaryFileSerializer(file: File){
   }
 
   def putIntArrays(arrs: Array[Int]*): Unit = {
-    for(arr <- arrs){
+    for (arr <- arrs) {
       putIntArray(arr)
     }
   }
@@ -43,7 +43,7 @@ class BinaryFileSerializer(file: File){
     //TODO: make more efficient
     putInt(arr.length)
     var i = 0
-    while(i < arr.length){
+    while (i < arr.length) {
       putInt(arr(i))
       i += 1
     }
@@ -54,8 +54,9 @@ class BinaryFileSerializer(file: File){
   }
 }
 
-object DataFrameViewSerializer{
+object DataFrameViewSerializer {
   val serializer = DataFrameViewSerializers.dataFrameSerializer()
+
   def toBinary(outputStream: OutputStream, dataFrameView: DataFrameView): Unit = {
     serializer.toBinary(outputStream, dataFrameView)
   }
@@ -65,18 +66,18 @@ object DataFrameViewSerializer{
   }
 }
 
-object PointSignaturesSerializer extends StrictLogging{
+object PointSignaturesSerializer extends StrictLogging {
 
   def toBinary(outputStream: OutputStream, pointSignatures: PointSignatures): Unit = {
     //TODO: this functionality should be split into 2 classes
-    if (pointSignatures.backingDir != null && pointSignatures.pointSigReference == null){
+    if (pointSignatures.backingDir != null && pointSignatures.pointSigReference == null) {
       IntSerializer.write(outputStream, 1) //case 1
       StringSerializer.write(outputStream, pointSignatures.backingDir)
       IntSerializer.write(outputStream, pointSignatures.numPartitions)
       IntSerializer.write(outputStream, pointSignatures.numPoints)
       IntSerializer.write(outputStream, pointSignatures.numSignatures)
     }
-    else if (pointSignatures.pointSigReference != null){
+    else if (pointSignatures.pointSigReference != null) {
       IntSerializer.write(outputStream, 3) //case 3
       val pointSignatureSer = RandomTreesSerializersV2.pointSignatureReferenceSerializer()
       pointSignatureSer.toBinary(outputStream, pointSignatures.pointSigReference)
@@ -104,7 +105,7 @@ object PointSignaturesSerializer extends StrictLogging{
 
   def fromBinary(inputStream: InputStream): PointSignatures = {
     val caseId = IntSerializer.read(inputStream)
-    if (caseId == 1){
+    if (caseId == 1) {
       val backingDir = StringSerializer.read(inputStream)
       val numPartitions = IntSerializer.read(inputStream)
 
@@ -125,7 +126,7 @@ object PointSignaturesSerializer extends StrictLogging{
         }
       })(logger)
 
-      if (offset != data.length){
+      if (offset != data.length) {
         Utils.internalError()
       }
       new PointSignatures(null, null, -1, data, numPoints, numSig)
@@ -136,21 +137,21 @@ object PointSignaturesSerializer extends StrictLogging{
       val numSignatures = IntSerializer.read(inputStream)
       new PointSignatures(null, null, -1, signatures, numPoints, numSignatures)
     }
-    else if (caseId == 3){
+    else if (caseId == 3) {
       val pointSignatureSer = RandomTreesSerializersV2.pointSignatureReferenceSerializer()
       val pointSigRef = pointSignatureSer.fromBinary(inputStream)
       val pointSig = pointSigRef.toPointSignatures()
       val numPoints = IntSerializer.read(inputStream)
       val numSig = IntSerializer.read(inputStream)
-      if (pointSig.numSignatures != numSig){
+      if (pointSig.numSignatures != numSig) {
         Utils.internalError()
       }
-      if (pointSig.numPoints != numPoints){
+      if (pointSig.numPoints != numPoints) {
         Utils.internalError()
       }
       pointSig
     }
-    else{
+    else {
       Utils.internalError()
     }
     /*
@@ -167,20 +168,22 @@ object PointSignaturesSerializer extends StrictLogging{
 }
 
 //TODO: use sparse vector serialializer
-object ProjectionVectorSerializer{
+object ProjectionVectorSerializer {
+
   import ImplicitSerializers._
+
   def toBinary(outputStream: OutputStream, projVec: AbstractProjectionVector): Unit = {
     val vec = projVec.asInstanceOf[HadamardProjectionVector].signs
     outputStream.writeInt(vec.dim)
     val len = vec.ids.length
     outputStream.writeInt(len)
     var i = 0
-    while(i < len){
+    while (i < len) {
       outputStream.writeInt(vec.ids(i))
       i += 1
     }
     i = 0
-    while(i < len){
+    while (i < len) {
       DoubleSerializer.write(outputStream, vec.values(i))
       i += 1
     }
@@ -193,13 +196,13 @@ object ProjectionVectorSerializer{
     val values = Array.ofDim[Double](len)
 
     var i = 0
-    while(i < len){
+    while (i < len) {
       ids(i) = inputStream.readInt()
       i += 1
     }
 
     i = 0
-    while(i < len){
+    while (i < len) {
       values(i) = DoubleSerializer.read(inputStream)
       i += 1
     }

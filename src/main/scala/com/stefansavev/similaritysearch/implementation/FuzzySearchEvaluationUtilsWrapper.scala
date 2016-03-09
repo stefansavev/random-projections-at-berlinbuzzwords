@@ -3,8 +3,8 @@ package com.stefansavev.similaritysearch.implementation
 import java.util
 import java.util.Random
 
-import com.stefansavev.similaritysearch.{SimilaritySearchResult, SimilaritySearchResultBuilder, SimilaritySearchIndex, SimilaritySearchResults}
 import com.stefansavev.randomprojections.utils.RandomUtils
+import com.stefansavev.similaritysearch.{SimilaritySearchIndex, SimilaritySearchResult, SimilaritySearchResultBuilder, SimilaritySearchResults}
 
 object FuzzySearchEvaluationUtilsWrapper {
 
@@ -14,7 +14,7 @@ object FuzzySearchEvaluationUtilsWrapper {
 
     val sampleIds = RandomUtils.sample(rnd, numQueries, Array.range(0, itemNames.length))
     val builder = new SimilaritySearchResultBuilder()
-    for(id <- sampleIds){
+    for (id <- sampleIds) {
       val queryId = itemNames(id)
       val queryVector = index.getItemByName(queryId).getVector
       val queryResults = new util.ArrayList[SimilaritySearchResult]()

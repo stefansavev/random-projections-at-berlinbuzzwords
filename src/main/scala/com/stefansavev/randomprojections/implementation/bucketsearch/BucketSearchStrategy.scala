@@ -1,7 +1,7 @@
 package com.stefansavev.randomprojections.implementation.bucketsearch
 
-import com.stefansavev.randomprojections.implementation.{SearchBucketsResult, RandomTrees}
 import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer
+import com.stefansavev.randomprojections.implementation.{RandomTrees, SearchBucketsResult}
 
 trait BucketSearchSettings
 

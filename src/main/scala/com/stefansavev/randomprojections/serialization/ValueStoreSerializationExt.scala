@@ -10,8 +10,8 @@ import com.typesafe.scalalogging.StrictLogging
 object ValueStoreSerializationExt {
   val ser = valuesStoreSerializer()
 
-  implicit class ValueStoreSerializerExt(input: ValuesStore){
-    def toFile(file:File): Unit = {
+  implicit class ValueStoreSerializerExt(input: ValuesStore) {
+    def toFile(file: File): Unit = {
       Utils.toFile(ser, file, input)
     }
 
@@ -24,8 +24,8 @@ object ValueStoreSerializationExt {
     }
   }
 
-  implicit class ValueStoreDeserializerExt(t: ValuesStore.type) extends StrictLogging{
-    def fromFile(file:File): ValuesStore = {
+  implicit class ValueStoreDeserializerExt(t: ValuesStore.type) extends StrictLogging {
+    def fromFile(file: File): ValuesStore = {
       if (!file.exists()) {
         throw new IllegalStateException("file does not exist: " + file.getAbsolutePath)
       }
@@ -42,4 +42,5 @@ object ValueStoreSerializationExt {
       Utils.fromBytes(ser, input)
     }
   }
+
 }

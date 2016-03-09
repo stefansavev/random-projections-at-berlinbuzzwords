@@ -12,7 +12,7 @@ object AllNearestNeighborsForDataset {
     val numRows = testDataset.numRows
 
     var i = 0
-    while(i < numRows){
+    while (i < numRows) {
       val query = testDataset.getPointAsDenseVector(i)
       val knns = searcher.getNearestNeighborsByVector(query, topNearestNeighbors)
       knnsBuffer += (knns.copy(pointId = i))

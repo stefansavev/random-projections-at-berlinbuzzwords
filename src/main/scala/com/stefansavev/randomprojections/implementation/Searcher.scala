@@ -9,7 +9,7 @@ case class SearcherSettings(bucketSearchSettings: BucketSearchSettings,
                             pointScoreSettings: PointScoreSettings,
                             randomTrees: RandomTrees,
                             trainingSet: DataFrameView,
-                            usesPointWeights: Boolean = false){
+                            usesPointWeights: Boolean = false) {
   def createBucketSearchStrategy(): BucketSearchStrategy = {
     bucketSearchSettings match {
       //case pqBasedSettings: PriorityQueueBasedBucketSearchSettings => new PriorityQueueBasedBucketSearchStrategy(randomTrees.datasetSplitStrategy, pqBasedSettings)
@@ -20,16 +20,19 @@ case class SearcherSettings(bucketSearchSettings: BucketSearchSettings,
 
 trait Searcher {
   def getNearestNeighborsByVector(query: Array[Double], topNearestNeighbors: Int): KNNS
+
   def getNearestNeighborsById(id: Int, topNearestNeighbors: Int): KNNS
+
   def getSettings(): SearcherSettings
 }
 
-class NonThreadSafeSearcher(settings: SearcherSettings) extends Searcher{
-  if (!settings.randomTrees.header.isCompatible(settings.trainingSet.rowStoredView.getColumnHeader)){
+class NonThreadSafeSearcher(settings: SearcherSettings) extends Searcher {
+  if (!settings.randomTrees.header.isCompatible(settings.trainingSet.rowStoredView.getColumnHeader)) {
     throw new IllegalStateException("Index and dataset are not compatible")
   }
 
-  val numCols = settings.trainingSet.numCols //TODO: get those from the random tree
+  val numCols = settings.trainingSet.numCols
+  //TODO: get those from the random tree
   val numRows = settings.trainingSet.numRows
   val scratchBuffer = new NearestNeigbhorQueryScratchBuffer(numRows, numCols, settings.usesPointWeights)
   val bucketSearchStrategy = settings.createBucketSearchStrategy()

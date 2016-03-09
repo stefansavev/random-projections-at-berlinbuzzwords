@@ -4,7 +4,7 @@ import java.text.DecimalFormat
 
 import com.stefansavev.randomprojections.utils.OnlineVariance1
 
-class SimpleStatistics{
+class SimpleStatistics {
   var total = 0.0
   var count = 0.0
   var minValue = Int.MaxValue
@@ -18,7 +18,7 @@ class SimpleStatistics{
   }
 
   def getMean(): Double = {
-    total/count
+    total / count
   }
 }
 
@@ -105,27 +105,27 @@ object PerformanceCounters {
       df.format(value)
     }
 
-    val numTrees = numTreesCount/numQueries.toDouble
-    val avgLeavesPerQueryPerTree = leafCountStatistics.count/(numQueries.toDouble * numTrees)
+    val numTrees = numTreesCount / numQueries.toDouble
+    val avgLeavesPerQueryPerTree = leafCountStatistics.count / (numQueries.toDouble * numTrees)
     val numberOfRequiredPointsPerTree = numberOfRequiredPointsPerTreeCount / numQueries.toDouble
     println("Performance counters report")
     println("---------------------------------------")
     println("Total queries:                " + numQueries)
-    println("Number of trees:              " + numTreesCount/numQueries.toDouble)
+    println("Number of trees:              " + numTreesCount / numQueries.toDouble)
     println("Required points per tree:     " + numberOfRequiredPointsPerTree)
 
     println("Avg. leaves per query per tree:        " + customFormat(avgLeavesPerQueryPerTree))
     println("Min. leaf size:               " + customFormat(leafCountStatistics.minValue))
     println("Max. leaf size:               " + customFormat(leafCountStatistics.maxValue))
-    println("Avg. leaf size:               " + customFormat(leafCountStatistics.getMean()) + ";  should be = required points per tree/avg. leaves per tree = " + customFormat(numberOfRequiredPointsPerTree/avgLeavesPerQueryPerTree))
-    println("Considered tree nodes per query:         " + customFormat(totalNonLeafs/numQueries.toDouble))
-    println("Explored nodes per query:     " + customFormat(exploredNodes/numQueries.toDouble))
-    println("Explored buckets:             " + customFormat(exploredBuckets/numQueries.toDouble) + "; should be = avg leaves per query * num trees = " + customFormat(avgLeavesPerQueryPerTree * numTrees))
-    println("Expected points in buckets:   " + customFormat(expectedPointsInBucketsCount/numQueries.toDouble) + "; should be = num trees * required points per tree = " + customFormat(numTrees * numberOfRequiredPointsPerTree))
-    println("Search: Touched points:       " + customFormat(touchedPointsDuringSearchCount/numQueries.toDouble))
-    println("Search: Thresholded points:   " + customFormat(thresholdedPointsDuringSearchCount/numQueries.toDouble))
-    println("Search: Sorted points:        " + customFormat(sortedPointsDuringSearchCount/numQueries.toDouble))
-    println("Search: Evaluated points:     " + customFormat(evaluatedPointsDuringSearchCount/numQueries.toDouble))
+    println("Avg. leaf size:               " + customFormat(leafCountStatistics.getMean()) + ";  should be = required points per tree/avg. leaves per tree = " + customFormat(numberOfRequiredPointsPerTree / avgLeavesPerQueryPerTree))
+    println("Considered tree nodes per query:         " + customFormat(totalNonLeafs / numQueries.toDouble))
+    println("Explored nodes per query:     " + customFormat(exploredNodes / numQueries.toDouble))
+    println("Explored buckets:             " + customFormat(exploredBuckets / numQueries.toDouble) + "; should be = avg leaves per query * num trees = " + customFormat(avgLeavesPerQueryPerTree * numTrees))
+    println("Expected points in buckets:   " + customFormat(expectedPointsInBucketsCount / numQueries.toDouble) + "; should be = num trees * required points per tree = " + customFormat(numTrees * numberOfRequiredPointsPerTree))
+    println("Search: Touched points:       " + customFormat(touchedPointsDuringSearchCount / numQueries.toDouble))
+    println("Search: Thresholded points:   " + customFormat(thresholdedPointsDuringSearchCount / numQueries.toDouble))
+    println("Search: Sorted points:        " + customFormat(sortedPointsDuringSearchCount / numQueries.toDouble))
+    println("Search: Evaluated points:     " + customFormat(evaluatedPointsDuringSearchCount / numQueries.toDouble))
     println("Search-Pruning Threshold mean: " + customFormat(pruningThreshold.getMean()))
     println("Search-Pruning Threshold min: " + pruningThreshold.minValue)
     println("Search-Pruning Threshold max: " + pruningThreshold.maxValue)

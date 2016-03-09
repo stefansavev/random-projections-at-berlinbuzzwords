@@ -1,6 +1,6 @@
 package com.stefansavev.randomprojections.implementation.query
 
-class NearestNeigbhorQueryScratchBuffer(val numRows: Int, val numCols: Int, val usesPointWeights: Boolean){
+class NearestNeigbhorQueryScratchBuffer(val numRows: Int, val numCols: Int, val usesPointWeights: Boolean) {
   val pointCounts = Array.ofDim[Int](numRows)
   val pointsWeights = if (usesPointWeights) Array.ofDim[Double](numRows) else null
 

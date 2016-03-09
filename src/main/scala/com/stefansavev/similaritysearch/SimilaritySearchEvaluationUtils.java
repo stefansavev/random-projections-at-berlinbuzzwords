@@ -1,6 +1,7 @@
 package com.stefansavev.similaritysearch;
 
 import com.stefansavev.randomprojections.evaluation.RecallEvaluator;
+import com.stefansavev.randomprojections.utils.OnlineVariance1;
 import com.stefansavev.similaritysearch.implementation.FuzzySearchEvaluationUtilsWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,29 @@ public class SimilaritySearchEvaluationUtils {
         //RecallEvaluator.evaluateRecall(11, retrieved, testSet).printRecalls();
     }
 
+    public static void printSimilarities(SimilaritySearchResults results){
+        Iterator<SimilaritySearchQueryResults> iterator = results.getIterator();
+        List<OnlineVariance1> avgSimilaritiesAtRankK = new ArrayList<>();
+        for(int i = 0; i < 10; i ++){
+            avgSimilaritiesAtRankK.add(new OnlineVariance1());
+        }
+
+        while(iterator.hasNext()){
+            SimilaritySearchQueryResults queryResults = iterator.next();
+            for(int i = 0; i < 10; i ++){
+                double cosineSimilarity = 0.0;
+                if (i < queryResults.getQueryResults().size()){
+                    cosineSimilarity = queryResults.getQueryResults().get(i).cosineSimilarity;
+                }
+                avgSimilaritiesAtRankK.get(i).processPoint(cosineSimilarity);
+            }
+        }
+        for (int i = 0; i < 10; i++) {
+            double mean = (Double) avgSimilaritiesAtRankK.get(i).getMeanAndVar()._1();
+            System.out.println(String.format("AVG similarity at rank %d %.2f", i, mean));
+        }
+    }
+
     public static void compareWithBruteForce(String indexFile, Random rnd, int numQueries, int numResults) throws IOException {
         SimilaritySearchIndex index = SimilaritySearchIndex.open(indexFile);
         SimilaritySearchResults testSet = generateRandomTestSet(rnd, numQueries, index);
@@ -75,8 +99,13 @@ public class SimilaritySearchEvaluationUtils {
         resultsOnTestSet(index, testSet1, numResults, false); //with the system
 
         SimilaritySearchResults retrieved = resultsOnTestSet(index, testSet, numResults, false); //with the system
-
+        logger.info("Now running bruteforce computation");
         SimilaritySearchResults expected = resultsOnTestSet(index, testSet, numResults, true); //brute force
         RecallEvaluator.evaluateRecall(11, retrieved, expected).printRecalls();
+        System.out.println("Brute force similarities");
+        printSimilarities(expected);
+        System.out.println("ApproximateSearch similarities");
+        printSimilarities(retrieved);
+
     }
 }

@@ -1,48 +1,34 @@
 package com.stefansavev.randomprojections.implementation
 
-import java.io.{FileOutputStream, BufferedOutputStream, File}
+import java.io.{BufferedOutputStream, File, FileOutputStream}
 import java.util.Random
 
+import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
+import com.stefansavev.core.serialization.core.{LongArraySerializer, Utils}
 import com.stefansavev.randomprojections.actors.Application
-import com.stefansavev.randomprojections.buffers.{LongArrayBuffer, IntArrayBuffer}
+import com.stefansavev.randomprojections.buffers.LongArrayBuffer
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
-import com.stefansavev.core.serialization.core.{LongArraySerializer, Utils}
-import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.utils.RandomUtils
 import com.typesafe.scalalogging.StrictLogging
 
-object Counts{
-  /*
-  def numberOf1s(input: Int): Int = {
-    var b = input
-    var sum = 0
-    var i = 0
-    while(i < 8){
-      sum += (if (1 == (b & 1)) 1 else 0)
-      i += 1
-      b >>= 1
-    }
-    sum
-  }
-
-  val table: Array[Int] = Array.range(0, 256).map(i => numberOf1s(i))
-  */
-
+object Counts {
   def numberOf1sLong(input: Long): Int = {
     java.lang.Long.bitCount(input)
   }
 }
+
 object Signatures {
 
   def getSign(v: Double): Int = if (v >= 0) 1 else -1
-  def isSignificant(v: Double): Boolean = Math.abs(v)> Math.sqrt(1.0/64)
+
+  def isSignificant(v: Double): Boolean = Math.abs(v) > Math.sqrt(1.0 / 64)
 
   def vectorToHash(vec: Array[Double]): Long = {
     var i = 0
     val len = Math.min(vec.length, 64)
     var hash: Long = 0L
-    while(i < len){
+    while (i < len) {
       val sign = if (vec(i) >= 0) 1L else 0L
       hash = hash << 1 | sign
       i += 1
@@ -54,11 +40,11 @@ object Signatures {
     val res = Array.ofDim[Double](64)
     var v = h
     var i = 0
-    while(i < 64){
-      if ((v & 1L) == 1L){
+    while (i < 64) {
+      if ((v & 1L) == 1L) {
         res(63 - i) = 1.0
       }
-      else{
+      else {
         res(63 - i) = -1.0
       }
       v >>= 1
@@ -77,7 +63,7 @@ object Signatures {
 
   def hadamardRepr(signs: SparseVector, query: Array[Double]): Array[Double] = {
     val dim = signs.dim
-    val input =  Array.ofDim[Double](dim)
+    val input = Array.ofDim[Double](dim)
     val output = Array.ofDim[Double](dim)
     //TODO: move to function
     var j = 0
@@ -98,17 +84,17 @@ object Signatures {
 
     //TODO: move to function
     var j = 0
-    while(j < 0){
-      input(j)= 0.0
+    while (j < 0) {
+      input(j) = 0.0
       j += 1
     }
 
     j = 0
-    while(j < signs.ids.length){
+    while (j < signs.ids.length) {
       val index = signs.ids(j)
       val b = signs.values(j)
       val a = query(index)
-      input(j) = a*b
+      input(j) = a * b
       j += 1
     }
 
@@ -132,7 +118,7 @@ object Signatures {
     val vectors = Array.ofDim[SparseVector](numSignatures)
     val signatures = Array.ofDim[Array[Long]](numSignatures)
     var i = 0
-    while(i < numSignatures){
+    while (i < numSignatures) {
       val (vec, sig) = computePointSignaturesHelper(rnd, dataFrameView)
       vectors(i) = vec
       signatures(i) = sig
@@ -144,7 +130,7 @@ object Signatures {
   def computeSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int): SignatureVectors = {
     val vectors = Array.ofDim[SparseVector](numSignatures)
     var i = 0
-    while(i < numSignatures){
+    while (i < numSignatures) {
       vectors(i) = computeSignatureVectorsHelper(rnd, numColumns)
       i += 1
     }
@@ -154,8 +140,6 @@ object Signatures {
   def computePointSignaturesHelper(rnd: Random, dataFrameView: DataFrameView): (SparseVector, Array[Long]) = {
     val dim = dataFrameView.numCols
     val signs = RandomUtils.generateRandomVector(rnd, dim, Array.range(0, dim))
-    //generate the random vector based on the data
-    //val signs = (new DataInformedProjectionStrategy(rnd, dim)).nextRandomProjection(0, dataFrameView, null).asInstanceOf[HadamardProjectionVector].signs
     val vec = Array.ofDim[Double](dataFrameView.numCols)
 
     val powOf2 = HadamardUtils.roundUp(dim)
@@ -163,7 +147,7 @@ object Signatures {
     val output = Array.ofDim[Double](powOf2)
     val signatures = Array.ofDim[Long](dataFrameView.numRows)
     var i = 0
-    while(i < dataFrameView.numRows){
+    while (i < dataFrameView.numRows) {
       dataFrameView.getPointAsDenseVector(i, signs.ids, vec)
       val hash = computePointSignature(signs, vec, input, output)
       signatures(i) = hash
@@ -178,7 +162,7 @@ object Signatures {
   }
 }
 
-class OnlineSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int){
+class OnlineSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int) {
   val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
   val buffer = new LongArrayBuffer()
   var numPoints = 0
@@ -197,14 +181,15 @@ class OnlineSignatureVectors(rnd: Random, numSignatures: Int, numColumns: Int){
   }
 }
 
-object DiskBackedOnlineSignatureVectorsUtils{
+object DiskBackedOnlineSignatureVectorsUtils {
   val partitionFileNamePrefix = "_signature_partition_"
+
   def fileName(dirName: String, partitionId: Int): String = {
     (new File(dirName, partitionFileNamePrefix + partitionId)).getAbsolutePath
   }
 }
 
-class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int, numColumns: Int) extends StrictLogging{
+class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int, numColumns: Int) extends StrictLogging {
   val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
   var buffer = new LongArrayBuffer()
   var numPoints = 0
@@ -225,13 +210,13 @@ class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSigna
     val querySigs = sigVectors.computePointSignatures(vec, 0, numSignatures)
     buffer ++= querySigs
     numPoints += 1
-    if (numPoints % partitionSize == 0){
+    if (numPoints % partitionSize == 0) {
       storePartition()
     }
   }
 
   def buildPointSignatures(): (SignatureVectors, PointSignatures) = {
-    if (buffer.size > 0){
+    if (buffer.size > 0) {
       storePartition()
     }
     //need to save the backing directory
@@ -241,18 +226,19 @@ class DiskBackedOnlineSignatureVectors(backingDir: String, rnd: Random, numSigna
 }
 
 
-object AsyncSignatureVectorsUtils{
+object AsyncSignatureVectorsUtils {
   val partitionFileNamePrefix = "_signature_partition_"
+
   def fileName(dirName: String): String = {
     (new File(dirName, partitionFileNamePrefix + "_async_")).getAbsolutePath
   }
 }
 
-class AsyncSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int, numColumns: Int){
+class AsyncSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int, numColumns: Int) {
   val sigVectors = Signatures.computeSignatureVectors(rnd, numSignatures, numColumns)
   var buffer = new LongArrayBuffer()
   var numPoints = 0
-  val partitionSize = (1 << 10) //(1 << 14)
+  val partitionSize = (1 << 10)
   var currentPartition = 0
   var nextBytesPos = 0L
   val writer = Application.createAsyncFileWriter(AsyncSignatureVectorsUtils.fileName(backingDir), "AsyncSignatureVectors")
@@ -273,13 +259,13 @@ class AsyncSignatureVectors(backingDir: String, rnd: Random, numSignatures: Int,
     val querySigs = sigVectors.computePointSignatures(vec, 0, numSignatures)
     buffer ++= querySigs
     numPoints += 1
-    if (numPoints % partitionSize == 0){
+    if (numPoints % partitionSize == 0) {
       storePartition()
     }
   }
 
   def buildPointSignatures(): (SignatureVectors, PointSignatures) = {
-    if (buffer.size > 0){
+    if (buffer.size > 0) {
       storePartition()
     }
     positions += nextBytesPos

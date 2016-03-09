@@ -1,7 +1,5 @@
 package com.stefansavev.randomprojections.implementation
 
-import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
-import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer
 import com.stefansavev.randomprojections.tuning.PerformanceCounters
 
 object Counter{
@@ -18,7 +16,6 @@ class BruteForceBySignatureSearcher(settings: SearcherSettings) extends Searcher
   if (!settings.randomTrees.header.isCompatible(settings.trainingSet.rowStoredView.getColumnHeader)){
     throw new IllegalStateException("Index and dataset are not compatible")
   }
-
   /*
   val numCols = settings.trainingSet.numCols //TODO: get those from the random tree
   val numRows = settings.trainingSet.numRows

@@ -2,11 +2,9 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.core.serialization._
-import com.stefansavev.core.serialization.core.Utils._
+import com.stefansavev.core.serialization.core.IsoSerializers._
 import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
 import com.stefansavev.core.serialization.core.TupleSerializers._
-import com.stefansavev.core.serialization.core.IsoSerializers._
 import com.stefansavev.core.serialization.core._
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
@@ -19,8 +17,9 @@ object RandomTreesSerializersV2 {
 
   implicit def pointSignatureReferenceSerializer(): TypedSerializer[PointSignatureReference] = {
 
-    implicit object PointSignatureReferenceIso extends Iso[PointSignatureReference, PointSignatureReference.TupleType]{
+    implicit object PointSignatureReferenceIso extends Iso[PointSignatureReference, PointSignatureReference.TupleType] {
       def from(input: Input): Output = input.toTuple
+
       def to(t: Output): Input = PointSignatureReference.fromTuple(t)
     }
 
@@ -31,7 +30,7 @@ object RandomTreesSerializersV2 {
     isoSerializer[PointSignatureReference, PointSignatureReference.TupleType](PointSignatureReferenceIso, pointSignatureReferenceTupleTypeSerializer())
   }
 
-  object SVDTransformSerializer extends TypedSerializer[SVDTransform]{
+  object SVDTransformSerializer extends TypedSerializer[SVDTransform] {
     def toBinary(outputStream: OutputStream, svdTransform: SVDTransform): Unit = {
       IntSerializer.write(outputStream, svdTransform.k)
       val matrix = svdTransform.weightedVt
@@ -53,7 +52,7 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  implicit object DimensionalityReductionTransformSerializer extends TypedSerializer[DimensionalityReductionTransform]{
+  implicit object DimensionalityReductionTransformSerializer extends TypedSerializer[DimensionalityReductionTransform] {
     def toBinary(outputStream: OutputStream, dimRedTransform: DimensionalityReductionTransform): Unit = {
       dimRedTransform match {
         case NoDimensionalityReductionTransform => {
@@ -75,7 +74,7 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  object ReportingDistanceEvaluatorSerializer extends TypedSerializer[ReportingDistanceEvaluator]{
+  object ReportingDistanceEvaluatorSerializer extends TypedSerializer[ReportingDistanceEvaluator] {
     def toBinary(outputStream: OutputStream, distanceEvaluator: ReportingDistanceEvaluator): Unit = {
       distanceEvaluator match {
         case evaluator: CosineOnOriginalDataDistanceEvaluator => {
@@ -95,7 +94,8 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  implicit object SignatureVectorsSerializer extends TypedSerializer[SignatureVectors]{
+  implicit object SignatureVectorsSerializer extends TypedSerializer[SignatureVectors] {
+
     import ImplicitSerializers._
 
     def toBinary(outputStream: OutputStream, sigVectors: SignatureVectors): Unit = {
@@ -103,7 +103,7 @@ object RandomTreesSerializersV2 {
       val len = vectors.length
       outputStream.writeInt(len)
       var i = 0
-      while(i < len){
+      while (i < len) {
         SparseVectorSerializer.toBinary(outputStream, vectors(i))
         i += 1
       }
@@ -113,7 +113,7 @@ object RandomTreesSerializersV2 {
       val len = inputStream.readInt()
       val vectors = Array.ofDim[SparseVector](len)
       var i = 0
-      while(i < len){
+      while (i < len) {
         vectors(i) = SparseVectorSerializer.fromBinary(inputStream)
         i += 1
       }
@@ -121,19 +121,21 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  implicit object SparseVectorSerializer extends TypedSerializer[SparseVector]{
+  implicit object SparseVectorSerializer extends TypedSerializer[SparseVector] {
+
     import ImplicitSerializers._
+
     def toBinary(outputStream: OutputStream, vec: SparseVector): Unit = {
       outputStream.writeInt(vec.dim)
       val len = vec.ids.length
       outputStream.writeInt(len)
       var i = 0
-      while(i < len){
+      while (i < len) {
         outputStream.writeInt(vec.ids(i))
         i += 1
       }
       i = 0
-      while(i < len){
+      while (i < len) {
         DoubleSerializer.write(outputStream, vec.values(i))
         i += 1
       }
@@ -146,13 +148,13 @@ object RandomTreesSerializersV2 {
       val values = Array.ofDim[Double](len)
 
       var i = 0
-      while(i < len){
+      while (i < len) {
         ids(i) = inputStream.readInt()
         i += 1
       }
 
       i = 0
-      while(i < len){
+      while (i < len) {
         values(i) = DoubleSerializer.read(inputStream)
         i += 1
       }
@@ -161,7 +163,8 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  implicit object SplitStrategySerializer extends TypedSerializer[DatasetSplitStrategy]{
+  implicit object SplitStrategySerializer extends TypedSerializer[DatasetSplitStrategy] {
+
     import ImplicitSerializers._
 
     def toBinary(stream: OutputStream, splitStrategy: DatasetSplitStrategy): Unit = {
@@ -175,7 +178,7 @@ object RandomTreesSerializersV2 {
 
     def fromBinary(stream: java.io.InputStream): DatasetSplitStrategy = {
       val id = stream.readInt()
-      id match{
+      id match {
         case 0 => new HadamardProjectionSplitStrategy()
         case 1 => new DataInformedSplitStrategy()
         case 2 => new NoSplitStrategy()
@@ -183,10 +186,12 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  object RandomTreeSerializer extends TypedSerializer[RandomTree]{
+  object RandomTreeSerializer extends TypedSerializer[RandomTree] {
+
     import ImplicitSerializers._
+
     def toBinary(outputStream: OutputStream, randomTree: RandomTree): Unit = {
-      if (randomTree == null){
+      if (randomTree == null) {
         outputStream.writeInt(1)
       }
       else {
@@ -238,7 +243,7 @@ object RandomTreesSerializersV2 {
           val numTrees = inputStream.readInt()
           val trees = Array.ofDim[RandomTree](numTrees)
           var i = 0
-          while(i < numTrees){
+          while (i < numTrees) {
             val tree = RandomTreeSerializer.fromBinary(inputStream)
             trees(i) = tree
             i += 1
@@ -258,7 +263,8 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  object RandomTreesSerializer extends TypedSerializer[RandomTrees]{
+  object RandomTreesSerializer extends TypedSerializer[RandomTrees] {
+
     import ColumnHeaderSerialization._
     import ImplicitSerializers._
 
@@ -269,7 +275,7 @@ object RandomTreesSerializersV2 {
       SplitStrategySerializer.toBinary(outputStream, randomTrees.datasetSplitStrategy)
       ColumnHeaderSerializer.toBinary(outputStream, randomTrees.header)
       outputStream.writeInt(randomTrees.trees.length)
-      for(tree <- randomTrees.trees){
+      for (tree <- randomTrees.trees) {
         RandomTreeSerializer.toBinary(outputStream, tree)
       }
     }
@@ -284,12 +290,12 @@ object RandomTreesSerializersV2 {
       val numTrees = inputStream.readInt()
       val trees = Array.ofDim[RandomTree](numTrees)
       var i = 0
-      while(i < numTrees){
+      while (i < numTrees) {
         val tree = RandomTreeSerializer.fromBinary(inputStream)
         trees(i) = tree
         i += 1
       }
-      new RandomTrees(dimRedTransform, distanceEvaluator, sigVectors, splitStrategy, header, null/*must be set by the caller*/, trees)
+      new RandomTrees(dimRedTransform, distanceEvaluator, sigVectors, splitStrategy, header, null /*must be set by the caller*/ , trees)
     }
   }
 

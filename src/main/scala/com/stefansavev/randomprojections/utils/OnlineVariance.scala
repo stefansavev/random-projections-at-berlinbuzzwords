@@ -31,9 +31,10 @@ class OnlineVariance(k: Int) {
   }
 }
 
-class OnlineVariance1{
+class OnlineVariance1 {
   val onlineVariance = new OnlineVariance(1)
   val buffer = Array.ofDim[Double](1)
+
   def processPoint(value: Double): Unit = {
     buffer(0) = value
     onlineVariance.processPoint(buffer)

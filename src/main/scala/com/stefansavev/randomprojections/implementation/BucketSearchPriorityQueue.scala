@@ -1,7 +1,9 @@
 package com.stefansavev.randomprojections.implementation
 
-case class PQEntry(var sumScores: Double, var depth: Int, var node: RandomTree) extends Comparable[PQEntry]{
-  def adjustScore(depth: Int, score: Double): Double = if (depth == 0.0) 0.0 /*to make sure progress id made*/ else sumScores/Math.sqrt(depth) //(sumScores*sumScores) /depth
+case class PQEntry(var sumScores: Double, var depth: Int, var node: RandomTree) extends Comparable[PQEntry] {
+  def adjustScore(depth: Int, score: Double): Double = if (depth == 0.0) 0.0 /*to make sure progress id made*/ else sumScores / Math.sqrt(depth)
+
+  //(sumScores*sumScores) /depth
   var adjScore = adjustScore(depth, sumScores)
 
   override def compareTo(o: PQEntry): Int = {
@@ -18,20 +20,23 @@ case class PQEntry(var sumScores: Double, var depth: Int, var node: RandomTree) 
 
 abstract class BucketSearchPriorityQueue {
   def remove(pqEntryOutput: PQEntry): Boolean
+
   def add(sumScores: Double, depth: Int, node: RandomTree): Unit
 }
 
-class OptimizedPriorityQueueSimpleImpl extends BucketSearchPriorityQueue{
+class OptimizedPriorityQueueSimpleImpl extends BucketSearchPriorityQueue {
+
   import java.util.PriorityQueue
+
   val pq = new PriorityQueue[PQEntry]()
 
   override def remove(pqEntryOutput: PQEntry): Boolean = {
-    if (pq.size() > 0){
+    if (pq.size() > 0) {
       val entry = pq.remove()
       pqEntryOutput.copyFrom(entry)
       true
     }
-    else{
+    else {
       false
     }
   }

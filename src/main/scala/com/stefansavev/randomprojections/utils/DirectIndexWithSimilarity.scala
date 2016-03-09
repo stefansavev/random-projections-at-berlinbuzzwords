@@ -2,7 +2,7 @@ package com.stefansavev.randomprojections.utils
 
 import com.stefansavev.randomprojections.buffers.{DoubleArrayBuffer, IntArrayBuffer}
 
-class DirectIndexWithSimilarity(offsets: Array[Int], contextIds: Array[Int], similarities: Array[Double]){
+class DirectIndexWithSimilarity(offsets: Array[Int], contextIds: Array[Int], similarities: Array[Double]) {
   def numDataPoints(): Int = offsets.length - 1
 
   def getContextIdsAndSimilarities(queryId: Int): (Array[Int], Array[Double]) = {
@@ -18,7 +18,9 @@ class DirectIndexWithSimilarity(offsets: Array[Int], contextIds: Array[Int], sim
 }
 
 class DirectIndexWithSimilarityBuilder {
-  var offsets = {val buffer = new IntArrayBuffer(1024); buffer += 0; buffer}
+  var offsets = {
+    val buffer = new IntArrayBuffer(1024); buffer += 0; buffer
+  }
 
   var contextIds = new IntArrayBuffer(1024)
   var scores = new DoubleArrayBuffer(1024)
@@ -26,7 +28,7 @@ class DirectIndexWithSimilarityBuilder {
   var nextPointId = 0
 
   def addContexts(pointId: Int, pointContextIds: Array[Int], similarities: Array[Double]): Unit = {
-    if (pointId != nextPointId){
+    if (pointId != nextPointId) {
       throw new IllegalStateException("Invalid queryId. Query ids should be added consequtively")
     }
 
