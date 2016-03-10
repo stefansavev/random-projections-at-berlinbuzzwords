@@ -17,7 +17,6 @@ object NoDimensionalityReductionTransform extends DimensionalityReductionTransfo
 
 case class DimensionalityReductionResult(transform: DimensionalityReductionTransform, transformedDataset: DataFrameView)
 
-//need to save the projection vectors
 object DimensionalityReduction {
   def fit(params: DimensionalityReductionParams, dataFrame: DataFrameView): DimensionalityReductionTransform = {
     params match {

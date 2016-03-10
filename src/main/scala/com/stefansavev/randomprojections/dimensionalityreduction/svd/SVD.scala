@@ -4,27 +4,27 @@ import java.io.PrintWriter
 import java.util.Random
 
 import com.github.fommil.netlib.BLAS
-import com.stefansavev.randomprojections.datarepr.dense.{DenseRowStoredMatrixViewBuilderFactory, ColumnHeaderBuilder, DataFrameView}
-import com.stefansavev.randomprojections.dimensionalityreduction.interface.{DimensionalityReductionTransform, DimensionalityReductionParams}
-import com.stefansavev.randomprojections.utils.{Utils, DenseMatrixUtils}
+import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeaderBuilder, DataFrameView, DenseRowStoredMatrixViewBuilderFactory}
+import com.stefansavev.randomprojections.dimensionalityreduction.interface.{DimensionalityReductionParams, DimensionalityReductionTransform}
+import com.stefansavev.randomprojections.utils.{DenseMatrixUtils, Utils}
 import com.typesafe.scalalogging.StrictLogging
-import no.uib.cipr.matrix.{SVD => MatrixSVD, DenseMatrix}
+import no.uib.cipr.matrix.{DenseMatrix, SVD => MatrixSVD}
 
-trait SVDMethod{
+trait SVDMethod {
   def fit(params: SVDParams, dataFrame: DataFrameView): SVDTransform
 }
 
-object SVDUtils{
+object SVDUtils {
 
   def datasetToDenseMatrix(dataFrame: DataFrameView): DenseMatrix = {
     val numCols = dataFrame.numCols
     val numRows = dataFrame.numRows
     val denseMatrix = new DenseMatrix(numRows, numCols)
     var pointId = 0
-    while(pointId < dataFrame.numRows){
+    while (pointId < dataFrame.numRows) {
       val dataPoint = dataFrame.getPointAsDenseVector(pointId)
       var i = 0
-      while(i < numCols){
+      while (i < numCols) {
         denseMatrix.set(pointId, i, dataPoint(i))
         i += 1
       }
@@ -37,11 +37,11 @@ object SVDUtils{
     val numRows = summary.numRows()
     val numCols = summary.numColumns()
     var i = 0
-    while(i < summary.numRows()){
+    while (i < summary.numRows()) {
       var j = 0
-      while(j < numCols){
+      while (j < numCols) {
         val value = summary.get(i, j)
-        summary.set(i, j, value/denom)
+        summary.set(i, j, value / denom)
         j += 1
       }
       i += 1
@@ -55,13 +55,13 @@ object SVDUtils{
     }
 
     var i = 0
-    while(i < Vt.numRows()){
+    while (i < Vt.numRows()) {
       //multiply each row
       val w = computeWeight(s(i))
       var j = 0
-      while(j < Vt.numColumns()){
+      while (j < Vt.numColumns()) {
         val value = Vt.get(i, j)
-        Vt.set(i, j, w*value)
+        Vt.set(i, j, w * value)
         j += 1
       }
       i += 1
@@ -71,17 +71,17 @@ object SVDUtils{
   def dumpVt(fileName: String, Vt: DenseMatrix): Unit = {
     val printWriter = new PrintWriter(fileName)
     var i = 0
-    while(i < Vt.numRows()){
+    while (i < Vt.numRows()) {
       var j = 0
-      while(j < Vt.numColumns()){
+      while (j < Vt.numColumns()) {
         val value = Vt.get(i, j)
         printWriter.write(value.toString)
-        if (j + 1 < Vt.numColumns()){
+        if (j + 1 < Vt.numColumns()) {
           printWriter.write(" ")
         }
         j += 1
       }
-      if (i + 1 < Vt.numRows()){
+      if (i + 1 < Vt.numRows()) {
         printWriter.write("\n")
       }
       i += 1
@@ -89,7 +89,7 @@ object SVDUtils{
   }
 }
 
-object FullDenseSVD extends SVDMethod with StrictLogging{
+object FullDenseSVD extends SVDMethod with StrictLogging {
   def XtTimesX(X: DenseMatrix): DenseMatrix = {
     val numCols = X.numColumns()
     val numRows = X.numRows()
@@ -103,10 +103,10 @@ object FullDenseSVD extends SVDMethod with StrictLogging{
       numCols, /*m: number of columns of X*/
       numRows, /*number of columns of X', number of rows of X*/
       1.0,
-      data /*A = X*/,
-      numRows /*first dimension of X*/,
-      data /*B = X*/,
-      numRows /*first dimension of X*/,
+      data /*A = X*/ ,
+      numRows /*first dimension of X*/ ,
+      data /*B = X*/ ,
+      numRows /*first dimension of X*/ ,
       1,
       output.getData,
       numCols /*first dimension of output*/)
@@ -126,31 +126,28 @@ object FullDenseSVD extends SVDMethod with StrictLogging{
     val s = svd.getS()
     var i = 0
     val Vt = svd.getVt
-    //SVDUtils.weightVt(Vt, svd.getS) //now Vt is weighted //optional
+    //SVDUtils.weightVt(Vt, svd.getS) //now Vt is weighted, this code is optional
     new SVDTransform(params.k, Vt)
   }
 }
 
-object SVDFromRandomizedDataEmbedding extends SVDMethod with StrictLogging{
+object SVDFromRandomizedDataEmbedding extends SVDMethod with StrictLogging {
   def computeSummary(numProj: Int, rnd: Random, dataFrame: DataFrameView): DenseMatrix = {
     val numCols = dataFrame.numCols
     val summary = new DenseMatrix(numProj, numCols)
     var pointId = 0
-    while(pointId < dataFrame.numRows){
+    while (pointId < dataFrame.numRows) {
       val dataPoint = dataFrame.getPointAsDenseVector(pointId)
       val sign = rnd.nextGaussian()
       val index = rnd.nextInt(numProj)
       var i = 0
-      while(i < numCols){
-        //val value = sign * dataPoint(i) + summary.get(index, i)
-        //summary.set(index, i, value)
-        //optionally can add to a couple of index positions
+      while (i < numCols) {
         summary.add(index, i, sign * dataPoint(i))
         i += 1
       }
       pointId += 1
     }
-    val denom = Math.sqrt(dataFrame.numRows - 1)//why this one?
+    val denom = Math.sqrt(dataFrame.numRows - 1) //TODO: why this one?
     SVDUtils.divideEntriesBy(summary, denom)
     summary
   }
@@ -162,11 +159,8 @@ object SVDFromRandomizedDataEmbedding extends SVDMethod with StrictLogging{
     val numProj = Math.min(1000, dataFrame.numRows)
     val summary = computeSummary(numProj, rnd, dataFrame)
     logger.info("Computed dataset summary using one pass")
-    //val summary = computeSummary2(rnd, dataFrame, 200, 20) //it should be that 2*200 < numCols
-    //may be divide by num rows
     val numCols = dataFrame.numCols
     val result = new DenseMatrix(numCols, numCols)
-    //summary.transABmult(summary, result)
 
     val svd = MatrixSVD.factorize(summary)
     val s = svd.getS()
@@ -174,34 +168,22 @@ object SVDFromRandomizedDataEmbedding extends SVDMethod with StrictLogging{
     val Vt = svd.getVt
     //SVDUtils.weightVt(Vt, svd.getS) //now Vt is weighted //optional
     new SVDTransform(params.k, Vt)
-    //dumpVt("D:/tmp/debug-vt.txt", svd.getVt)
-    //do the SVD of the summary matrix
-
-    /*
-    val svd = SVD.factorize(mat)
-    val s = svd.getS
-    i = 0
-    for(v <- s){
-      println(i + ":" + v)
-      i += 1
-    }
-    */
-    //projectDataset(k, svd.getVt, dataFrame) //second pass
   }
 }
+
 //-1 means choose k optimally
-case class SVDParams(k: Int, svdMethod: SVDMethod) extends DimensionalityReductionParams{
+case class SVDParams(k: Int, svdMethod: SVDMethod) extends DimensionalityReductionParams {
 }
 
-class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends DimensionalityReductionTransform with StrictLogging{
+class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends DimensionalityReductionTransform with StrictLogging {
   def reduceToTopK(newK: Int): SVDTransform = {
-    if (newK == k){
+    if (newK == k) {
       this
     }
-    else if (newK < k){
+    else if (newK < k) {
       new SVDTransform(newK, DenseMatrixUtils.takeRows(weightedVt, newK))
     }
-    else{
+    else {
       Utils.internalError()
     }
   }
@@ -209,12 +191,13 @@ class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends Dimensionali
   private def projectOnToRowsVt(k: Int, vec: Array[Double], weightedVt: DenseMatrix, out: Array[Double]): Unit = {
     val numOrigFeatures = weightedVt.numColumns()
     var i = 0
-    while(i < k){//for each new feature
-    //for each feature in the original data point
-    var dot = 0.0
+    while (i < k) {
+      //for each new feature
+      //for each feature in the original data point
+      var dot = 0.0
       var j = 0
-      while(j < numOrigFeatures){
-        dot += vec(j)*weightedVt.get(i, j)
+      while (j < numOrigFeatures) {
+        dot += vec(j) * weightedVt.get(i, j)
         j += 1
       }
       out(i) = dot
@@ -232,7 +215,7 @@ class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends Dimensionali
     val k = this.k
     val oldHeader = dataFrame.rowStoredView.getColumnHeader
     val newNumCols = k
-    val newF = Array.range(0, newNumCols).map(i => (i.toString,i ))
+    val newF = Array.range(0, newNumCols).map(i => (i.toString, i))
     val header = ColumnHeaderBuilder.build(oldHeader.labelName, newF, false, dataFrame.rowStoredView.getBuilderType)
     val builder = DenseRowStoredMatrixViewBuilderFactory.create(header)
 
@@ -242,10 +225,10 @@ class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends Dimensionali
 
     val newIds = Array.range(0, newNumCols)
     var i = 0
-    while(i < dataFrame.numRows){
+    while (i < dataFrame.numRows) {
       dataFrame.getPointAsDenseVector(i, colIds, vec)
       projectOnToRowsVt(k, vec, weightedVt, output)
-      if (i % 5000 == 0){
+      if (i % 5000 == 0) {
         logger.info(s"Processed ${i} rows")
       }
       builder.addRow(dataFrame.getLabel(i), newIds, output)
@@ -257,7 +240,7 @@ class SVDTransform(val k: Int, val weightedVt: DenseMatrix) extends Dimensionali
   }
 }
 
-object SVD extends StrictLogging{
+object SVD extends StrictLogging {
 
   def fit(params: SVDParams, dataFrame: DataFrameView): SVDTransform = {
     params.svdMethod.fit(params, dataFrame)
@@ -271,16 +254,17 @@ object SVD extends StrictLogging{
   }
 }
 
-trait OnlineFitter{
+trait OnlineFitter {
   def pass(vec: Array[Double]): Unit
+
   def finalizeFit(): DimensionalityReductionTransform
 }
 
-trait OnlineTransform{
+trait OnlineTransform {
   def getFitter(): OnlineFitter
 }
 
-class OnlineSVDFitter(numOrigColumns: Int) extends OnlineFitter{
+class OnlineSVDFitter(numOrigColumns: Int) extends OnlineFitter {
   val maxRows = 100000
   var numRowsInStore = 0
   var totalRows = 0.0
@@ -291,7 +275,7 @@ class OnlineSVDFitter(numOrigColumns: Int) extends OnlineFitter{
     DenseMatrixUtils.addToRow(currentStore, numRowsInStore, vec)
     numRowsInStore += 1
 
-    if (numRowsInStore == maxRows){
+    if (numRowsInStore == maxRows) {
       val partialXtX = FullDenseSVD.XtTimesX(currentStore)
       DenseMatrixUtils.addMatrixTo(XtX, partialXtX)
       totalRows += numRowsInStore
@@ -301,7 +285,7 @@ class OnlineSVDFitter(numOrigColumns: Int) extends OnlineFitter{
   }
 
   def finalizeFit(): DimensionalityReductionTransform = {
-    if (numRowsInStore > 0){
+    if (numRowsInStore > 0) {
       val partialStore = DenseMatrixUtils.takeRows(currentStore, numRowsInStore)
       val partialXtX = FullDenseSVD.XtTimesX(partialStore)
       DenseMatrixUtils.addMatrixTo(XtX, partialXtX)
@@ -318,15 +302,15 @@ class OnlineSVDFitter(numOrigColumns: Int) extends OnlineFitter{
   }
 }
 
-class OnlineSVD(k: Int) extends OnlineTransform{
+class OnlineSVD(k: Int) extends OnlineTransform {
   def getFitter(): OnlineFitter = null
 }
 
-object FullDenseSVDLimitedMemory extends SVDMethod{
+object FullDenseSVDLimitedMemory extends SVDMethod {
   def fit(params: SVDParams, dataFrame: DataFrameView): SVDTransform = {
     val fitter = new OnlineSVDFitter(dataFrame.numCols)
     var i = 0
-    while(i < dataFrame.numRows){
+    while (i < dataFrame.numRows) {
       fitter.pass(dataFrame.getPointAsDenseVector(i))
       i += 1
     }
