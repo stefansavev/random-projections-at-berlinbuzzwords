@@ -1,4 +1,4 @@
-The original algorithm is based on https://github.com/spotify/annoy.
+The original algorithm was based on https://github.com/spotify/annoy.
 
 Now there are a number of differences from Annoy's algorithm:
 
@@ -8,4 +8,4 @@ Now there are a number of differences from Annoy's algorithm:
 * The data can be stored as bytes, two bytes, floats (4 bytes), doubles (8 bytes)
 * When multiple candidate results appear in multiple trees, this information is used for pruning
 * Quantization (coming soon)
-* The trees are stored very efficiently  only two bytes are stored for splitting information instead of a high-dimensional vector
+* The trees are stored very efficiently. A split in a tree node is defined by a random high-dimensional vector. However, I store only two two bytes consisting of bit masks.
