@@ -1,8 +1,7 @@
 package com.stefansavev.randomprojections.datarepr.dense.store
 
 import java.io.{BufferedInputStream, File, FileInputStream}
-
-import com.stefansavev.core.serialization.core.DoubleArraySerializer
+import com.stefansavev.core.serialization.DoubleArraySerializer
 import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.buffers._
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector

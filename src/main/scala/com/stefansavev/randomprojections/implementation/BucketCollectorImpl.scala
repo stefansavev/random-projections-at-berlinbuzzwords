@@ -1,8 +1,7 @@
 package com.stefansavev.randomprojections.implementation
 
 import java.io._
-
-import com.stefansavev.core.serialization.core.IntArraySerializer
+import com.stefansavev.core.serialization.IntArraySerializer
 import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.datarepr.dense.PointIndexes
 import com.stefansavev.randomprojections.datarepr.dense.store.FixedLengthBuffer

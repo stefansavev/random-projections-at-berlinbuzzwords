@@ -1,4 +1,4 @@
-package com.stefansavev.core.serialization.core
+package com.stefansavev.core.serialization
 
 import java.io.{InputStream, OutputStream}
 
@@ -11,6 +11,8 @@ object IsoSerializers {
     def fromBinary(inputStream: InputStream): A = {
       iso.to(serB.fromBinary(inputStream))
     }
+
+    def name: String = s"IsoSerializer(via = ${serB.name})"
   }
 
   implicit def isoSerializer[A, B](implicit iso: Iso[A, B], serB: TypedSerializer[B]): IsoSerializer[A, B] = {

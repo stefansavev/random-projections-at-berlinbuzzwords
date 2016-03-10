@@ -2,8 +2,9 @@ package com.stefansavev.randomprojections.implementation
 
 import java.io.{BufferedInputStream, FileInputStream}
 
-import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
-import com.stefansavev.core.serialization.core.{Utils => SerializationUtils}
+import com.stefansavev.core.serialization.PrimitiveTypeSerializers
+import com.stefansavev.core.serialization.{Utils => SerializationUtils}
+import PrimitiveTypeSerializers.TypedLongArraySerializer
 import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.utils.Utils

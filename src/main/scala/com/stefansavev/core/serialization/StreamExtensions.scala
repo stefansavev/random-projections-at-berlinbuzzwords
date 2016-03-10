@@ -1,8 +1,12 @@
-package com.stefansavev.core.serialization.core
+package com.stefansavev.core.serialization
 
 import java.io.{InputStream, OutputStream}
 
-object ImplicitSerializers{
+/**
+ * Incomplete extensions if input/output streams used to read/write values
+ */
+object StreamExtensions{
+
   implicit class IntSerializerExt(outputStream: OutputStream) {
     def writeInt(value: Int): Unit = {
       IntSerializer.write(outputStream, value)
@@ -26,4 +30,5 @@ object ImplicitSerializers{
       DoubleArraySerializer.read(inputStream)
     }
   }
+
 }

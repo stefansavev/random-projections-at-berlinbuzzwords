@@ -2,7 +2,8 @@ package com.stefansavev.core.string2id
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.core.serialization.core.{IntSerializer, StringSerializer, TypedSerializer}
+import com.stefansavev.core.serialization.{StringSerializer, IntSerializer, TypedSerializer}
+import com.stefansavev.core.serialization.StringSerializer
 
 object String2IdHasherSerialization {
 
@@ -59,6 +60,8 @@ object String2IdHasherSerialization {
       }
       string2IdHasher
     }
+
+    def name: String = "String2IdHasherSerializer"
   }
 
 

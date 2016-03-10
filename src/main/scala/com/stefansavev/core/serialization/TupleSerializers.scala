@@ -1,4 +1,4 @@
-package com.stefansavev.core.serialization.core
+package com.stefansavev.core.serialization
 
 import java.io._
 
@@ -16,6 +16,8 @@ object TupleSerializers {
       val a2 = serA2.fromBinary(inputStream)
       (a1, a2)
     }
+
+    def name: String = s"tuple2(${serA1.name}, ${serA2.name})"
   }
 
   implicit def tuple2Serializer[A1, A2](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2]): Tuple2Serializer[A1, A2] = {
@@ -39,6 +41,8 @@ object TupleSerializers {
       val a3 = serA3.fromBinary(inputStream)
       (a1, a2, a3)
     }
+
+    def name: String = s"tuple3(${serA1.name}, ${serA2.name}, ${serA3.name})"
   }
 
   implicit def tuple3Serializer[A1, A2, A3](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3]): Tuple3Serializer[A1, A2, A3] = {
@@ -64,6 +68,8 @@ object TupleSerializers {
       val a4 = serA4.fromBinary(inputStream)
       (a1, a2, a3, a4)
     }
+
+    def name: String = s"tuple4(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name})"
   }
 
   implicit def tuple4Serializer[A1, A2, A3, A4](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4]): Tuple4Serializer[A1, A2, A3, A4] = {
@@ -91,6 +97,8 @@ object TupleSerializers {
       val a5 = serA5.fromBinary(inputStream)
       (a1, a2, a3, a4, a5)
     }
+
+    def name: String = s"tuple5(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name})"
   }
 
   implicit def tuple5Serializer[A1, A2, A3, A4, A5](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5]): Tuple5Serializer[A1, A2, A3, A4, A5] = {
@@ -120,6 +128,8 @@ object TupleSerializers {
       val a6 = serA6.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6)
     }
+
+    def name: String = s"tuple6(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name})"
   }
 
   implicit def tuple6Serializer[A1, A2, A3, A4, A5, A6](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6]): Tuple6Serializer[A1, A2, A3, A4, A5, A6] = {
@@ -151,6 +161,8 @@ object TupleSerializers {
       val a7 = serA7.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7)
     }
+
+    def name: String = s"tuple7(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name}, ${serA7.name})"
   }
 
   implicit def tuple7Serializer[A1, A2, A3, A4, A5, A6, A7](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6], serA7: TypedSerializer[A7]): Tuple7Serializer[A1, A2, A3, A4, A5, A6, A7] = {
@@ -184,6 +196,8 @@ object TupleSerializers {
       val a8 = serA8.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8)
     }
+
+    def name: String = s"tuple8(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name}, ${serA7.name},  ${serA8.name})"
   }
 
   implicit def tuple8Serializer[A1, A2, A3, A4, A5, A6, A7, A8](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6], serA7: TypedSerializer[A7], serA8: TypedSerializer[A8]): Tuple8Serializer[A1, A2, A3, A4, A5, A6, A7, A8] = {
@@ -219,6 +233,8 @@ object TupleSerializers {
       val a9 = serA9.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9)
     }
+
+    def name: String = s"tuple9(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name}, ${serA7.name}, ${serA8.name}, ${serA9.name})"
   }
 
   implicit def tuple9Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6], serA7: TypedSerializer[A7], serA8: TypedSerializer[A8], serA9: TypedSerializer[A9]): Tuple9Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9] = {
@@ -256,6 +272,9 @@ object TupleSerializers {
       val a10 = serA10.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
     }
+
+    def name: String = s"tuple10(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name}," +
+      s"${serA7.name}, ${serA8.name}, ${serA9.name}, ${serA10.name})"
   }
 
   implicit def tuple10Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6], serA7: TypedSerializer[A7], serA8: TypedSerializer[A8], serA9: TypedSerializer[A9], serA10: TypedSerializer[A10]): Tuple10Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10] = {
@@ -295,6 +314,9 @@ object TupleSerializers {
       val a11 = serA11.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11)
     }
+
+    def name: String = s"tuple11(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name}," +
+      s"${serA7.name}, ${serA8.name}, ${serA9.name}, ${serA10.name}, ${serA11.name})"
   }
 
   implicit def tuple11Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6], serA7: TypedSerializer[A7], serA8: TypedSerializer[A8], serA9: TypedSerializer[A9], serA10: TypedSerializer[A10], serA11: TypedSerializer[A11]): Tuple11Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11] = {
@@ -336,6 +358,9 @@ object TupleSerializers {
       val a12 = serA12.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12)
     }
+
+    def name: String = s"tuple12(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name}," +
+      s"${serA7.name}, ${serA8.name}, ${serA9.name}, ${serA10.name}, ${serA11.name}, ${serA12.name})"
   }
 
   implicit def tuple12Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6], serA7: TypedSerializer[A7], serA8: TypedSerializer[A8], serA9: TypedSerializer[A9], serA10: TypedSerializer[A10], serA11: TypedSerializer[A11], serA12: TypedSerializer[A12]): Tuple12Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12] = {
@@ -379,6 +404,9 @@ object TupleSerializers {
       val a13 = serA13.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13)
     }
+
+    def name: String = s"tuple13(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name}," +
+      s"${serA7.name}, ${serA8.name}, ${serA9.name}, ${serA10.name}, ${serA11.name}, ${serA12.name}, ${serA13.name})"
   }
 
   implicit def tuple13Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6], serA7: TypedSerializer[A7], serA8: TypedSerializer[A8], serA9: TypedSerializer[A9], serA10: TypedSerializer[A10], serA11: TypedSerializer[A11], serA12: TypedSerializer[A12], serA13: TypedSerializer[A13]): Tuple13Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13] = {
@@ -424,12 +452,14 @@ object TupleSerializers {
       val a14 = serA14.fromBinary(inputStream)
       (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14)
     }
+
+    def name: String = s"tuple14(${serA1.name}, ${serA2.name}, ${serA3.name}, ${serA4.name}, ${serA5.name}, ${serA6.name}," +
+      s"${serA7.name}, ${serA8.name}, ${serA9.name}, ${serA10.name}, ${serA11.name}, ${serA12.name}, ${serA13.name}, ${serA14.name})"
   }
 
   implicit def tuple14Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14](implicit serA1: TypedSerializer[A1], serA2: TypedSerializer[A2], serA3: TypedSerializer[A3], serA4: TypedSerializer[A4], serA5: TypedSerializer[A5], serA6: TypedSerializer[A6], serA7: TypedSerializer[A7], serA8: TypedSerializer[A8], serA9: TypedSerializer[A9], serA10: TypedSerializer[A10], serA11: TypedSerializer[A11], serA12: TypedSerializer[A12], serA13: TypedSerializer[A13], serA14: TypedSerializer[A14]): Tuple14Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14] = {
     new Tuple14Serializer[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14](serA1, serA2, serA3, serA4, serA5, serA6, serA7, serA8, serA9, serA10, serA11, serA12, serA13, serA14)
   }
-
 
   //---------------------------------------------------------
 }

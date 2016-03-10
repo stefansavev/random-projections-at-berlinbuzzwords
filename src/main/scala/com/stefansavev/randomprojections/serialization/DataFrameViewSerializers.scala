@@ -2,11 +2,12 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.core.serialization.core.IsoSerializers._
-import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
-import com.stefansavev.core.serialization.core.SubtypeSerializers._
-import com.stefansavev.core.serialization.core.TupleSerializers._
-import com.stefansavev.core.serialization.core.{Iso, TypedSerializer}
+import com.stefansavev.core.serialization._
+import IsoSerializers._
+import PrimitiveTypeSerializers._
+import SubtypeSerializers._
+import TupleSerializers._
+import com.stefansavev.core.serialization.Iso
 import com.stefansavev.core.string2id.{String2IdHasher, String2IdHasherSerialization}
 import com.stefansavev.core.string2id.String2IdHasherSerialization.String2IdHasherSerializer
 import com.stefansavev.randomprojections.datarepr.dense._
@@ -151,6 +152,8 @@ object DataFrameViewSerializers {
           case _ => vs
         }
       }
+
+      def name: String = "ValueStoreWithTransformedTypeSerializer"
     }
     ValueStoreWithTransformedTypeSerializer
   }

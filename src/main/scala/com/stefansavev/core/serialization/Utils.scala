@@ -1,4 +1,4 @@
-package com.stefansavev.core.serialization.core
+package com.stefansavev.core.serialization
 
 import java.io._
 

@@ -2,7 +2,8 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io._
 
-import com.stefansavev.core.serialization.core._
+import com.stefansavev.core.serialization._
+import com.stefansavev.core.serialization._
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.implementation._
@@ -170,7 +171,7 @@ object PointSignaturesSerializer extends StrictLogging {
 //TODO: use sparse vector serialializer
 object ProjectionVectorSerializer {
 
-  import ImplicitSerializers._
+  import StreamExtensions._
 
   def toBinary(outputStream: OutputStream, projVec: AbstractProjectionVector): Unit = {
     val vec = projVec.asInstanceOf[HadamardProjectionVector].signs

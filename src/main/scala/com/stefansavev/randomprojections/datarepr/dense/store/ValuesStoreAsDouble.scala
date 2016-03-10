@@ -1,6 +1,6 @@
 package com.stefansavev.randomprojections.datarepr.dense.store
 
-import com.stefansavev.core.serialization.core.DoubleArraySerializer
+import com.stefansavev.core.serialization.DoubleArraySerializer
 import com.stefansavev.randomprojections.buffers.DoubleArrayBuffer
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.utils.Utils

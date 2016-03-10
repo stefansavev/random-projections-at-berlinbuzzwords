@@ -3,8 +3,9 @@ package com.stefansavev.randomprojections.implementation
 import java.io.{BufferedOutputStream, File, FileOutputStream}
 import java.util.Random
 
-import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers.TypedLongArraySerializer
-import com.stefansavev.core.serialization.core.{LongArraySerializer, Utils}
+import com.stefansavev.core.serialization.{Utils, LongArraySerializer, PrimitiveTypeSerializers}
+import PrimitiveTypeSerializers.TypedLongArraySerializer
+import com.stefansavev.core.serialization.{Utils => SerializationUtils}
 import com.stefansavev.randomprojections.actors.Application
 import com.stefansavev.randomprojections.buffers.LongArrayBuffer
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView

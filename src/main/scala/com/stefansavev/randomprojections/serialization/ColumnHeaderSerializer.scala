@@ -2,14 +2,14 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.OutputStream
 
-import com.stefansavev.core.serialization.core.{ImplicitSerializers, TypedSerializer}
+import com.stefansavev.core.serialization.{NamedSerializer, StreamExtensions, TypedSerializer}
 import com.stefansavev.randomprojections.datarepr.dense.{ColumnHeader, ColumnHeaderImpl}
 
 object ColumnHeaderSerialization {
 
-  implicit object ColumnHeaderSerializer extends TypedSerializer[ColumnHeader] {
+  implicit object ColumnHeaderSerializer extends NamedSerializer[ColumnHeader] {
 
-    import ImplicitSerializers._
+    import StreamExtensions._
 
     def toBinary(stream: OutputStream, header: ColumnHeader): Unit = {
       stream.writeInt(header.numCols)
@@ -19,6 +19,7 @@ object ColumnHeaderSerialization {
       val numCols = stream.readInt()
       new ColumnHeaderImpl(numCols, null, null, null, false)
     }
+
   }
 
 }

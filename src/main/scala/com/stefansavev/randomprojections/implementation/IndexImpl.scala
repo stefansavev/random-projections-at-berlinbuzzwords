@@ -1,8 +1,7 @@
 package com.stefansavev.randomprojections.implementation
 
 import java.io.File
-
-import com.stefansavev.core.serialization.core.StringSerializer
+import com.stefansavev.core.serialization.StringSerializer
 import com.stefansavev.randomprojections.buffers.IntArrayBuffer
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.implementation.query.NearestNeigbhorQueryScratchBuffer

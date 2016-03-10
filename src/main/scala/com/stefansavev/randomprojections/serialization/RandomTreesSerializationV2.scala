@@ -2,10 +2,11 @@ package com.stefansavev.randomprojections.serialization
 
 import java.io.{InputStream, OutputStream}
 
-import com.stefansavev.core.serialization.core.IsoSerializers._
-import com.stefansavev.core.serialization.core.PrimitiveTypeSerializers._
-import com.stefansavev.core.serialization.core.TupleSerializers._
-import com.stefansavev.core.serialization.core._
+import com.stefansavev.core.serialization._
+import IsoSerializers._
+import PrimitiveTypeSerializers._
+import TupleSerializers._
+import com.stefansavev.core.serialization._
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.datarepr.sparse.SparseVector
 import com.stefansavev.randomprojections.dimensionalityreduction.interface.{DimensionalityReductionTransform, NoDimensionalityReductionTransform}
@@ -30,7 +31,7 @@ object RandomTreesSerializersV2 {
     isoSerializer[PointSignatureReference, PointSignatureReference.TupleType](PointSignatureReferenceIso, pointSignatureReferenceTupleTypeSerializer())
   }
 
-  object SVDTransformSerializer extends TypedSerializer[SVDTransform] {
+  object SVDTransformSerializer extends NamedSerializer[SVDTransform]{
     def toBinary(outputStream: OutputStream, svdTransform: SVDTransform): Unit = {
       IntSerializer.write(outputStream, svdTransform.k)
       val matrix = svdTransform.weightedVt
@@ -52,7 +53,7 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  implicit object DimensionalityReductionTransformSerializer extends TypedSerializer[DimensionalityReductionTransform] {
+  implicit object DimensionalityReductionTransformSerializer extends NamedSerializer[DimensionalityReductionTransform] {
     def toBinary(outputStream: OutputStream, dimRedTransform: DimensionalityReductionTransform): Unit = {
       dimRedTransform match {
         case NoDimensionalityReductionTransform => {
@@ -74,7 +75,7 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  object ReportingDistanceEvaluatorSerializer extends TypedSerializer[ReportingDistanceEvaluator] {
+  object ReportingDistanceEvaluatorSerializer extends NamedSerializer[ReportingDistanceEvaluator] {
     def toBinary(outputStream: OutputStream, distanceEvaluator: ReportingDistanceEvaluator): Unit = {
       distanceEvaluator match {
         case evaluator: CosineOnOriginalDataDistanceEvaluator => {
@@ -94,9 +95,9 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  implicit object SignatureVectorsSerializer extends TypedSerializer[SignatureVectors] {
+  implicit object SignatureVectorsSerializer extends NamedSerializer[SignatureVectors] {
 
-    import ImplicitSerializers._
+    import StreamExtensions._
 
     def toBinary(outputStream: OutputStream, sigVectors: SignatureVectors): Unit = {
       val vectors = sigVectors.signatureVectors
@@ -121,9 +122,9 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  implicit object SparseVectorSerializer extends TypedSerializer[SparseVector] {
+  implicit object SparseVectorSerializer extends NamedSerializer[SparseVector] {
 
-    import ImplicitSerializers._
+    import StreamExtensions._
 
     def toBinary(outputStream: OutputStream, vec: SparseVector): Unit = {
       outputStream.writeInt(vec.dim)
@@ -163,9 +164,9 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  implicit object SplitStrategySerializer extends TypedSerializer[DatasetSplitStrategy] {
+  implicit object SplitStrategySerializer extends NamedSerializer[DatasetSplitStrategy] {
 
-    import ImplicitSerializers._
+    import StreamExtensions._
 
     def toBinary(stream: OutputStream, splitStrategy: DatasetSplitStrategy): Unit = {
       val tag = splitStrategy match {
@@ -186,9 +187,9 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  object RandomTreeSerializer extends TypedSerializer[RandomTree] {
+  object RandomTreeSerializer extends NamedSerializer[RandomTree] {
 
-    import ImplicitSerializers._
+    import StreamExtensions._
 
     def toBinary(outputStream: OutputStream, randomTree: RandomTree): Unit = {
       if (randomTree == null) {
@@ -263,10 +264,10 @@ object RandomTreesSerializersV2 {
     }
   }
 
-  object RandomTreesSerializer extends TypedSerializer[RandomTrees] {
+  object RandomTreesSerializer extends NamedSerializer[RandomTrees] {
 
     import ColumnHeaderSerialization._
-    import ImplicitSerializers._
+    import StreamExtensions._
 
     def toBinary(outputStream: OutputStream, randomTrees: RandomTrees): Unit = {
       DimensionalityReductionTransformSerializer.toBinary(outputStream, randomTrees.dimReductionTransform)

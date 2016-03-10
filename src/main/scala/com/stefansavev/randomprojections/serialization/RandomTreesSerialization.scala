@@ -3,7 +3,8 @@ package com.stefansavev.randomprojections.serialization
 import java.io._
 import java.nio.ByteBuffer
 
-import com.stefansavev.core.serialization.core.{IntSerializer, StringSerializer}
+import com.stefansavev.core.serialization.{StringSerializer, IntSerializer}
+import com.stefansavev.core.serialization.StringSerializer
 import com.stefansavev.randomprojections.implementation.{BucketCollectorImpl, IndexImpl, Leaf2Points, RandomTrees}
 import com.stefansavev.randomprojections.serialization.RandomTreesSerialization.BinaryFileDeserializer
 import com.stefansavev.randomprojections.serialization.RandomTreesSerializersV2.RandomTreesSerializer

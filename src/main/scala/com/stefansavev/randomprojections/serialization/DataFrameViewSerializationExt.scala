@@ -1,8 +1,7 @@
 package com.stefansavev.randomprojections.serialization
 
 import java.io.File
-
-import com.stefansavev.core.serialization.core.Utils
+import com.stefansavev.core.serialization.Utils
 import com.stefansavev.randomprojections.datarepr.dense.DataFrameView
 import com.stefansavev.randomprojections.serialization.DataFrameViewSerializers._
 
