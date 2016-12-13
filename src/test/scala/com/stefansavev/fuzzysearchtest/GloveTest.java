@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 public class GloveTest {
     static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions) {
@@ -98,8 +99,8 @@ public class GloveTest {
 
     public static void main(String[] args) throws Exception {
         //download: http://nlp.stanford.edu/data/glove.6B.zip and use the file 100d.txt
-        String inputTextFile = "C:/DownloadedData/glove/100d.txt";
-        String indexFile = "C:/tmp/output-index-glove/";
+        String inputTextFile = "/projects/random-projections-at-berlinbuzzwords/src/test/resources/glove/glove.6B.100d.txt";
+        String indexFile = "/tmp/output-index-glove-v1/";
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);

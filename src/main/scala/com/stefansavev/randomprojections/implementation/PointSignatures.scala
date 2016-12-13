@@ -131,10 +131,14 @@ class PointSignatureReference(backingDir: String, numPartitions: Int, numPoints:
           val offset = partitionId * partitionSize * numSignatures
           //println("computed offset for part " + partitionId + " " + offset + " len: " + values.length)
           System.arraycopy(values, 0, buffer2, offset, values.length)
-          for (k <- offset until (offset + values.length)) {
-            if (buffer1(k) != buffer2(k)) {
-              logger.info("Error at offset: " + (k - offset))
-              Utils.internalError()
+
+          //this is just for verification with the syncronous read
+          if (readSynchronously) {
+            for (k <- offset until (offset + values.length)) {
+              if (buffer1(k) != buffer2(k)) {
+                logger.info("Error at offset: " + (k - offset))
+                Utils.internalError()
+              }
             }
           }
           //println("completed array copy at index " + partitionId)

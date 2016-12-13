@@ -8,7 +8,7 @@ public interface VectorType {
     enum StorageSize {
         Double,
         Float,
-        TwoBytes,
+        TwoBytes, //needs testing
         SingleByte
     }
 

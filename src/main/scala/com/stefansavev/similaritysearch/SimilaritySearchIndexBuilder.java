@@ -44,6 +44,7 @@ public class SimilaritySearchIndexBuilder {
 
     public void build() {
         FuzzySearchIndexWrapper wrappedIndex = wrapper.build();
+        //we don't return the index on purpose
         //use FuzzySearchIndex.open to open the index
     }
 }

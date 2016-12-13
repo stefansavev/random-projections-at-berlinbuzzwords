@@ -144,9 +144,9 @@ public class MnistTest {
     }
 
     public static void main(String[] args) throws Exception {
-        String inputTextFile = "D:/RandomTreesData-144818512896186816/input/" + "mnist/svdpreprocessed/train.csv";
+        String inputTextFile = "/projects/random-projections-at-berlinbuzzwords/src/test/resources/mnist/preprocessed-train.csv";
         String queriesFile = inputTextFile; //same as training in this example
-        String indexFile = "C:/tmp/output-index-mnist-2/";
+        String indexFile = "/tmp/output-index-mnist/";
 
         /*
         String inputTextFile = "C:/tmp/fuzzysearch-demo/testdata/mnist/preprocessed-train.csv";
