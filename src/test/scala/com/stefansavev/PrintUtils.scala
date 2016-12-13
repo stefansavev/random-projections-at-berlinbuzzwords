@@ -7,7 +7,7 @@ import scala.io.{Codec, Source}
 object PrintUtils {
   def columnVectorToFile(fileName: String, v: Array[Double]): Unit = {
     val writer = new PrintWriter(fileName)
-    for(a <- v){
+    for (a <- v) {
       writer.println(a.toString)
     }
     writer.close()
@@ -15,7 +15,7 @@ object PrintUtils {
 
   def stringsToFile(fileName: String, v: Array[String]): Unit = {
     val writer = new PrintWriter(fileName)
-    for(a <- v){
+    for (a <- v) {
       writer.println(a)
     }
     writer.close()
@@ -29,7 +29,7 @@ object PrintUtils {
 
 }
 
-object FileReadUtils{
+object FileReadUtils {
   def withLinesIterator[T](fileName: String)(body: Iterator[String] => T): T = {
     val source = Source.fromFile(fileName)(Codec.UTF8)
     val result = body(source.getLines())

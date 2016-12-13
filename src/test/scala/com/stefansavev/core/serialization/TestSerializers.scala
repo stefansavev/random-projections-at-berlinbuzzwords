@@ -24,11 +24,11 @@ object SerializersTestUtils {
   case class BasePoint(x: Int, y: Double)
 
   class ExtendedPoint(val z: Int, x: Int, y: Double) extends BasePoint(x, y) {
-    override def toString = "ExtendedPoint" +(z, x, y)
+    override def toString = "ExtendedPoint" + (z, x, y)
   }
 
   class SuperPoint(val k: Int, x: Int, y: Double) extends ExtendedPoint(-1, x, y) {
-    override def toString = "SuperPoint" +(z, x, y)
+    override def toString = "SuperPoint" + (z, x, y)
   }
 
   implicit object ExtendedPointTag extends TypeTag[ExtendedPoint] {
@@ -242,7 +242,7 @@ class SerializersTest extends FunSuite with TemporaryFolderFixture with Matchers
 
     val allInOne = (i, b, s, li, d, f, str)
     val ser = pickSerializer(allInOne)
-    val expectedSerializerName = "tuple7(array[int], array[byte], array[short], array[long], array[double]," +
+    val expectedSerializerName = "tuple7(array[int], array[byte], array[short], array[long], array[double], " +
       "array[float], GenericArraySerializer(string))"
 
     ser.name should be(expectedSerializerName)
@@ -251,11 +251,11 @@ class SerializersTest extends FunSuite with TemporaryFolderFixture with Matchers
 
     //convert the nested arrays to string manually and then compare
     def convertTuple(t: Product): String =
-      t.productIterator.map { element => element match {
-        case a: Array[_] => a.mkString(";")
-        case _ => element.toString()
-      }
-      }.mkString(", ")
+    t.productIterator.map { element => element match {
+      case a: Array[_] => a.mkString(";")
+      case _ => element.toString()
+    }
+    }.mkString(", ")
     convertTuple(allInOne) should be(convertTuple(output))
   }
 
@@ -272,9 +272,9 @@ class SerializersTest extends FunSuite with TemporaryFolderFixture with Matchers
     val allInOne = (i, b, s, li, d, f, str)
     val ser = pickSerializer(allInOne)
     val expectedName = "tuple7(GenericArraySerializer(array[int]), GenericArraySerializer(array[byte]), " +
-                        "GenericArraySerializer(array[short]), GenericArraySerializer(array[long]), " +
-                        "GenericArraySerializer(array[double]), GenericArraySerializer(array[float]), " +
-                        "GenericArraySerializer(GenericArraySerializer(string)))"
+      "GenericArraySerializer(array[short]), GenericArraySerializer(array[long]), " +
+      "GenericArraySerializer(array[double]), GenericArraySerializer(array[float]), " +
+      "GenericArraySerializer(GenericArraySerializer(string)))"
 
     val output = roundTripInputOutput(ser, allInOne, temporaryFolder.newFile())
     def convertTuple(t: Product): String = {
@@ -285,11 +285,11 @@ class SerializersTest extends FunSuite with TemporaryFolderFixture with Matchers
       }
       }.mkString(", ") + ")"
     }
-    ser.name should be (expectedName)
+    ser.name should be(expectedName)
 
     val expectedOutput = "([[11:Integer],[12:Integer],[13:Integer]], [[1:Byte]], [[5:Short]], [[13:Long]], " +
-                          "[[1.1:Double]], [[1.5:Float]], [[a string:String]])"
-    convertTuple(output) should be (expectedOutput)
+      "[[1.1:Double]], [[1.5:Float]], [[a string:String]])"
+    convertTuple(output) should be(expectedOutput)
   }
 }
 

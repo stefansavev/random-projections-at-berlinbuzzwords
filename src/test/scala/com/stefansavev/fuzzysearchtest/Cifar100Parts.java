@@ -13,23 +13,23 @@ import java.util.List;
 import java.util.Random;
 
 public class Cifar100Parts {
-    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions){
+    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions) {
         String[] parts = line.split("\\s+");
         //System.out.println("Parts len: " + parts.length);
-        if (parts.length != 67){
+        if (parts.length != 67) {
             return null;
         }
 
-        if (parts.length != (3 + numDimensions)){
-            throw new IllegalStateException("Invalid data format. Expecting data of dimension " + numDimensions  + line);
+        if (parts.length != (3 + numDimensions)) {
+            throw new IllegalStateException("Invalid data format. Expecting data of dimension " + numDimensions + line);
         }
         String fileIndex = parts[0];
         String partId = parts[1];
         int labelId = Integer.parseInt(parts[2]);
 
         double[] vec = new double[numDimensions];
-        for(int i = 0; i < numDimensions; i ++){
-            vec[i] =  Double.parseDouble(parts[i + 1]);
+        for (int i = 0; i < numDimensions; i++) {
+            vec[i] = Double.parseDouble(parts[i + 1]);
         }
         return new SimilaritySearchItem(fileIndex + "_" + partId, labelId, vec);
 
@@ -55,7 +55,7 @@ public class Cifar100Parts {
             if (item != null) {
                 indexBuilder.addItem(item);
             }
-            lineNumber ++;
+            lineNumber++;
         }
         reader.close();
         //build the index
@@ -74,13 +74,13 @@ public class Cifar100Parts {
             SimilaritySearchItem item = itemsIterator.next();
             List<SimilaritySearchResult> results = index.search(10, item.getVector());
             resultBuilder.addResult(item.getName(), results);
-            if (!results.get(0).getName().equals(item.getName())){
+            if (!results.get(0).getName().equals(item.getName())) {
                 throw new IllegalStateException("The top result should be the query itself");
             }
-            if ((++numQueries) % 1000 == 0){
+            if ((++numQueries) % 1000 == 0) {
                 long endInterm = System.currentTimeMillis();
-                double queriesPerSec = 1000.0*numQueries/((double)(endInterm - start + 1L));
-                System.out.println("Ran " + numQueries + " queries; Queries per sec. so far.: "  + queriesPerSec);
+                double queriesPerSec = 1000.0 * numQueries / ((double) (endInterm - start + 1L));
+                System.out.println("Ran " + numQueries + " queries; Queries per sec. so far.: " + queriesPerSec);
             }
         }
         /*
@@ -103,10 +103,10 @@ public class Cifar100Parts {
         */
 
         long end = System.currentTimeMillis();
-        double timePerQuery = ((double)(end - start))/numQueries;
-        double queriesPerSec = 1000.0*numQueries/((double)(end - start + 1L));
+        double timePerQuery = ((double) (end - start)) / numQueries;
+        double queriesPerSec = 1000.0 * numQueries / ((double) (end - start + 1L));
 
-        System.out.println("Total search time in secs.: " + (((double)(end - start))/1000.0));
+        System.out.println("Total search time in secs.: " + (((double) (end - start)) / 1000.0));
         System.out.println("Num queries: " + numQueries);
         System.out.println("Time per query in ms.: " + timePerQuery);
         System.out.println("Queries per sec.: " + queriesPerSec);

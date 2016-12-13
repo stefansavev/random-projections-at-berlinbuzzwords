@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Random;
 
 public class WikipediaLSI {
-    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions){
+    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions) {
         String[] parts = line.split("\\s+");
         //if (parts.length != (numDimensions)){
         //    throw new IllegalStateException("Invalid data format. Expecting data of dimension " + numDimensions  + " such as: 'the 0.020341 0.011216 0.099383 0.102027 0.041391 -0.010218 ");
         //}
         double[] vec = new double[numDimensions];
-        for(int i = 0; i < numDimensions; i ++){
-            vec[i] =  Double.parseDouble(parts[i]);
+        for (int i = 0; i < numDimensions; i++) {
+            vec[i] = Double.parseDouble(parts[i]);
         }
 
         return new SimilaritySearchItem(Integer.toString(lineNumber), -1, vec); //ignore the label
@@ -49,14 +49,13 @@ public class WikipediaLSI {
             SimilaritySearchItem item = parseItem(lineNumber, line, dataDimension);
             if (lineNumber <= 1000000) {
                 indexBuilder.addItem(item);
-            }
-            else{
+            } else {
                 break;
             }
-            if (lineNumber % 1000 == 0){
+            if (lineNumber % 1000 == 0) {
                 System.out.println(" " + lineNumber + " docs. read");
             }
-            lineNumber ++;
+            lineNumber++;
         }
         System.out.println("#docs: " + lineNumber);
         reader.close();
@@ -77,13 +76,13 @@ public class WikipediaLSI {
             SimilaritySearchItem item = itemsIterator.next();
             List<SimilaritySearchResult> results = index.search(10, item.getVector());
             resultBuilder.addResult(item.getName(), results);
-            if (!results.get(0).getName().equals(item.getName())){
+            if (!results.get(0).getName().equals(item.getName())) {
                 throw new IllegalStateException("The top result should be the query itself");
             }
-            if ((++numQueries) % 1000 == 0){
+            if ((++numQueries) % 1000 == 0) {
                 long endInterm = System.currentTimeMillis();
-                double queriesPerSec = 1000.0*numQueries/((double)(endInterm - start + 1L));
-                System.out.println("Ran " + numQueries + " queries; Queries per sec. so far.: "  + queriesPerSec);
+                double queriesPerSec = 1000.0 * numQueries / ((double) (endInterm - start + 1L));
+                System.out.println("Ran " + numQueries + " queries; Queries per sec. so far.: " + queriesPerSec);
             }
         }
         /*
@@ -106,10 +105,10 @@ public class WikipediaLSI {
         */
 
         long end = System.currentTimeMillis();
-        double timePerQuery = ((double)(end - start))/numQueries;
-        double queriesPerSec = 1000.0*numQueries/((double)(end - start + 1L));
+        double timePerQuery = ((double) (end - start)) / numQueries;
+        double queriesPerSec = 1000.0 * numQueries / ((double) (end - start + 1L));
 
-        System.out.println("Total search time in secs.: " + (((double)(end - start))/1000.0));
+        System.out.println("Total search time in secs.: " + (((double) (end - start)) / 1000.0));
         System.out.println("Num queries: " + numQueries);
         System.out.println("Time per query in ms.: " + timePerQuery);
         System.out.println("Queries per sec.: " + queriesPerSec);
@@ -122,7 +121,7 @@ public class WikipediaLSI {
 
         buildIndex(inputTextFile, indexFile);
         //runQueriesFromIndex(indexFile);
-        System.out.println("Free memory: " + Runtime.getRuntime().freeMemory()/(1024));
+        System.out.println("Free memory: " + Runtime.getRuntime().freeMemory() / (1024));
         SimilaritySearchEvaluationUtils.compareWithBruteForce(indexFile, new Random(481868), 100, 50);
     }
 

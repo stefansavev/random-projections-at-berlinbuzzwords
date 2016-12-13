@@ -1,23 +1,23 @@
 package com.stefansavev.fuzzysearchtest;
 
-import com.stefansavev.similaritysearch.*;
 import com.stefansavev.randomprojections.actors.Application;
+import com.stefansavev.similaritysearch.*;
 import com.stefansavev.similaritysearch.implementation.VectorTypes;
-import com.typesafe.scalalogging.LazyLogging;
-import com.typesafe.scalalogging.StrictLogging;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class MnistTest{
+public class MnistTest {
 
-    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions){
+    static SimilaritySearchItem parseItem(int lineNumber, String line, int numDimensions) {
         String[] tokens = line.split(",");
         int label = Integer.parseInt(tokens[0]);
         double[] values = new double[numDimensions];
-        for(int i = 0; i < numDimensions; i ++){
+        for (int i = 0; i < numDimensions; i++) {
             values[i] = Double.parseDouble(tokens[i + 1]);
         }
         String lineNumberStr = Integer.toString(lineNumber);
@@ -30,7 +30,7 @@ public class MnistTest{
         int numTrees = 10;
         //create an indexer
         SimilaritySearchIndexBuilder indexBuilder = new SimilaritySearchIndexBuilder(outputIndexFile,
-                VectorTypes.uncorrelatedFeatures(dataDimension,VectorType.StorageSize.Double),
+                VectorTypes.uncorrelatedFeatures(dataDimension, VectorType.StorageSize.Double),
                 SimilarityIndexingEngines.fastTrees(numTrees),
                 QueryTypes.cosineSimilarity());
 
@@ -46,7 +46,7 @@ public class MnistTest{
         while ((line = reader.readLine()) != null) {
             SimilaritySearchItem item = parseItem(lineNumber, line, dataDimension);
             indexBuilder.addItem(item);
-            lineNumber ++;
+            lineNumber++;
         }
         reader.close();
 
@@ -121,23 +121,22 @@ public class MnistTest{
         while (itemsIterator.hasNext()) {
             SimilaritySearchItem item = itemsIterator.next();
             List<SimilaritySearchResult> results = index.search(10, item.getVector());
-            if (!results.get(0).getName().equals(item.getName())){
+            if (!results.get(0).getName().equals(item.getName())) {
                 throw new IllegalStateException("The top result should be the query itself");
             }
-            if (item.getLabel() == results.get(1).getLabel()){
-                agree ++;
-            }
-            else{
-                disagree ++;
+            if (item.getLabel() == results.get(1).getLabel()) {
+                agree++;
+            } else {
+                disagree++;
             }
         }
         long end = System.currentTimeMillis();
-        double accuracy = 100.0*agree/(agree + disagree);
-        int numQueries = (int)(agree + disagree);
-        double timePerQuery = ((double)(end - start))/numQueries;
-        double queriesPerSec = 1000.0*numQueries/((double)(end - start + 1L));
+        double accuracy = 100.0 * agree / (agree + disagree);
+        int numQueries = (int) (agree + disagree);
+        double timePerQuery = ((double) (end - start)) / numQueries;
+        double queriesPerSec = 1000.0 * numQueries / ((double) (end - start + 1L));
 
-        System.out.println("Total search time in secs.: " + (((double)(end - start))/1000.0));
+        System.out.println("Total search time in secs.: " + (((double) (end - start)) / 1000.0));
         System.out.println("Num queries: " + numQueries);
         System.out.println("Accuracy estimate: " + accuracy);
         System.out.println("Time per query in ms.: " + timePerQuery);
@@ -158,7 +157,7 @@ public class MnistTest{
         //runQueriesFromFile(queriesFile, indexFile);
         //runQueriesFromIndex(indexFile);
         Runtime runtime = Runtime.getRuntime();
-        int mb = 1024*1024;
+        int mb = 1024 * 1024;
         //Print used memory
         System.out.println("Before index load: Used Memory [in MB]:"
                 + (runtime.totalMemory() - runtime.freeMemory()) / mb);

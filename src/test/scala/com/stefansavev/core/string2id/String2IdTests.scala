@@ -8,8 +8,10 @@ import org.scalatest.{FlatSpec, Matchers}
 @RunWith(classOf[JUnitRunner])
 class TestDynamicString2IdHasher extends FlatSpec with Matchers {
   val table = new String2UniqueIdTable()
+
   def makeName(i: Int): String = i + "#" + i
-  for(i <- 0 until 100000){
+
+  for (i <- 0 until 100000) {
     table.addString(makeName(i))
   }
 
@@ -33,7 +35,7 @@ class String2IdHasherTester extends FlatSpec with Matchers {
       val index = h.getOrAddId(arr, 0, arr.length, true)
       if (word == "cd" || word == "p" || word == "q") {
         //cannot add
-        index should be (-2)
+        index should be(-2)
       }
     }
   }

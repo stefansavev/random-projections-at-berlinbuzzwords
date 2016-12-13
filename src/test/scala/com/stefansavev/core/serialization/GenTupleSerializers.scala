@@ -1,6 +1,6 @@
 package com.stefansavev.core.serialization
 
-object GenTupleSerializers{
+object GenTupleSerializers {
   //use this code to generate all tuple serializers
   def genTupleSerializers(n: Int): Unit = {
     val ids = Vector.range(1, n + 1)
@@ -33,7 +33,7 @@ object GenTupleSerializers{
 
     val replacements = List(
       ("%K%", n.toString),
-      ("%commaSepParams%",commaSepParams),
+      ("%commaSepParams%", commaSepParams),
       ("%toBinaryStr%", toBinaryStr),
       ("%fromBinaryStr%", fromBinaryStr),
       ("%outputParams%", outputParams),
@@ -41,20 +41,20 @@ object GenTupleSerializers{
       ("%serParams%", serParams)
     )
 
-    for((pattern, value) <- replacements){
+    for ((pattern, value) <- replacements) {
       code = code.replaceAll(pattern, value)
     }
     println(code)
   }
 
-  def main (args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {
     println("package com.stefansavev.core.serialization.core\n")
 
     println("import java.io._\n")
 
     println("object TupleSerializers {")
 
-    for(i <- 2 until 15){
+    for (i <- 2 until 15) {
       genTupleSerializers(i)
       println("    //---------------------------------------------------------")
     }
