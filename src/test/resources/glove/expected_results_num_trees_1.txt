@@ -1,0 +1,84 @@
+----------------------
+query: java
+java: java 1.0
+java: platform 0.41202640624800424
+java: platforms 0.39898772866165666
+java: matsu 0.3946767608209779
+java: shetland 0.3857490941559544
+java: batam 0.37338714266775164
+java: mandarin 0.37090880770262613
+java: lanyu 0.3281397439156103
+java: pilipinas 0.31276056458125434
+java: 8-bit 0.2673285884610813
+----------------------
+query: scala
+scala: scala 1.0
+scala: tosca 0.4816008872517612
+scala: biblioteca 0.46419566824188097
+scala: ballet 0.4578351659942257
+scala: accademia 0.4506582345150615
+scala: conservatory 0.4500913293255274
+scala: romana 0.4102917774938396
+scala: centrale 0.4087958040972307
+scala: museo 0.39989033746317104
+scala: nazionale 0.39871997900962075
+----------------------
+query: c++
+c++: c++ 1.0
+c++: compiler 0.7526918763377063
+c++: fortran 0.729840646550826
+c++: javascript 0.6958026237810975
+c++: object-oriented 0.6663514906760801
+c++: runtime 0.5957295809711478
+c++: codice_1 0.5857099177093644
+c++: interface 0.5723644431488932
+c++: debugger 0.5444898767324591
+c++: matlab 0.5381417104832298
+----------------------
+query: berlin
+berlin: berlin 1.0
+berlin: munich 0.8067099661783561
+berlin: vienna 0.794233193381004
+berlin: prague 0.7246278118266953
+berlin: cologne 0.7121577110633157
+berlin: leipzig 0.6786375400279053
+berlin: heidelberg 0.5943222281489476
+berlin: hanover 0.5874121952432542
+berlin: nuremberg 0.5647709769453099
+berlin: potsdam 0.5635360300984174
+----------------------
+query: london
+london: london 1.0
+london: york 0.6945249319623287
+london: bbc 0.5386386105345866
+london: offices 0.5288098194238909
+london: press 0.49097643844062355
+london: metro 0.4851911639192802
+london: telegraph 0.4715353467402361
+london: news 0.4370070056041023
+london: newspaper 0.4279174271707934
+london: jerusalem 0.418660492977882
+----------------------
+query: germany
+germany: germany 1.0
+germany: europe 0.7593437235400956
+germany: netherlands 0.7447889863268574
+germany: turkey 0.5528969566392401
+germany: ireland 0.5407751487729455
+germany: swedish 0.520853516522942
+germany: biggest 0.5112921203503611
+germany: defending 0.4927234800291648
+germany: result 0.49087557292508066
+germany: draw 0.4863860327601136
+----------------------
+query: microsoft
+microsoft: microsoft 1.0
+microsoft: google 0.8104098502002781
+microsoft: yahoo 0.7737911235365997
+microsoft: aol 0.7413646896084234
+microsoft: msn 0.6389302403071668
+microsoft: ebay 0.5933121224080717
+microsoft: unix 0.5508077315517725
+microsoft: acquisition 0.5359035789684902
+microsoft: comcast 0.5289013850091397
+microsoft: amazon 0.5061266006628165
