@@ -1,9 +1,10 @@
 .gradle/
-build/*
+target/
+build/
 */build/*
 projectFilesBackup/
 out/
 *.iml
 *.ipr
 *.iws
-artifacts/*
+artifacts/
