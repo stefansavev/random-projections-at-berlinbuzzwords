@@ -38,7 +38,7 @@ for all data points in datasets of sizes up to half a million data points.
 dense vectors. The remaining 1 result can be found by increasing the number of trees, essentially giving more computational time and memory to the library.
 
 
-#Usage
+# Usage
 
 There is a sample projection using this library at https://github.com/stefansavev/fuzzysearch-demo
 
@@ -60,7 +60,7 @@ There is a sample projection using this library at https://github.com/stefansave
 * RESTful API
  
 
-#API
+# API
 
 ### Indexing (in batch mode)
 
