@@ -50,7 +50,7 @@ There is a sample projection using this library at https://github.com/stefansave
 * integration with Elasticsearch: index and search dense vectors in Elasticsearch together with other fields
 * reduced index size
 * integration with learning algorithms. If your data is labeled, you can levarage the labels to improved your search
-* integration with vizualization algorithms. Big high dimensional data can be successfully vizualized with the t-SNA algorithm
+* integration with vizualization algorithms. Big high dimensional data can be successfully vizualized with the t-SNE algorithm
 * let the system guide your search with 20 questions. How do you search if you don't know where to start. We implement an algorithm that asks you questions and based on the answers navigates a high-dimensional space. This is useful when you don't know how to express your search query.
 * both exact keyword search and semantic search on the same platform. Integrate multiple filters such as time, location and sparse signals such as keywords
 * integrate with sparse data
@@ -62,7 +62,7 @@ There is a sample projection using this library at https://github.com/stefansave
 
 #API
 
-###Indexing (in batch mode)
+### Indexing (in batch mode)
 
 ```java
 int dataDimension = 100;
@@ -86,7 +86,7 @@ FuzzySearchIndex index = indexBuilder.build();
 index.save(outputIndexFile);
 ```
 
-###Queries (Search)
+### Queries (Search)
 
 ```java
 //load the index
