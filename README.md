@@ -21,7 +21,7 @@ The original search algorithm and API was based on [Spotify Annoy](https://githu
 
 Technical information is available at:
 
-http://stefansavev.com/randomtrees/
+https://stefansavev.github.io/randomtrees/
 
 This library implements a fast and scalable fuzzy search of dense vectors (as opposed to exact search of sparse vectors) using the cosine similarity between the vectors. The library improves the speed of search up to 10 times compared to the
 obvious brute force approach. With this library it is practical to compute all nearest neighbors
